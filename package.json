@@ -1,0 +1,38 @@
+{
+  "name": "lanyard",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "nuxi typecheck"
+  },
+  "dependencies": {
+    "@nuxt/test-utils": "^3.23.0",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@pinia/nuxt": "^0.11.3",
+    "@supabase/ssr": "^0.12.4",
+    "@supabase/supabase-js": "^2.112.2",
+    "@typescript-eslint/eslint-plugin": "^8.66.0",
+    "@typescript-eslint/parser": "^8.66.0",
+    "@vue/eslint-config-typescript": "^14.9.0",
+    "eslint": "^10.8.0",
+    "eslint-plugin-vue": "^10.10.0",
+    "nuxt": "^3.21.11",
+    "vitest": "^3.2.7",
+    "vue-tsc": "^3.3.9"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@nuxt/eslint": "^1.17.0",
+    "@nuxt/eslint-config": "^1.17.0",
+    "@types/node": "^26.1.2",
+    "typescript": "~5.9"
+  }
+}

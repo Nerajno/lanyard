@@ -1,0 +1,25 @@
+# Secrets — never commit. See .env.example for the required keys.
+.env
+.env.local
+.env.*.local
+supabase/.env
+
+# Deps & build
+node_modules/
+.nuxt/
+.output/
+dist/
+.vercel/
+.netlify/
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Test & tooling
+coverage/
+*.log
+.DS_Store
+
+# Claude Code — machine-local overrides only; .claude/settings.json IS committed
+.claude/settings.local.json
