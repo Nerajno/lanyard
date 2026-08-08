@@ -2,6 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --canvas: 13 21 32;
+  --paper: 247 246 242;
+  --sunken: 242 241 236;
+  --surface: 255 255 255;
+  --ink: 23 25 31;
+  --ink-2: 74 76 84;
+  --muted: 113 116 125;
+  --faint: 154 157 165;
+  --line: 231 229 223;
+  --navy: 18 36 63;
+  --coral: 232 80 58;
+  --coral-press: 200 62 41;
+  --coral-soft: 251 230 225;
+  --fresh: 15 157 143;
+  --fresh-soft: 230 245 242;
+  --warm: 232 161 58;
+  --warm-soft: 251 240 220;
+  --due: 232 80 58;
+  --due-soft: 251 230 225;
+  --graduated: 11 110 100;
+  --bubble: 233 234 237;
+  --bubble-ink: 28 30 36;
+}
+
+[data-theme='dark'] {
+  --paper: 21 23 28;
+  --sunken: 17 19 24;
+  --surface: 29 32 39;
+  --line: 44 47 55;
+  --ink: 236 237 239;
+  --ink-2: 185 188 196;
+  --muted: 138 141 150;
+  --faint: 102 105 115;
+  --navy: 22 39 63;
+  --coral: 238 90 66;
+  --coral-press: 216 70 46;
+  --coral-soft: 58 33 28;
+  --fresh: 22 179 163;
+  --fresh-soft: 20 49 46;
+  --warm: 240 176 84;
+  --warm-soft: 58 46 23;
+  --due: 238 90 66;
+  --due-soft: 58 33 28;
+  --graduated: 27 145 132;
+  --bubble: 42 45 52;
+  --bubble-ink: 230 232 238;
+}
+
 html {
   @apply antialiased;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: rgb(var(--paper));
+  color: rgb(var(--ink));
+  transition: background-color 0.35s, color 0.35s;
+}
+
+:focus-visible {
+  outline: 2.5px solid rgb(var(--coral));
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition: none !important;
+  }
 }
