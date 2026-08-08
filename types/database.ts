@@ -2,6 +2,8 @@
 // Mirrors supabase/migrations/0001_initial_schema.sql. Keep in sync with the schema.
 // (When a real Supabase project is wired, regenerate with `npx supabase gen types typescript`.)
 
+import type { Ladder } from './index'
+
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export interface Database {
@@ -44,9 +46,10 @@ export interface Database {
           how_met: string
           email: string | null
           phone: string | null
-          cadence_ladder: number[]
+          cadence_ladder: Ladder
           touchpoints_done: number
           follow_up_by: string
+          remind_at: string | null
           status: 'active' | 'graduated' | 'archived'
           created_at: string
           updated_at: string
@@ -58,9 +61,10 @@ export interface Database {
           how_met: string
           email?: string | null
           phone?: string | null
-          cadence_ladder?: number[]
+          cadence_ladder?: Ladder
           touchpoints_done?: number
           follow_up_by: string
+          remind_at?: string | null
           status?: 'active' | 'graduated' | 'archived'
         }
         Update: Partial<Database['public']['Tables']['contacts']['Insert']>

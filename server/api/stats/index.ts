@@ -2,6 +2,7 @@
 // completion funnel. Reads from nudges/contacts via the service-role client but
 // scoped to the signed-in user (JWT), so it never leaks another user's rows.
 import type { H3Event } from 'h3'
+import type { Ladder } from '~/types'
 import { useSupabaseAdmin } from '~/server/utils/supabaseAdmin'
 
 export default defineEventHandler(async (event) => {
@@ -13,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const { data: contacts } = await admin.from('contacts').select('status, touchpoints_done, cadence_ladder').eq('user_id', user.id)
 
   const nudgeRows = (nudges ?? []) as { sent_at: string; acted_at: string | null }[]
-  const contactRows = (contacts ?? []) as { status: string; touchpoints_done: number; cadence_ladder: number[] }[]
+  const contactRows = (contacts ?? []) as { status: string; touchpoints_done: number; cadence_ladder: Ladder }[]
 
   const acted = nudgeRows.filter((n) => n.acted_at)
 

@@ -14,10 +14,14 @@ export type UpdateProfile = GeneratedDatabase['public']['Tables']['profiles']['U
 
 export type ContactStatus = Contact['status']
 
-export const LADDER_PRESETS: Record<'warm' | 'default' | 'slow', number[]> = {
-  warm: [1, 7, 21],
-  default: [2, 14, 45],
-  slow: [7, 30, 90],
+export type LadderUnit = 'min' | 'hour' | 'day'
+export type LadderRung = { value: number; unit: LadderUnit }
+export type Ladder = LadderRung[]
+
+export const LADDER_PRESETS: Record<'warm' | 'default' | 'slow', Ladder> = {
+  warm: [{ value: 1, unit: 'day' }, { value: 7, unit: 'day' }, { value: 21, unit: 'day' }],
+  default: [{ value: 2, unit: 'day' }, { value: 14, unit: 'day' }, { value: 45, unit: 'day' }],
+  slow: [{ value: 7, unit: 'day' }, { value: 30, unit: 'day' }, { value: 90, unit: 'day' }],
 }
 
 export const LADDER_NAMES = Object.keys(LADDER_PRESETS) as (keyof typeof LADDER_PRESETS)[]
