@@ -36,6 +36,20 @@
         <button class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50" @click="$emit('archive', contact)">
           Archive
         </button>
+        <button class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50" @click="showRemind = !showRemind">
+          Nudge me later
+        </button>
+        <div v-if="showRemind" class="mt-2 flex flex-wrap items-center gap-2 rounded-lg bg-slate-100 p-2">
+          <button
+            v-for="opt in remindOptions"
+            :key="opt.label"
+            type="button"
+            class="rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs hover:bg-slate-200"
+            @click="$emit('remind', opt.rung)"
+          >
+            {{ opt.label }}
+          </button>
+        </div>
       </template>
       <button v-if="contact.status !== 'graduated'" class="rounded-lg px-3 py-1.5 text-xs text-red-600 hover:bg-red-50" @click="$emit('delete', contact)">
         Delete
@@ -49,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Contact } from '~/types'
+import type { Contact, LadderRung } from '~/types'
 import { coffeeProgress, daysUntil, urgencyOf } from '~/utils/cadence'
 import type { Urgency } from '~/utils/cadence'
 
@@ -59,6 +73,7 @@ defineEmits<{
   snooze: [contact: Contact]
   archive: [contact: Contact]
   delete: [contact: Contact]
+  remind: [rung: LadderRung]
 }>()
 
 const coffee = computed(() => coffeeProgress(props.contact.cadence_ladder, props.contact.touchpoints_done))
@@ -74,6 +89,15 @@ const urgencyLabel = computed(() => {
 })
 
 const isOverdue = computed(() => urgency.value === 'due' && daysUntil(props.contact.follow_up_by) < 0)
+
+const showRemind = ref(false)
+
+const remindOptions: { label: string; rung: LadderRung }[] = [
+  { label: '15 min', rung: { value: 15, unit: 'min' } },
+  { label: '1 hr', rung: { value: 1, unit: 'hour' } },
+  { label: '4 hr', rung: { value: 4, unit: 'hour' } },
+  { label: '1 day', rung: { value: 1, unit: 'day' } },
+]
 
 const urgencyClasses = computed(() => {
   switch (urgency.value) {
