@@ -1,9 +1,9 @@
 <template>
   <div class="mx-auto max-w-xl">
-    <h1 class="text-2xl font-bold">Add a contact</h1>
-    <p class="mt-1 text-sm text-slate-500">Who you met, where you met, and a way to reach them.</p>
+    <h1 class="font-display text-3xl font-extrabold tracking-[-0.03em]">Add a contact</h1>
+    <p class="mt-1 text-sm text-muted">Who you met, where you met, and a way to reach them.</p>
 
-    <p v-if="error" class="mt-4 text-sm text-red-600">{{ error }}</p>
+    <p v-if="error" class="mt-4 text-sm text-coral">{{ error }}</p>
     <div class="mt-6">
       <ContactForm submit-label="Save contact" @submit="onSubmit" />
     </div>

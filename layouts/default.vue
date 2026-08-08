@@ -1,18 +1,18 @@
 <template>
-  <div class="min-h-screen bg-slate-50 text-slate-900">
-    <header class="border-b border-slate-200 bg-white">
+  <div class="min-h-screen bg-paper text-ink">
+    <header class="border-b border-line bg-surface">
       <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
-        <NuxtLink to="/" class="text-lg font-semibold tracking-tight">Lanyard</NuxtLink>
-        <nav class="flex items-center gap-4 text-sm">
-          <NuxtLink to="/contacts" class="text-slate-600 hover:text-slate-900">Contacts</NuxtLink>
-          <NuxtLink to="/add" class="text-slate-600 hover:text-slate-900">Add</NuxtLink>
-          <NuxtLink to="/settings" class="text-slate-600 hover:text-slate-900">Settings</NuxtLink>
-          <NuxtLink to="/stats" class="text-slate-600 hover:text-slate-900">Stats</NuxtLink>
+        <BrandMark />
+        <nav class="flex items-center gap-6 text-sm">
+          <NuxtLink to="/contacts" class="font-mono text-xs uppercase tracking-eyebrow text-muted transition hover:text-coral">Contacts</NuxtLink>
+          <NuxtLink to="/add" class="font-mono text-xs uppercase tracking-eyebrow text-muted transition-colors hover:text-coral">Add</NuxtLink>
+          <NuxtLink to="/settings" class="font-mono text-xs uppercase tracking-eyebrow text-muted transition-colors hover:text-coral">Settings</NuxtLink>
+          <NuxtLink to="/stats" class="font-mono text-xs uppercase tracking-eyebrow text-muted transition-colors hover:text-coral">Stats</NuxtLink>
           <template v-if="user">
-            <span class="text-slate-400">{{ user.email }}</span>
-            <button class="text-slate-600 hover:text-slate-900" @click="signOut">Sign out</button>
+            <span class="hidden font-mono text-xs text-muted sm:inline">{{ user.email }}</span>
+            <button class="font-mono text-xs uppercase tracking-eyebrow text-muted hover:text-coral" @click="signOut">Sign out</button>
           </template>
-          <NuxtLink v-else to="/login" class="text-slate-600 hover:text-slate-900">Sign in</NuxtLink>
+          <NuxtLink v-else to="/login" class="font-mono text-xs uppercase tracking-eyebrow text-muted hover:text-coral">Sign in</NuxtLink>
         </nav>
       </div>
     </header>

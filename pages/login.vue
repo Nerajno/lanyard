@@ -1,29 +1,29 @@
 <template>
   <div class="mx-auto max-w-sm">
-    <h1 class="text-2xl font-bold">Sign in</h1>
-    <p class="mt-1 text-sm text-slate-500">We email you a magic link — no password to remember.</p>
+    <h1 class="font-display text-3xl font-extrabold tracking-[-0.03em]">Sign in</h1>
+    <p class="mt-1 text-sm text-muted">We email you a magic link — no password to remember.</p>
 
     <form class="mt-6 space-y-4" @submit.prevent="send">
       <div>
-        <label class="text-sm font-medium" for="email">Email</label>
+        <label class="text-sm font-medium text-ink" for="email">Email</label>
         <input
           id="email"
           v-model="email"
           type="email"
           required
           autocomplete="email"
-          class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+          class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none"
           placeholder="you@example.com"
         >
       </div>
 
-      <p v-if="sent" class="text-sm text-emerald-700">Check your inbox for the sign-in link.</p>
-      <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+      <p v-if="sent" class="text-sm text-graduated">Check your inbox for the sign-in link.</p>
+      <p v-if="error" class="text-sm text-coral">{{ error }}</p>
 
       <button
         type="submit"
         :disabled="sending"
-        class="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+        class="w-full rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-hover disabled:opacity-50"
       >
         {{ sending ? 'Sending…' : 'Send magic link' }}
       </button>
