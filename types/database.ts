@@ -15,7 +15,8 @@ export interface Database {
           phone_verified_at: string | null
           nudge_channel: 'sms' | 'email' | 'both'
           timezone: string
-          quiet_hours: [number, number] | null
+          quiet_hours_start: number
+          quiet_hours_end: number
           sms_opt_in_at: string | null
           sms_opted_out_at: string | null
           created_at: string
@@ -28,7 +29,8 @@ export interface Database {
           phone_verified_at?: string | null
           nudge_channel?: 'sms' | 'email' | 'both'
           timezone?: string
-          quiet_hours?: [number, number] | null
+          quiet_hours_start?: number
+          quiet_hours_end?: number
           sms_opt_in_at?: string | null
           sms_opted_out_at?: string | null
         }

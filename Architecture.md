@@ -19,7 +19,8 @@
 | email | text | mirrored from auth.users |
 | nudge_channel | text | `sms` \| `email` \| `both` |
 | timezone | text | IANA, e.g. `America/New_York` |
-| quiet_hours | int4range | local hours to suppress sends |
+| quiet_hours_start | smallint | local hour (0-23) quiet window start, default 21 |
+| quiet_hours_end | smallint | local hour (0-23) quiet window end, default 9; wrap = next day |
 | sms_opt_in_at | timestamptz | required before any SMS |
 | sms_opted_out_at | timestamptz | set by STOP webhook; hard block on sends |
 
