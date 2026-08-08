@@ -1,38 +1,69 @@
 import { createBrowserClient, createServerClient } from '@supabase/ssr'
 import type { CookieOptions } from '@supabase/ssr'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
-
-
-let client: SupabaseClient | null = null
+import { getRequestHeader, setCookie } from 'h3'
 
 /**
- * Singleton Supabase client. Only construct once per runtime (server or browser);
- * @supabase/ssr keeps the session cookie in sync for us.
+ * The browser client is a true singleton — one tab, one session.
  */
-export function getSupabaseClient(): SupabaseClient {
-  if (client) return client
+let browserClient: SupabaseClient | null = null
 
+/**
+ * Server clients are per-request, never global: a module-level cache would let
+ * one request read and write another request's auth cookies. Keyed on the Nuxt
+ * app instance (one per SSR request) and weakly held so it dies with it.
+ */
+const serverClients = new WeakMap<object, SupabaseClient>()
+
+export function getSupabaseClient(): SupabaseClient {
   const { public: { supabaseUrl, supabaseAnonKey } } = useRuntimeConfig()
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('SUPABASE_URL and SUPABASE_ANON_KEY must be set (see .env.example)')
+    throw new Error('NUXT_PUBLIC_SUPABASE_URL and NUXT_PUBLIC_SUPABASE_ANON_KEY must be set (see .env.example)')
   }
 
-  if (import.meta.server) {
-    client = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() {
-          return parseCookieHeader(getCookieHeader())
-        },
-        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-          setCookieHeader(cookiesToSet)
-        },
+  if (import.meta.client) {
+    browserClient ??= createBrowserClient(supabaseUrl, supabaseAnonKey)
+    return browserClient
+  }
+
+  const nuxtApp = useNuxtApp()
+  const cached = serverClients.get(nuxtApp)
+  if (cached) return cached
+
+  // Resolve the event NOW, while a Nuxt instance is guaranteed. Supabase calls
+  // the cookie handlers below lazily from deep inside its async session code,
+  // where useRequestEvent()/useRequestHeaders() would throw.
+  const event = useRequestEvent()
+
+  // Mutable jar seeded from the request. setAll writes back into it so a later
+  // getAll sees cookies this request already set, rather than a stale snapshot.
+  const jar = new Map<string, string>()
+  for (const { name, value } of parseCookieHeader(event ? getRequestHeader(event, 'cookie') ?? null : null)) {
+    jar.set(name, value)
+  }
+
+  const client = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return [...jar].map(([name, value]) => ({ name, value }))
       },
-    })
-  } else {
-    client = createBrowserClient(supabaseUrl, supabaseAnonKey)
-  }
+      setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
+        for (const { name, value, options } of cookiesToSet) {
+          jar.set(name, value)
+          if (!event) continue
+          setCookie(event, name, value, {
+            maxAge: options.maxAge,
+            httpOnly: options.httpOnly,
+            secure: options.secure,
+            sameSite: options.sameSite,
+          })
+        }
+      },
+    },
+  })
 
+  serverClients.set(nuxtApp, client)
   return client
 }
 
@@ -51,21 +82,4 @@ function parseCookieHeader(header: string | null): { name: string; value: string
     const [name, ...rest] = part.trim().split('=')
     return { name, value: rest.join('=') }
   })
-}
-
-function getCookieHeader(): string | null {
-  return useRequestHeaders(['cookie']).cookie ?? null
-}
-
-function setCookieHeader(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-  const event = useRequestEvent()
-  if (!event) return
-  for (const cookie of cookiesToSet) {
-    setCookie(event, cookie.name, cookie.value, {
-      maxAge: cookie.options.maxAge,
-      httpOnly: cookie.options.httpOnly,
-      secure: cookie.options.secure,
-      sameSite: cookie.options.sameSite,
-    })
-  }
 }
