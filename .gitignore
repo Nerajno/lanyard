@@ -23,3 +23,4 @@ coverage/
 
 # Claude Code — machine-local overrides only; .claude/settings.json IS committed
 .claude/settings.local.json
+.worktrees
