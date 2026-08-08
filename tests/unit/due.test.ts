@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { computeDue, hasSubDayDue, splitSubDay } from '~/utils/due'
+import { computeDue, hasSubDayDue, splitSubDay, shouldDeliverForUser } from '~/utils/due'
 import type { DueContact } from '~/utils/due'
 import { TODAY, fixtureContacts } from '../fixtures/due'
 
@@ -42,5 +42,21 @@ describe('hasSubDayDue / splitSubDay', () => {
     ])
     expect(subDay.map((c) => c.id)).toEqual(['a'])
     expect(day.map((c) => c.id)).toEqual(['b'])
+  })
+})
+
+describe('shouldDeliverForUser — daily-cap bypass', () => {
+  it('allows delivery normally', () => {
+    expect(shouldDeliverForUser(false, [{ id: 'x', follow_up_by: '2026-08-01T00:00:00Z', status: 'active', unitHint: 'day' }])).toBe(true)
+  })
+  it('suppresses day deliver after send', () => {
+    const day: DueContact[] = [{ id: 'x', follow_up_by: '2026-08-01T00:00:00Z', status: 'active', unitHint: 'day' }]
+    expect(shouldDeliverForUser(true, day)).toBe(false)
+  })
+  it('bypasses cap for sub-day/remind after send', () => {
+    const sub: DueContact[] = [{ id: 'x', follow_up_by: '2026-08-01T00:00:00Z', status: 'active', unitHint: 'hour' }]
+    expect(shouldDeliverForUser(true, sub)).toBe(true)
+    const remind: DueContact[] = [{ id: 'y', follow_up_by: '2026-09-01T00:00:00Z', status: 'active', remind_at: '2026-08-01T00:00:00Z', unitHint: 'day' }]
+    expect(shouldDeliverForUser(true, remind)).toBe(true)
   })
 })

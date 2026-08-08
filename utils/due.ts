@@ -35,6 +35,12 @@ export function hasSubDayDue(due: DueContact[]): boolean {
   return due.some((c) => c.remind_at != null || (c.unitHint ?? 'day') !== 'day')
 }
 
+/** True only when we must deliver despite the daily cap (sub-day due present). */
+export function shouldDeliverForUser(alreadySentToday: boolean, due: DueContact[]): boolean {
+  if (!alreadySentToday) return true
+  return hasSubDayDue(due)
+}
+
 /** Split due contacts into sub-day (bypass cap) vs day (respect cap). */
 export function splitSubDay(due: DueContact[]): { subDay: DueContact[]; day: DueContact[] } {
   const subDay = due.filter((c) => c.remind_at != null || (c.unitHint ?? 'day') !== 'day')
