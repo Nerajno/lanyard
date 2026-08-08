@@ -18,7 +18,7 @@
     <footer class="mt-3 flex flex-wrap items-center gap-2">
       <template v-if="contact.status === 'active'">
         <button
-          class="rounded-lg bg-coral px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-coral-hover"
+          class="rounded-lg bg-coral px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-coral-press"
           @click="$emit('follow-up', contact)"
         >
           Follow up

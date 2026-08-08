@@ -95,7 +95,7 @@
     <button
       type="submit"
       :disabled="submitting || !valid"
-      class="rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-hover disabled:cursor-not-allowed disabled:opacity-50"
+      class="rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:cursor-not-allowed disabled:opacity-50"
     >
       {{ submitting ? 'Saving…' : submitLabel }}
     </button>

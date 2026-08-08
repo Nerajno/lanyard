@@ -23,7 +23,7 @@
       <button
         type="submit"
         :disabled="sending"
-        class="w-full rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-hover disabled:opacity-50"
+        class="w-full rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:opacity-50"
       >
         {{ sending ? 'Sending…' : 'Send magic link' }}
       </button>

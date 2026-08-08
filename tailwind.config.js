@@ -11,22 +11,38 @@ export default {
   theme: {
     extend: {
       colors: {
-        canvas: '#0D1520',
-        paper: '#F7F6F2',
-        surface: '#FFFFFF',
-        ink: '#17191F',
-        muted: '#71747D',
-        line: '#E7E5DF',
-        navy: '#12243F',
+        canvas: 'rgb(var(--canvas) / <alpha-value>)',
+        paper: 'rgb(var(--paper) / <alpha-value>)',
+        sunken: 'rgb(var(--sunken) / <alpha-value>)',
+        surface: 'rgb(var(--surface) / <alpha-value>)',
+        ink: 'rgb(var(--ink) / <alpha-value>)',
+        'ink-2': 'rgb(var(--ink-2) / <alpha-value>)',
+        muted: 'rgb(var(--muted) / <alpha-value>)',
+        faint: 'rgb(var(--faint) / <alpha-value>)',
+        line: 'rgb(var(--line) / <alpha-value>)',
+        navy: 'rgb(var(--navy) / <alpha-value>)',
         coral: {
-          DEFAULT: '#E8503A',
-          hover: '#D4432F',
-          soft: '#FBE5E0',
+          DEFAULT: 'rgb(var(--coral) / <alpha-value>)',
+          press: 'rgb(var(--coral-press) / <alpha-value>)',
+          soft: 'rgb(var(--coral-soft) / <alpha-value>)',
         },
-        fresh: '#0F9D8F',
-        warm: '#E8A13A',
-        due: '#E8503A',
-        graduated: '#0B6E64',
+        fresh: {
+          DEFAULT: 'rgb(var(--fresh) / <alpha-value>)',
+          soft: 'rgb(var(--fresh-soft) / <alpha-value>)',
+        },
+        warm: {
+          DEFAULT: 'rgb(var(--warm) / <alpha-value>)',
+          soft: 'rgb(var(--warm-soft) / <alpha-value>)',
+        },
+        due: {
+          DEFAULT: 'rgb(var(--due) / <alpha-value>)',
+          soft: 'rgb(var(--due-soft) / <alpha-value>)',
+        },
+        graduated: {
+          DEFAULT: 'rgb(var(--graduated) / <alpha-value>)',
+        },
+        bubble: 'rgb(var(--bubble) / <alpha-value>)',
+        'bubble-ink': 'rgb(var(--bubble-ink) / <alpha-value>)',
       },
       fontFamily: {
         display: ['"Bricolage Grotesque"', 'Inter', 'system-ui', 'sans-serif'],

@@ -13,6 +13,13 @@
             <button class="font-mono text-xs uppercase tracking-eyebrow text-muted hover:text-coral" @click="signOut">Sign out</button>
           </template>
           <NuxtLink v-else to="/login" class="font-mono text-xs uppercase tracking-eyebrow text-muted hover:text-coral">Sign in</NuxtLink>
+          <button
+            class="border-line bg-surface text-ink hover:border-coral flex h-8 w-8 items-center justify-center rounded-full border text-sm"
+            :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+            @click="toggleTheme"
+          >
+            {{ isDark ? '☀' : '☾' }}
+          </button>
         </nav>
       </div>
     </header>
@@ -28,6 +35,7 @@ import { useAuthStore } from '~/stores/auth'
 
 const auth = useAuthStore()
 const { user } = storeToRefs(auth)
+const { isDark, toggle: toggleTheme } = useTheme()
 
 async function signOut() {
   await auth.signOut()
