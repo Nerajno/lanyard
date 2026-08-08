@@ -16,6 +16,16 @@
       "type": "local",
       "command": ["npx", "-y", "@upstash/context7-mcp"],
       "enabled": true
+    },
+    "netlify": {
+      "type": "local",
+      "command": ["npx", "-y", "@netlify/mcp"],
+      "enabled": true
+    },
+    "supabase": {
+      "type": "remote",
+      "url": "https://mcp.supabase.com/mcp",
+      "enabled": true
     }
   }
 }

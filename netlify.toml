@@ -1,0 +1,6 @@
+# Netlify auto-detects the Nuxt build, so no [build] block here — overriding it
+# would replace the working Nitro netlify preset with a static publish.
+
+# Hourly trigger for the nudge loop (see README → Deploy → Netlify).
+[functions."nudge-cron"]
+  schedule = "@hourly"
