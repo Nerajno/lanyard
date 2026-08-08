@@ -1,33 +1,33 @@
 <template>
   <div class="mx-auto max-w-xl">
-    <h1 class="text-2xl font-bold">Your loop, so far</h1>
-    <p class="mt-1 text-sm text-slate-500">Measured from the <code>nudges</code> table — not self-report.</p>
+    <h1 class="font-display text-3xl font-extrabold tracking-[-0.03em]">Your loop, so far</h1>
+    <p class="mt-1 text-sm text-muted">Measured from the <code class="font-mono">nudges</code> table — not self-report.</p>
 
-    <p v-if="error" class="mt-4 text-sm text-red-600">{{ error }}</p>
+    <p v-if="error" class="mt-4 text-sm text-coral">{{ error }}</p>
 
-    <div v-if="loading" class="mt-8 text-sm text-slate-500">Crunching numbers…</div>
+    <div v-if="loading" class="mt-8 text-sm text-muted">Crunching numbers…</div>
 
     <template v-else-if="stats">
       <section class="mt-8">
-        <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-400">The one metric</h2>
-        <div class="mt-3 rounded-xl border border-slate-200 bg-white p-5">
-          <p class="text-4xl font-bold tracking-tight">{{ formatMinutes(stats.nudges.medianLatencyMinutes) }}</p>
-          <p class="mt-1 text-sm text-slate-500">median nudge → act time</p>
+        <h2 class="font-mono text-xs uppercase tracking-eyebrow text-muted">The one metric</h2>
+        <div class="mt-3 rounded-xl border border-line bg-surface p-5">
+          <p class="font-display text-4xl font-extrabold tracking-[-0.03em]">{{ formatMinutes(stats.nudges.medianLatencyMinutes) }}</p>
+          <p class="mt-1 font-mono text-xs text-muted">median nudge → act time</p>
         </div>
       </section>
 
       <section class="mt-8 grid gap-4 sm:grid-cols-2">
-        <div class="rounded-xl border border-slate-200 bg-white p-5">
-          <p class="text-3xl font-semibold">{{ stats.nudges.actedOnPercent }}%</p>
-          <p class="mt-1 text-sm text-slate-500">nudges acted on ({{ stats.nudges.actedOn }} / {{ stats.nudges.total }})</p>
+        <div class="rounded-xl border border-line bg-surface p-5">
+          <p class="font-display text-3xl font-extrabold tracking-[-0.03em]">{{ stats.nudges.actedOnPercent }}%</p>
+          <p class="mt-1 font-mono text-xs text-muted">nudges acted on ({{ stats.nudges.actedOn }} / {{ stats.nudges.total }})</p>
         </div>
-        <div class="rounded-xl border border-slate-200 bg-white p-5">
-          <p class="text-3xl font-semibold">{{ stats.contacts.graduatedPercent }}%</p>
-          <p class="mt-1 text-sm text-slate-500">contacts reached all three coffees ({{ stats.contacts.graduated }} / {{ stats.contacts.total }})</p>
+        <div class="rounded-xl border border-line bg-surface p-5">
+          <p class="font-display text-3xl font-extrabold tracking-[-0.03em]">{{ stats.contacts.graduatedPercent }}%</p>
+          <p class="mt-1 font-mono text-xs text-muted">contacts reached all three coffees ({{ stats.contacts.graduated }} / {{ stats.contacts.total }})</p>
         </div>
       </section>
 
-      <p v-if="stats.nudges.total === 0" class="mt-6 text-sm text-slate-500">
+      <p v-if="stats.nudges.total === 0" class="mt-6 text-sm text-muted">
         No nudges sent yet. The first hourly pass after your next event fills this in.
       </p>
     </template>

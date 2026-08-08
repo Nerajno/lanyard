@@ -1,64 +1,56 @@
 <template>
-  <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+  <article class="rounded-xl border border-line bg-surface p-4 shadow-sm">
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
-        <h3 class="truncate font-semibold text-slate-900">{{ contact.name }}</h3>
-        <p class="mt-0.5 line-clamp-2 text-sm text-slate-500">{{ contact.how_met }}</p>
-        <p v-if="dueLabel" class="mt-1 text-xs text-slate-400">{{ dueLabel }}</p>
+        <h3 class="truncate font-display text-base font-bold tracking-[-0.02em] text-ink">{{ contact.name }}</h3>
+        <p class="mt-0.5 line-clamp-2 text-sm text-muted">{{ contact.how_met }}</p>
+        <p v-if="dueLabel" class="mt-1 font-mono text-xs text-muted">{{ dueLabel }}</p>
       </div>
-      <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium" :class="urgencyClasses">
+      <span class="shrink-0 rounded-full px-2.5 py-1 font-mono text-[11px] uppercase tracking-eyebrow" :class="urgencyClasses">
         {{ urgencyLabel }}
       </span>
     </div>
 
-    <div class="mt-3 flex items-center gap-2">
-      <div class="flex gap-1" aria-hidden="true">
-        <span
-          v-for="i in 3"
-          :key="i"
-          class="inline-block h-2.5 w-2.5 rounded-full"
-          :class="i <= coffee ? 'bg-slate-800' : 'bg-slate-200'"
-        />
-      </div>
-      <span class="text-xs text-slate-500">{{ coffee }}/3 coffees</span>
+    <div class="mt-3">
+      <CoffeeDots :filled="coffee" />
     </div>
 
     <footer class="mt-3 flex flex-wrap items-center gap-2">
       <template v-if="contact.status === 'active'">
         <button
-          class="rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700"
+          class="rounded-lg bg-coral px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-coral-hover"
           @click="$emit('follow-up', contact)"
         >
-          Mark done
+          Follow up
         </button>
-        <button class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50" @click="$emit('snooze', contact)">
+        <button class="rounded-lg border border-line px-3 py-1.5 text-xs text-ink transition-colors hover:bg-paper" @click="$emit('snooze', contact)">
           Snooze
         </button>
-        <button class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50" @click="$emit('archive', contact)">
-          Archive
+        <button class="rounded-lg border border-line px-3 py-1.5 text-xs text-ink transition-colors hover:bg-paper" @click="$emit('archive', contact)">
+          Set aside
         </button>
-        <button class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50" @click="showRemind = !showRemind">
+        <button class="rounded-lg border border-line px-3 py-1.5 text-xs text-ink transition-colors hover:bg-paper" @click="showRemind = !showRemind">
           Nudge me later
         </button>
-        <div v-if="showRemind" class="mt-2 flex flex-wrap items-center gap-2 rounded-lg bg-slate-100 p-2">
+        <div v-if="showRemind" class="mt-2 flex flex-wrap items-center gap-2 rounded-lg bg-paper p-2">
           <button
             v-for="opt in remindOptions"
             :key="opt.label"
             type="button"
-            class="rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs hover:bg-slate-200"
+            class="rounded-lg border border-line bg-surface px-3 py-1 text-xs text-ink transition-colors hover:bg-paper"
             @click="onRemindPick(opt.rung)"
           >
             {{ opt.label }}
           </button>
         </div>
       </template>
-      <button v-if="contact.status !== 'graduated'" class="rounded-lg px-3 py-1.5 text-xs text-red-600 hover:bg-red-50" @click="$emit('delete', contact)">
+      <button v-if="contact.status !== 'graduated'" class="rounded-lg px-3 py-1.5 text-xs text-coral transition-colors hover:bg-coral-soft" @click="$emit('delete', contact)">
         Delete
       </button>
-      <NuxtLink :to="`/contacts/${contact.id}/edit`" class="rounded-lg px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50">
+      <NuxtLink :to="`/contacts/${contact.id}/edit`" class="rounded-lg px-3 py-1.5 text-xs text-muted transition-colors hover:bg-paper">
         Edit
       </NuxtLink>
-      <span v-if="contact.status === 'graduated'" class="text-xs font-medium text-emerald-700">Graduated — all 3 coffees 🎉</span>
+      <span v-if="contact.status === 'graduated'" class="font-mono text-xs font-medium text-graduated">Graduated — all 3 coffees</span>
     </footer>
   </article>
 </template>
@@ -116,10 +108,10 @@ function onRemindPick(rung: LadderRung): void {
 
 const urgencyClasses = computed(() => {
   switch (urgency.value) {
-    case 'due': return isOverdue.value ? 'bg-red-100 text-red-700' : 'bg-red-100 text-red-700'
-    case 'close': return 'bg-amber-100 text-amber-700'
-    case 'graduated': return 'bg-emerald-100 text-emerald-700'
-    default: return 'bg-slate-100 text-slate-600'
+    case 'due': return isOverdue.value ? 'bg-coral-soft text-coral' : 'bg-coral-soft text-coral'
+    case 'close': return 'bg-warm/15 text-warm'
+    case 'graduated': return 'bg-graduated/15 text-graduated'
+    default: return 'bg-fresh/15 text-fresh'
   }
 })
 </script>
