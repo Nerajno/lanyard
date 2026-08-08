@@ -71,18 +71,25 @@ openssl rand -hex 32   # CRON_SECRET (protects the scheduled nudge endpoint)
 ```
 
 ### Fill `.env`
+Keep the `NUXT_` prefixes. Nuxt maps env vars onto `runtimeConfig` in
+`nuxt.config.ts` by that prefix alone — `NUXT_PUBLIC_*` become
+`runtimeConfig.public.*` (shipped to the browser), bare `NUXT_*` stay
+server-only. An unprefixed name is read by nothing and the value silently
+stays `''` at runtime.
+
 ```
-SUPABASE_URL=
-SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE=     # server-only; NEVER in the client bundle
-TWILIO_SID=
-TWILIO_TOKEN=
-TWILIO_FROM=
-TWILIO_VERIFY_SID=
-EMAIL_API_KEY=             # Resend
-EMAIL_FROM=
-ACT_LINK_SIGNING_SECRET=
-CRON_SECRET=
+NUXT_PUBLIC_SUPABASE_URL=
+NUXT_PUBLIC_SUPABASE_ANON_KEY=
+NUXT_PUBLIC_APP_URL=http://localhost:3000
+NUXT_SUPABASE_SERVICE_ROLE=     # server-only; NEVER in the client bundle
+NUXT_TWILIO_SID=
+NUXT_TWILIO_TOKEN=
+NUXT_TWILIO_FROM=
+NUXT_TWILIO_VERIFY_SID=
+NUXT_EMAIL_API_KEY=             # Resend
+NUXT_EMAIL_FROM=
+NUXT_ACT_LINK_SIGNING_SECRET=
+NUXT_CRON_SECRET=
 ```
 
 ---
@@ -94,8 +101,9 @@ CRON_SECRET=
    Nuxt is auto-detected (Nitro builds with the `netlify` preset); build command
    `npm run build`, publish directory `dist`.
 2. Set every env var from the list above in **Site configuration → Environment
-   variables**. `SUPABASE_SERVICE_ROLE`, `CRON_SECRET`, and
-   `ACT_LINK_SIGNING_SECRET` are server-only — do not prefix them for the client.
+   variables**, names verbatim. `NUXT_SUPABASE_SERVICE_ROLE`, `NUXT_CRON_SECRET`,
+   and `NUXT_ACT_LINK_SIGNING_SECRET` are server-only — never move them under
+   `NUXT_PUBLIC_`, which would ship them in the client bundle.
 3. Set `NUXT_PUBLIC_APP_URL` to your real site URL. The act-links in every nudge
    are built from it; if it's wrong or missing, links point at `localhost:3000`.
 4. The hourly trigger is a **Netlify Scheduled Function** —

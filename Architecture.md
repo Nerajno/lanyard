@@ -61,9 +61,9 @@ Later cols (P2/P3, all nullable): `title`, `company`, `event_name`, `socials jso
 Social handles → `socials jsonb` (or a `contact_socials` child table); one column per platform doesn't scale. Manual capture requires `name` + `how_met` + one of email/phone; everything above is optional and best filled from a badge vCard or the share-link, not typed at a booth.
 
 ## The reminder loop (core)
-A **Netlify Scheduled Function** (`netlify/functions/nudge-cron`, `schedule = "@hourly"`) calls the Nitro route `/api/cron/nudge` with the shared `CRON_SECRET`. Hourly, not daily — it must hit each user's local send window. The Nitro route holds all the logic so it stays testable and reuses the same pure `utils/`; the Netlify function is a thin trigger.
+A **Netlify Scheduled Function** (`netlify/functions/nudge-cron`, `schedule = "@hourly"`) calls the Nitro route `/api/cron/nudge` with the shared `NUXT_CRON_SECRET`. Hourly, not daily — it must hit each user's local send window. The Nitro route holds all the logic so it stays testable and reuses the same pure `utils/`; the Netlify function is a thin trigger.
 
-Netlify scheduled functions are not HTTP-invocable in production, which is a feature here: the schedule is the only production trigger, and `CRON_SECRET` guards the route against anything else.
+Netlify scheduled functions are not HTTP-invocable in production, which is a feature here: the schedule is the only production trigger, and `NUXT_CRON_SECRET` guards the route against anything else.
 
 Per run:
 1. `select` users whose local time is inside their send window and outside `quiet_hours`, not opted out.
@@ -86,4 +86,10 @@ Fallback if Netlify scheduling is fiddly: any external cron (GitHub Actions, cro
 - **P3 AI opener:** edge function → LLM with `how_met` → returns draft; store `opener_draft`, feed it into the composer body. Draft-only first (see decisions.md).
 
 ## Secrets
-`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE` (server only), `TWILIO_SID`, `TWILIO_TOKEN`, `TWILIO_FROM`, `TWILIO_VERIFY_SID`, `EMAIL_API_KEY`, `EMAIL_FROM`, `ACT_LINK_SIGNING_SECRET`, `CRON_SECRET`. Canonical list + comments in `.env.example`; in production these live in Netlify → Site configuration → Environment variables.
+Names carry a `NUXT_` prefix because that is the only thing Nuxt maps onto `runtimeConfig` in `nuxt.config.ts`: `NUXT_PUBLIC_*` → `runtimeConfig.public.*` (client-visible), bare `NUXT_*` → server-only. An unprefixed name resolves to `''` at runtime with no error.
+
+Client-visible: `NUXT_PUBLIC_SUPABASE_URL`, `NUXT_PUBLIC_SUPABASE_ANON_KEY`, `NUXT_PUBLIC_APP_URL` (origin for act-links; falls back to `http://localhost:3000`).
+
+Server only: `NUXT_SUPABASE_SERVICE_ROLE`, `NUXT_TWILIO_SID`, `NUXT_TWILIO_TOKEN`, `NUXT_TWILIO_FROM`, `NUXT_TWILIO_VERIFY_SID`, `NUXT_EMAIL_API_KEY`, `NUXT_EMAIL_FROM`, `NUXT_ACT_LINK_SIGNING_SECRET`, `NUXT_CRON_SECRET`.
+
+Canonical list + comments in `.env.example`; in production these live in Netlify → Site configuration → Environment variables.
