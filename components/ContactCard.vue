@@ -4,6 +4,7 @@
       <div class="min-w-0">
         <h3 class="truncate font-semibold text-slate-900">{{ contact.name }}</h3>
         <p class="mt-0.5 line-clamp-2 text-sm text-slate-500">{{ contact.how_met }}</p>
+        <p v-if="dueLabel" class="mt-1 text-xs text-slate-400">{{ dueLabel }}</p>
       </div>
       <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium" :class="urgencyClasses">
         {{ urgencyLabel }}
@@ -78,6 +79,14 @@ defineEmits<{
 
 const coffee = computed(() => coffeeProgress(props.contact.cadence_ladder, props.contact.touchpoints_done))
 const urgency = computed<Urgency>(() => urgencyOf(props.contact.follow_up_by, props.contact.status))
+
+const dueLabel = computed(() => {
+  if (!props.contact.follow_up_by) return ''
+  const d = daysUntil(props.contact.follow_up_by)
+  if (d < 0) return 'Due'
+  if (d === 0) return 'Due today'
+  return `In ${d}d`
+})
 
 const urgencyLabel = computed(() => {
   switch (urgency.value) {
