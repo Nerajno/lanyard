@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import type { ContactFormValues } from '~/components/ContactForm.vue'
-import { resolveLadder } from '~/utils/cadence'
+import { presetOf, resolveLadder } from '~/utils/cadence'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -41,6 +41,7 @@ const initial = computed<Partial<ContactFormValues> | null>(() => {
     how_met: contact.value.how_met,
     email: contact.value.email,
     phone: contact.value.phone,
+    ladderPreset: presetOf(contact.value.cadence_ladder),
     customLadder: contact.value.cadence_ladder,
   }
 })

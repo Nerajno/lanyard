@@ -4,17 +4,18 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 
 ## 0. Setup
 - [x] Scaffold Nuxt 3 + TS + Tailwind + Pinia
-- [ ] Create Supabase project; add `.env` + `.env.example` *(code + example done; create the project and paste keys)*
+- [x] Create Supabase project; add `.env` + `.env.example` *(project `ymmlysznstdguegylbjq` created; linked + migrations pushed)*
 - [x] Wire Supabase client + auth (email magic link is fine)
 - [ ] Email provider account (Resend/Postmark) + verified sending domain *(build uses Resend; sign up + add key)*
 - [ ] **Start Twilio A2P 10DLC registration now** — it takes days to weeks to approve and blocks all SMS. Email nudges cover the gap. *(build + Verify hooks are in place)*
 
 ## 1. Schema (see Architecture.md)
-- [x] `profiles` table migration (phone, verified_at, nudge_channel, timezone, quiet_hours, opt-in/opt-out)
+- [x] `profiles` table migration (phone, verified_at, nudge_channel, timezone, quiet_hours, opt-in/opt-out) *(applied to remote; `quiet_hours` → `quiet_hours_start`/`quiet_hours_end` smallint — overnight windows can't be an int4range)*
 - [x] `contacts` table migration incl. `cadence_ladder int[]`, `touchpoints_done`, CHECK (email or phone)
 - [x] `nudges` table migration
 - [x] RLS policies (`user_id = auth.uid()`) for all CRUD on all three
-- [x] Seed a couple rows for local testing
+- [x] `0003_custom_cadence`: `cadence_ladder` → `jsonb` `{value,unit}` rungs (`min`/`hour`/`day`), `follow_up_by` → `timestamptz`, new one-shot `remind_at`, supporting index — RLS unchanged (covered by existing policies) *(applied to remote)*
+- [ ] Seed a couple rows for local testing *(removed — `0002_seed.sql` referenced a fake auth user that broke `db push`; seed via a real user or `supabase/seed.sql` for local only)*
 
 ## 2. Add contact
 - [x] Add page/form: name, how_met, email, phone, ladder preset chips (warm / default / slow / custom)
@@ -40,9 +41,13 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] Manual archive (distinct from graduated)
 - [x] Edit / delete contact
 - [x] **Vitest: ladder advance logic** — rungs 1→2→3, graduation on 3, custom ladders, snooze doesn't consume a rung
+- [x] Custom rung entries in the add/edit form (`{value,unit}` rows, min/hour/day) with preset chips
+- [x] Quick nudge ("Nudge me later") → one-shot `remind_at`; never consumes a rung
 
 ## 5. The nudge (core — don't skip to polish before this works)
 - [x] "Who is due" query as a testable function (Vitest against fixtures)
+- [x] Instant-based due: `computeDue` checks `follow_up_by`/`remind_at` against `now`, covering `min`/`hour`/`day` rungs
+- [x] Sub-day nudges bypass the per-day cap (`shouldDeliverForUser` / `splitSubDay`); cron clears `remind_at` after its beat
 - [ ] Twilio account + from-number; store secrets *(provision account; fill TWILIO_* + Verify SID)*
 - [x] Email send path (provider SDK)
 - [x] Signed act-link tokens (`ACT_LINK_SIGNING_SECRET`) — must work from a phone without a fresh login
@@ -52,7 +57,7 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] STOP/HELP webhook → set `sms_opted_out_at`, hard block sends
 
 ## 6. Dogfood
-- [ ] Deploy (Netlify + Supabase) — *needs your Netlify + Supabase accounts*
+- [ ] Deploy (Netlify + Supabase) — *Supabase project exists + migrations pushed; Netlify side pending*
 - [ ] Swap `vercel.json` for `netlify.toml` + `netlify/functions/nudge-cron.mts` (host decision changed; see decisions.md)
 - [ ] Set `NUXT_PUBLIC_APP_URL` on Netlify — act-links are built from it
 - [ ] Add real people from your next event — *human action*

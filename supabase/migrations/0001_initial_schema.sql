@@ -16,7 +16,10 @@ create table if not exists public.profiles (
   nudge_channel    text not null default 'email'
                    check (nudge_channel in ('sms', 'email', 'both')),
   timezone         text not null default 'UTC',           -- IANA name
-  quiet_hours      int4range not null default '[21,9)',   -- local hours to suppress sends
+  quiet_hours_start smallint not null default 21,         -- local hour (0-23) quiet window starts
+  quiet_hours_end   smallint not null default 9,          -- local hour (0-23) quiet window ends (wrap = next day)
+  check (quiet_hours_start between 0 and 23),
+  check (quiet_hours_end between 0 and 23),
   sms_opt_in_at    timestamptz,                            -- required before any SMS
   sms_opted_out_at timestamptz,                            -- set by STOP; hard block sends
   created_at       timestamptz not null default now(),

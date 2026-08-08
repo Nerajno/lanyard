@@ -1,90 +1,94 @@
 // Pure cadence logic for the "three cups of coffee" ladder.
 // No IO — unit-tested in Vitest (see tests/unit/cadence.test.ts).
 
+import type { Ladder, LadderRung } from '~/types'
 import { LADDER_PRESETS } from '~/types'
+
+/** Deterministic UTC day number for a Date or date string. */
+function utcDayNumber(input: Date | string | number): number {
+  return Math.floor(asInstant(input) / 86_400_000)
+}
+
+/** Parse any accepted date input to an epoch millisecond. */
+export function asInstant(input: Date | string | number): number {
+  if (input instanceof Date) return input.getTime()
+  if (typeof input === 'number') return input
+  const t = Date.parse(input)
+  if (Number.isNaN(t)) throw new Error(`Invalid date: ${input}`)
+  return t
+}
+
+/** Days in milliseconds. */
+const DAY_MS = 86_400_000
+
+/** Millisecond equivalent of a rung (value in min/hour/day). */
+export function rungToMs(rung: LadderRung): number {
+  switch (rung.unit) {
+    case 'min': return rung.value * 60_000
+    case 'hour': return rung.value * 3_600_000
+    case 'day': return rung.value * DAY_MS
+  }
+}
+
+/** Add a rung's duration to a base time; returns a Date. DST-safe because we operate in absolute UTC ms. */
+export function addToTimestamp(base: Date | string | number, rung: LadderRung): Date {
+  return new Date(asInstant(base) + rungToMs(rung))
+}
 
 export type LadderPreset = keyof typeof LADDER_PRESETS
 
-/** Day-add without drifting across DST or timezone — operate on absolute UTC day numbers. */
-export function addDaysUtc(date: Date, days: number): Date {
-  const ms = utcDayNumber(date) * 86_400_000 + days * 86_400_000
-  return new Date(ms)
-}
-
-function utcDayNumber(input: Date | string): number {
-  let t: number
-  if (typeof input === 'string') {
-    t = Date.parse(`${input}T00:00:00Z`)
-  } else {
-    t = Date.UTC(input.getUTCFullYear(), input.getUTCMonth(), input.getUTCDate())
-  }
-  return Math.floor(t / 86_400_000)
-}
-
-export function startOfDay(date: Date): string {
-  const d = addDaysUtc(date, 0)
-  return d.toISOString().slice(0, 10)
-}
-
-/** Resolve a preset or a raw custom ladder into a normalized 3-rung array. */
-export function resolveLadder(preset: LadderPreset | 'custom', custom?: number[]): number[] {
+/** Resolve a preset or raw custom ladder into a normalized Ladder. */
+export function resolveLadder(preset: LadderPreset | 'custom', custom?: Ladder): Ladder {
   if (preset !== 'custom') return [...LADDER_PRESETS[preset]]
-  const c = (custom ?? []).filter((n) => Number.isFinite(n) && n > 0)
-  return c.length > 0 ? c : [...LADDER_PRESETS.default]
+  if (custom && custom.some((x) => Number.isFinite(x.value) && x.value > 0)) {
+    return custom.filter((x) => Number.isFinite(x.value) && x.value > 0)
+  }
+  return [...LADDER_PRESETS.default]
 }
 
-/**
- * follow_up_by for a *new* contact: created date + first rung.
- * Uses 1-based ladder indexing: ladder[0] is the first gap.
- */
-export function initialFollowUp(createdAt: Date | string, ladder: number[]): string {
-  const base = new Date(createdAt)
-  return startOfDay(addDaysUtc(new Date(base), ladder[0] ?? 2))
+/** follow_up_by for a *new* contact: created instant + first rung. */
+export function initialFollowUp(createdAt: Date | string, ladder: Ladder): string {
+  return addToTimestamp(createdAt, ladder[0] ?? { value: 2, unit: 'day' }).toISOString()
 }
 
 /**
  * Advance after a touchpoint is marked done.
  * Returns the new contact edge values, or null when the contact graduates.
- *
- * @param current touchpoints completed so far (0, 1, 2)
- * @param actedToday date the touchpoint was recorded (usually "today")
  */
 export function advanceTouchpoint(
-  ladder: number[],
+  ladder: Ladder,
   current: number,
   actedToday: Date | string,
-): { touchpoints_done: number; follow_up_by: string } | null {
+): {
+  touchpoints_done: number
+  follow_up_by: string
+} | null {
   if (ladder.length === 0) return null
-
   const next = current + 1
-  if (next >= ladder.length) {
-    // Graduated: done with all rungs, stop nudging.
-    return null
-  }
-  // Move to the *next* rung, counted from the day the touchpoint was done.
-  const days = ladder[next]
-  return { touchpoints_done: next, follow_up_by: startOfDay(addDaysUtc(new Date(actedToday), days)) }
+  if (next >= ladder.length) return null
+  return { touchpoints_done: next, follow_up_by: addToTimestamp(actedToday, ladder[next]).toISOString() }
 }
 
-/**
- * Snooze: push follow_up_by forward 3 days. Ladder position is unchanged —
- * snoozing must NOT consume a rung.
- */
-export function snooze(followUpBy: string, days = 3): string {
-  const base = new Date(`${followUpBy}T00:00:00Z`)
-  if (Number.isNaN(base.getTime())) return followUpBy
-  return startOfDay(addDaysUtc(base, days))
+/** The rung due after `touchpointsDone` completed contacts, or null when graduated. */
+export function nextRung(ladder: Ladder | undefined, touchpointsDone: number): LadderRung | null {
+  if (!ladder?.length) return null
+  const rung = ladder[touchpointsDone]
+  return rung ?? null
 }
 
-/** Whole-day count from `from` (a date or now) until `date` (positive = in the future). */
-export function daysUntil(date: string, from: Date | string = new Date()): number {
+/** Snooze: push follow_up_by forward `days` days. Ladder position unchanged. */
+export function snooze(followUpBy: string | Date, days = 3): string {
+  return new Date(asInstant(followUpBy) + days * DAY_MS).toISOString()
+}
+
+/** Whole-day count from `from` to `date` (positive = future). */
+export function daysUntil(date: Date | string, from: Date | string = new Date()): number {
   return utcDayNumber(date) - utcDayNumber(from)
 }
 
-/** Urgency bucket for the triage list. */
 export type Urgency = 'due' | 'close' | 'fresh' | 'graduated'
 
-export function urgencyOf(date: string, status: string, now: Date | string = new Date()): Urgency {
+export function urgencyOf(date: Date | string, status: string, now: Date | string = new Date()): Urgency {
   if (status === 'graduated') return 'graduated'
   const d = daysUntil(date, now)
   if (d < 0) return 'due'
@@ -92,8 +96,28 @@ export function urgencyOf(date: string, status: string, now: Date | string = new
   return 'fresh'
 }
 
-/** Coffee progress out of three, for the row indicator. */
-export function coffeeProgress(ladder: number[], touchpointsDone: number): number {
-  const total = Math.max(ladder.length, 3)
+/** Coffee progress out of three. */
+export function coffeeProgress(ladder?: Ladder, touchpointsDone = 0): number {
+  const total = Math.max(ladder?.length ?? 0, 3)
   return Math.min(Math.max(touchpointsDone, 0), total)
+}
+
+/** Detect which preset a ladder is, else 'custom'. */
+export function presetOf(ladder: Ladder | undefined): LadderPreset | 'custom' {
+  if (!ladder) return 'custom'
+  for (const key of Object.keys(LADDER_PRESETS) as LadderPreset[]) {
+    if (JSON.stringify(ladder) === JSON.stringify(LADDER_PRESETS[key])) return key
+  }
+  return 'custom'
+}
+
+/** Short rung label, e.g. 2h / 30m / 3d. */
+export function formatRung(rung: LadderRung): string {
+  const letter = { min: 'm', hour: 'h', day: 'd' }[rung.unit]
+  return `${rung.value}${letter}`
+}
+
+/** Human ladder string, e.g. "2d / 14d / 45d". */
+export function formatLadder(ladder: Ladder): string {
+  return ladder.map(formatRung).join(' / ')
 }

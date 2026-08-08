@@ -3,6 +3,7 @@
 ADR-lite. Newest first. When an open question closes, move it up as a decision.
 
 ## Decided
+- **Cadence is min/hour/day rungs; sub-day nudges bypass the per-day cap; quick nudge is a one-shot `remind_at`.** `cadence_ladder` is `jsonb` `{value, unit}` rungs; presets stay day-rungs. `follow_up_by` is a `timestamptz` instant, so a 30-minute rung lands on an absolute time. The per-day cap (a `nudges` row from the last 26h) only gates *day* rungs: `shouldDeliverForUser` always delivers sub-day due. The "Nudge me later" quick nudge is a one-shot `remind_at` column that flows through the same hourly cron (so quiet hours apply), is cleared after a beat, and never consumes a rung or affects graduation.
 - **Host = Netlify.** Frontend + Nitro server routes on Netlify, Supabase managed alongside. Closes the earlier "Vercel/Netlify" hedge. Practical upside: **Netlify Scheduled Functions run hourly on the free tier**, whereas Vercel's Hobby plan caps cron at once per day — and the nudge loop must run hourly to hit each user's local send window. Choosing Vercel would have meant paying for Pro or degrading the core loop.
 - **Email sender = Resend.** Chosen for the P1 email path (the fallback channel while 10DLC registration is pending). Closes the earlier Resend-vs-Postmark question.
 - **Quiet hours = user-configurable.** Captured at onboarding as a per-profile local send window; `quiet_hours` is a per-user range, not a fixed 9am default. The extra onboarding step is worth not texting people at 3am.

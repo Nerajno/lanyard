@@ -1,8 +1,8 @@
 import { watch } from 'vue'
 import type { Ref } from 'vue'
-import type { Contact, InsertContact, UpdateContact } from '~/types'
+import type { Contact, InsertContact, Ladder, LadderRung, UpdateContact } from '~/types'
 import type { LadderPreset } from '~/utils/cadence'
-import { advanceTouchpoint, initialFollowUp, resolveLadder, snooze } from '~/utils/cadence'
+import { addToTimestamp, advanceTouchpoint, initialFollowUp, resolveLadder, snooze } from '~/utils/cadence'
 
 export interface NewContactInput {
   name: string
@@ -10,7 +10,7 @@ export interface NewContactInput {
   email?: string | null
   phone?: string | null
   ladderPreset: LadderPreset | 'custom'
-  customLadder?: number[]
+  customLadder?: Ladder
 }
 
 /**
@@ -65,7 +65,7 @@ export function useContacts() {
       email: input.email?.trim() || null,
       phone: input.phone?.trim() || null,
       cadence_ladder: ladder,
-      follow_up_by: initialFollowUp(new Date(), ladder),
+      follow_up_by: initialFollowUp(new Date().toISOString(), ladder),
     }
 
     const { data, error: e } = await sb.from('contacts').insert(payload).select().single()
@@ -114,10 +114,18 @@ export function useContacts() {
     await update(id, { follow_up_by: snooze(contact.follow_up_by, days) })
   }
 
+  /** Set a one-off reminder by deferring the next rung from now. */
+  async function remindContact(id: string, rung: LadderRung): Promise<void> {
+    if (!auth.user) throw new Error('You must be signed in')
+    const contact = contacts.value.find((c) => c.id === id)
+    if (!contact) return
+    await update(id, { remind_at: addToTimestamp(new Date(), rung).toISOString() })
+  }
+
   /** Manual archive — distinct from graduating. */
   async function archive(id: string): Promise<void> {
     await update(id, { status: 'archived' })
   }
 
-  return { contacts, loading, error, load, add, update, remove, markFollowedUp, snoozeContact, archive }
+  return { contacts, loading, error, load, add, update, remove, markFollowedUp, snoozeContact, remindContact, archive }
 }

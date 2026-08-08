@@ -51,8 +51,41 @@
         >
           {{ preset.label }}
           <span :class="form.ladderPreset === preset.key ? 'text-slate-300' : 'text-slate-500'" class="block text-xs">
-            {{ preset.days }}
+            {{ preset.summary }}
           </span>
+        </button>
+        <button
+          type="button"
+          class="rounded-lg border px-3 py-2 text-sm transition"
+          :class="form.ladderPreset === 'custom'
+            ? 'border-slate-900 bg-slate-900 text-white'
+            : 'border-slate-300 hover:border-slate-400'"
+          @click="form.ladderPreset = 'custom'"
+        >
+          Custom
+          <span :class="form.ladderPreset === 'custom' ? 'text-slate-300' : 'text-slate-500'" class="block text-xs">
+            {{ customSummary }}
+          </span>
+        </button>
+      </div>
+
+      <div v-if="form.ladderPreset === 'custom'" class="mt-3 space-y-2">
+        <div v-for="(rung, i) in form.customLadder" :key="i" class="flex items-center gap-2">
+          <input
+            v-model.number="form.customLadder[i].value"
+            type="number"
+            min="1"
+            class="w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
+          >
+          <select v-model="form.customLadder[i].unit" class="rounded-lg border border-slate-300 px-2 py-1.5 text-sm">
+            <option value="min">min</option>
+            <option value="hour">hours</option>
+            <option value="day">days</option>
+          </select>
+          <button type="button" class="text-sm text-red-600" @click="removeRung(i)">Remove</button>
+        </div>
+        <button v-if="form.customLadder.length < 3" type="button" class="text-sm text-slate-500 hover:text-slate-700" @click="addRung()">
+          + Add rung
         </button>
       </div>
     </fieldset>
@@ -70,7 +103,9 @@
 </template>
 
 <script setup lang="ts">
+import type { Ladder, LadderRung } from '~/types'
 import type { LadderPreset } from '~/utils/cadence'
+import { formatLadder } from '~/utils/cadence'
 import { LADDER_NAMES, LADDER_PRESETS } from '~/types'
 
 export interface ContactFormValues {
@@ -79,7 +114,7 @@ export interface ContactFormValues {
   email: string | null
   phone: string | null
   ladderPreset: LadderPreset | 'custom'
-  customLadder: number[]
+  customLadder: Ladder
 }
 
 const props = defineProps<{
@@ -92,7 +127,7 @@ const emit = defineEmits<{ submit: [values: ContactFormValues] }>()
 const presets = LADDER_NAMES.map((key) => ({
   key,
   label: key.charAt(0).toUpperCase() + key.slice(1),
-  days: LADDER_PRESETS[key].join(' / ') + ' days',
+  summary: formatLadder(LADDER_PRESETS[key]),
 }))
 
 const form = reactive<ContactFormValues>({
@@ -101,7 +136,11 @@ const form = reactive<ContactFormValues>({
   email: props.initial?.email ?? '',
   phone: props.initial?.phone ?? '',
   ladderPreset: props.initial?.ladderPreset ?? 'default',
-  customLadder: props.initial?.customLadder ?? [],
+  customLadder: props.initial?.customLadder ?? [
+    { value: 1, unit: 'day' },
+    { value: 7, unit: 'day' },
+    { value: 21, unit: 'day' },
+  ],
 })
 
 const submitting = ref(false)
@@ -109,6 +148,19 @@ const formError = ref<string | null>(null)
 
 const hasChannel = computed(() => Boolean((form.email ?? '').trim() || (form.phone ?? '').trim()))
 const valid = computed(() => Boolean(form.name.trim() && form.how_met.trim()) && hasChannel.value)
+
+const customSummary = computed(() => (form.ladderPreset === 'custom' ? formatLadder(form.customLadder) : ''))
+
+function addRung(): void {
+  if (form.customLadder.length >= 3) return
+  const rung: LadderRung = { value: 1, unit: 'day' }
+  form.customLadder.push(rung)
+}
+
+function removeRung(i: number): void {
+  if (form.customLadder.length <= 1) return
+  form.customLadder.splice(i, 1)
+}
 
 async function onSubmit() {
   formError.value = null

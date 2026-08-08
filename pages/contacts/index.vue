@@ -30,6 +30,7 @@
             @snooze="onSnooze"
             @archive="onArchive"
             @delete="onDelete"
+            @remind="onRemind(contact, $event)"
           />
         </div>
         <p v-else class="mt-3 text-sm text-slate-500">Nothing on the docket. Add a contact or wait for the next rung.</p>
@@ -47,11 +48,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Contact } from '~/types'
+import type { Contact, LadderRung } from '~/types'
 
 definePageMeta({ middleware: 'auth' })
 
-const { contacts, loading, error, markFollowedUp, snoozeContact, archive, remove } = useContacts()
+const { contacts, loading, error, markFollowedUp, snoozeContact, archive, remove, remindContact } = useContacts()
 
 const active = computed(() =>
   [...contacts.value].filter((c) => c.status === 'active').sort((a, b) => a.follow_up_by.localeCompare(b.follow_up_by)),
@@ -70,6 +71,9 @@ async function onArchive(c: Contact) {
 async function onDelete(c: Contact) {
   if (!confirm(`Delete ${c.name}?`)) return
   await run(remove(c.id))
+}
+async function onRemind(c: Contact, rung: LadderRung) {
+  await run(remindContact(c.id, rung))
 }
 
 async function run(p: Promise<void>) {
