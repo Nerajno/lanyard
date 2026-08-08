@@ -36,7 +36,7 @@
 | cadence_ladder | jsonb | rungs `{value, unit}` in `min`/`hour`/`day`; default `[{"value":2,"unit":"day"},{"value":14,"unit":"day"},{"value":45,"unit":"day"}]` — the three coffees. Presets are day-rungs |
 | touchpoints_done | int | default 0; 3 = graduated |
 | follow_up_by | timestamptz | initial `created_at + ladder[1]`; on advance `acted_at + ladder[touchpoints_done + 1]` (instant-based, not a bucket) |
-| remind_at | timestamptz | nullable one-shot quick nudge; flows through the same nightly cron, cleared after it fires; never consumes a rung |
+| remind_at | timestamptz | nullable one-shot quick nudge; flows through the same hourly cron, cleared after it fires; never consumes a rung |
 | status | text | `active` \| `graduated` \| `archived` |
 | created_at | timestamptz | default now() |
 
@@ -81,7 +81,7 @@ Fallback if Netlify scheduling is fiddly: any external cron (GitHub Actions, cro
 ## Key flows
 - **Add:** form → validate at least one of email/phone → insert row, `follow_up_by = created_at + cadence_ladder[1]`.
 - **Nudge:** scheduled fn → Twilio or email (above).
-- **Act:** act-link (signed, single-purpose token so it works from a phone without a fresh login) → stamps `nudges.opened_at`, opens `sms:<phone>?&body=…` or `mailto:<email>?subject=…&body=…` prefilled, and marks the touchpoint: `touchpoints_done += 1`, `acted_at` stamped. If `touchpoints_done < 3` → `follow_up_by = today + cadence_ladder[touchpoints_done + 1]`; if `= 3` → `status = 'graduated'`, nudging stops.
+- **Act:** act-link (signed, single-purpose token so it works from a phone without a fresh login) → stamps `nudges.opened_at`, opens `sms:<phone>?&body=…` or `mailto:<email>?subject=…&body=…` prefilled, and marks the touchpoint: `touchpoints_done += 1`, `acted_at` stamped. If `touchpoints_done < 3` → `follow_up_by = acted_at + cadence_ladder[touchpoints_done + 1]`; if `= 3` → `status = 'graduated'`, nudging stops.
 - **Snooze:** `follow_up_by += 3d`, ladder position unchanged.
 - **Triage list:** active contacts `order by follow_up_by asc`, urgency color from days-until-due; separate graduated section — visible proof the loop worked.
 
