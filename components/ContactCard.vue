@@ -46,7 +46,7 @@
             :key="opt.label"
             type="button"
             class="rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs hover:bg-slate-200"
-            @click="$emit('remind', opt.rung)"
+            @click="onRemindPick(opt.rung)"
           >
             {{ opt.label }}
           </button>
@@ -69,7 +69,7 @@ import { coffeeProgress, daysUntil, urgencyOf } from '~/utils/cadence'
 import type { Urgency } from '~/utils/cadence'
 
 const props = defineProps<{ contact: Contact }>()
-defineEmits<{
+const emit = defineEmits<{
   'follow-up': [contact: Contact]
   snooze: [contact: Contact]
   archive: [contact: Contact]
@@ -81,6 +81,7 @@ const coffee = computed(() => coffeeProgress(props.contact.cadence_ladder, props
 const urgency = computed<Urgency>(() => urgencyOf(props.contact.follow_up_by, props.contact.status))
 
 const dueLabel = computed(() => {
+  if (props.contact.status === 'graduated') return ''
   if (!props.contact.follow_up_by) return ''
   const d = daysUntil(props.contact.follow_up_by)
   if (d < 0) return 'Due'
@@ -107,6 +108,11 @@ const remindOptions: { label: string; rung: LadderRung }[] = [
   { label: '4 hr', rung: { value: 4, unit: 'hour' } },
   { label: '1 day', rung: { value: 1, unit: 'day' } },
 ]
+
+function onRemindPick(rung: LadderRung): void {
+  showRemind.value = false
+  emit('remind', rung)
+}
 
 const urgencyClasses = computed(() => {
   switch (urgency.value) {

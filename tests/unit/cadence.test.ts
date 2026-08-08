@@ -5,6 +5,7 @@ import { LADDER_PRESETS, type Ladder } from '~/types'
 import {
   addToTimestamp,
   advanceTouchpoint,
+  coffeeProgress,
   daysUntil,
   formatLadder,
   formatRung,
@@ -95,5 +96,17 @@ describe('presetOf / formatLadder', () => {
     expect(formatRung({ value: 4, unit: 'hour' })).toBe('4h')
     expect(formatRung({ value: 3, unit: 'day' })).toBe('3d')
     expect(formatLadder([{ value: 1, unit: 'day' }, { value: 7, unit: 'day' }])).toBe('1d / 7d')
+  })
+})
+
+describe('coffeeProgress', () => {
+  it('reports completed touchpoints out of three', () => {
+    expect(coffeeProgress(LADDER_PRESETS.default, 0)).toBe(0)
+    expect(coffeeProgress(LADDER_PRESETS.default, 2)).toBe(2)
+    expect(coffeeProgress(LADDER_PRESETS.default, 3)).toBe(3)
+  })
+  it('clamps out-of-range values', () => {
+    expect(coffeeProgress(LADDER_PRESETS.default, 99)).toBe(3)
+    expect(coffeeProgress(LADDER_PRESETS.default, -1)).toBe(0)
   })
 })

@@ -33,9 +33,10 @@
 | how_met | text | used verbatim in the nudge |
 | email | text | required unless `phone` set |
 | phone | text | required unless `email` set |
-| cadence_ladder | int[] | default `{2,14,45}` — the three coffees |
+| cadence_ladder | jsonb | rungs `{value, unit}` in `min`/`hour`/`day`; default `[{"value":2,"unit":"day"},{"value":14,"unit":"day"},{"value":45,"unit":"day"}]` — the three coffees. Presets are day-rungs |
 | touchpoints_done | int | default 0; 3 = graduated |
-| follow_up_by | date | initial `created_at + ladder[1]`; on advance `today + ladder[touchpoints_done + 1]` |
+| follow_up_by | timestamptz | initial `created_at + ladder[1]`; on advance `acted_at + ladder[touchpoints_done + 1]` (instant-based, not a bucket) |
+| remind_at | timestamptz | nullable one-shot quick nudge; flows through the same nightly cron, cleared after it fires; never consumes a rung |
 | status | text | `active` \| `graduated` \| `archived` |
 | created_at | timestamptz | default now() |
 
@@ -68,10 +69,12 @@ Netlify scheduled functions are not HTTP-invocable in production, which is a fea
 
 Per run:
 1. `select` users whose local time is inside their send window and outside `quiet_hours`, not opted out.
-2. For each, `select * from contacts where user_id = ? and status='active' and follow_up_by <= today`.
+2. For each, `computeDue` the active contacts against `now` as an **instant**: due = `follow_up_by <= now` **or** a pending one-shot `remind_at <= now`. Min/hour rungs land on absolute times; the whole day-level "due today" check is a compare against the current instant, not a date bucket.
 3. Branch on count: **1 due** → direct message with `name` + `how_met` + act-link. **2+ due** → digest ("3 due today") + triage-list link.
-4. Branch on `nudge_channel` → Twilio or the email provider.
-5. Insert a `nudges` row with `sent_at`, `channel`, `contact_ids`, `provider_message_id`. This row is also the double-send guard: skip anyone with a `nudges` row today.
+4. **Daily cap, bypassed by sub-day.** A `nudges` row from the last 26h is the double-send guard. But the cap only gates *day* rungs: `shouldDeliverForUser` always delivers when something sub-day is due (a `min`/`hour` rung or a queued `remind_at`). When the user already sent today and only day rungs are due, that user is skipped. When sub-day and day items are mixed, only the sub-day ones go out this pass.
+5. Branch on `nudge_channel` → Twilio or the email provider.
+6. Insert a `nudges` row with `sent_at`, `channel`, `contact_ids`, `provider_message_id`.
+7. Clear `remind_at` on every delivered contact that came due via the one-shot — it's single-fire.
 
 Fallback if Netlify scheduling is fiddly: any external cron (GitHub Actions, crontab) POSTs the same route with `x-cron-secret`. No code change — only the trigger differs.
 

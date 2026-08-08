@@ -14,6 +14,7 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] `contacts` table migration incl. `cadence_ladder int[]`, `touchpoints_done`, CHECK (email or phone)
 - [x] `nudges` table migration
 - [x] RLS policies (`user_id = auth.uid()`) for all CRUD on all three
+- [x] `0003_custom_cadence`: `cadence_ladder` → `jsonb` `{value,unit}` rungs (`min`/`hour`/`day`), `follow_up_by` → `timestamptz`, new one-shot `remind_at`, supporting index — RLS unchanged (covered by existing policies) *(applied to remote)*
 - [ ] Seed a couple rows for local testing *(removed — `0002_seed.sql` referenced a fake auth user that broke `db push`; seed via a real user or `supabase/seed.sql` for local only)*
 
 ## 2. Add contact
@@ -40,9 +41,13 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] Manual archive (distinct from graduated)
 - [x] Edit / delete contact
 - [x] **Vitest: ladder advance logic** — rungs 1→2→3, graduation on 3, custom ladders, snooze doesn't consume a rung
+- [x] Custom rung entries in the add/edit form (`{value,unit}` rows, min/hour/day) with preset chips
+- [x] Quick nudge ("Nudge me later") → one-shot `remind_at`; never consumes a rung
 
 ## 5. The nudge (core — don't skip to polish before this works)
 - [x] "Who is due" query as a testable function (Vitest against fixtures)
+- [x] Instant-based due: `computeDue` checks `follow_up_by`/`remind_at` against `now`, covering `min`/`hour`/`day` rungs
+- [x] Sub-day nudges bypass the per-day cap (`shouldDeliverForUser` / `splitSubDay`); cron clears `remind_at` after its beat
 - [ ] Twilio account + from-number; store secrets *(provision account; fill TWILIO_* + Verify SID)*
 - [x] Email send path (provider SDK)
 - [x] Signed act-link tokens (`ACT_LINK_SIGNING_SECRET`) — must work from a phone without a fresh login

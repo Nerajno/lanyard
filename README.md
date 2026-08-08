@@ -39,7 +39,7 @@ live in environment variables — never in code, never in the client bundle.**
 1. Create a project at https://supabase.com.
 2. Run the migrations, in order, in the SQL editor:
    - `supabase/migrations/0001_initial_schema.sql` (tables + RLS + trigger)
-   - `supabase/migrations/0002_seed.sql` (optional local seed rows)
+   - `supabase/migrations/0003_custom_cadence.sql` (cadence rungs as `{value,unit}`, `follow_up_by` → `timestamptz`, one-shot `remind_at`)
    - (Or `supabase db push` with a linked project.)
 3. Grab **Project URL** and the **anon** key from Project → Settings → API.
 4. Regenerate typed tables for the client:
@@ -140,13 +140,16 @@ curl -f -X POST -H "x-cron-secret: $CRON_SECRET" https://<your-site>/api/cron/nu
 
 1. `/api/cron/nudge` runs hourly: fans out over users whose local time is inside
    their send window, not opted out.
-2. For each, computes **"who is due"** (`follow_up_by <= today`, active) via
-   `utils/due.ts`.
+2. For each, computes **"who is due"** as an instant via `utils/due.ts`
+   (`follow_up_by <= now` or a pending one-shot `remind_at <= now`, active) —
+   ladder rungs are `{value,unit}` in minutes/hours/days.
 3. Branches: **1 due → direct** message inlining `how_met` + a one-tap act-link;
-   **2+ due → digest** linking to the triage list.
+   **2+ due → digest** linking to the triage list. Sub-day items (min/hour rungs
+   or a queued `remind_at`) bypass the per-day cap and always deliver.
 4. Branches on channel (`sms`/`email`/`both`) → Twilio or Resend, scoped by your
    `sms_opt_in_at` / `sms_opted_out_at` settings.
-5. Inserts a `nudges` row per send (the double-send guard + latency instrument).
+5. Inserts a `nudges` row per send (the double-send guard + latency instrument);
+   a fired one-shot `remind_at` is cleared so it stays single-fire.
 6. **Act**: the signed link calls `/api/act?t=…` on a phone with no fresh login,
    stamps `opened_at`, marks the touchpoint (advance rung or graduate), then
    302s to a prefilled `sms:` / `mailto:` composer. Lanyard never sends the
@@ -161,7 +164,7 @@ written from day one.
 
 ## Testing
 
-- **Vitest**: 30 unit tests covering the ladder rung-advance (1→2→3, graduation
+- **Vitest**: 32 unit tests covering the ladder rung-advance (1→2→3, graduation
   on 3, custom ladders, snooze doesn't consume a rung), the due query against
   fixtures, and act-link signing/verification. `npm run test`.
 - **Lint / type**: `npm run lint` · `npx nuxi typecheck`.
@@ -178,7 +181,7 @@ stores/           Pinia (auth)
 utils/            cadence, due, actLink (pure logic, tested)
 server/           api/act, api/cron/nudge, api/profile/phone, api/twilio/sms-status
 server/services/  nudgeSender (Twilio + Resend)
-supabase/         migrations (0001 schema+RLS, 0002 seed)
+supabase/         migrations (0001 schema+RLS, 0003 custom cadence + remind_at)
 types/            database.ts + domain aliases
 tests/            unit + fixtures
 ```
