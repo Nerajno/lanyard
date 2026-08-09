@@ -1,6 +1,6 @@
 <template>
   <div class="border-line mx-auto w-[290px] overflow-hidden rounded-[38px] border bg-paper shadow-[0_30px_70px_-28px_rgba(20,22,30,0.45),0_0_0_9px_#1b1d24,0_0_0_10px_#33363f]">
-    <div class="ph-top flex items-end justify-between px-4 pb-2 pt-6">
+    <div class="flex items-end justify-between px-4 pb-2 pt-6">
       <div>
         <div class="font-display text-base font-bold tracking-[-0.02em]">lanyard<span class="text-coral">.</span></div>
         <div class="text-[9px] text-muted">Follow up before it goes cold</div>

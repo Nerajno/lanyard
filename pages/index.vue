@@ -14,8 +14,14 @@
             You meet people worth knowing at conferences. Lanyard remembers them, texts you at the right moment, and gets you from "I should reach out" to message-sent in one tap.
           </p>
           <div class="mt-7 flex flex-wrap items-center gap-3">
-            <button class="btn solid lg" @click="scrollToId('get')">Get early access</button>
-            <button class="btn-surface lg" @click="scrollToId('how')">See how it works</button>
+            <button
+              class="inline-flex cursor-pointer items-center gap-[8px] rounded-[11px] border border-coral-press bg-coral-press px-6 py-[14px] text-[15px] font-semibold text-white transition-transform duration-150 hover:brightness-95 active:scale-[0.98]"
+              @click="scrollToId('get')"
+            >Get early access</button>
+            <button
+              class="inline-flex cursor-pointer items-center gap-[8px] rounded-[11px] border border-line bg-surface px-6 py-[14px] text-[15px] font-semibold text-ink transition-transform duration-150 active:scale-[0.98]"
+              @click="scrollToId('how')"
+            >See how it works</button>
           </div>
           <p class="mt-4 text-[12.5px] text-muted">No spam. Just a note when it's ready.</p>
         </div>
@@ -29,11 +35,11 @@
     <!-- PROBLEM -->
     <section class="border-line border-t py-16">
       <div class="mx-auto max-w-[1080px] px-6">
-        <p class="kick">The problem</p>
+        <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">The problem</p>
         <h2 class="font-display text-[clamp(1.6rem,4.4vw,2.4rem)] font-bold leading-tight tracking-[-0.025em]">
           The hallway track is where it happens. Then it fades.
         </h2>
-        <p class="text-ink-4 max-w-[620px] pt-4 text-[17px]">
+        <p class="text-ink-2 max-w-[620px] pt-4 text-[17px]">
           The best part of a conference is the conversations between the talks — the person you met in the coffee line, the one who gave you a real answer in the hallway. You both mean to keep in touch. Then the event ends, the context slips, and the follow-up you meant to send never goes out.
         </p>
       </div>
@@ -42,7 +48,7 @@
     <!-- HOW -->
     <section id="how" class="border-line border-t py-16">
       <div class="mx-auto max-w-[1080px] px-6">
-        <p class="kick">How it works</p>
+        <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">How it works</p>
         <h2 class="font-display font-bold">Three steps, no spreadsheet.</h2>
         <div class="mt-8 grid gap-4 md:grid-cols-3">
           <div
@@ -50,12 +56,12 @@
             :key="i"
             class="border-line bg-surface rounded-[18px] border p-6"
           >
-<div class="font-mono mb-3 text-xs text-muted">{{ String(i + 1).padStart(2, '0') }}</div>
+            <div class="font-mono mb-3 text-xs text-muted">{{ String(i + 1).padStart(2, '0') }}</div>
             <div class="mb-3 text-2xl" aria-hidden="true">{{ step.icon }}</div>
             <h3 class="font-display text-lg font-bold">{{ step.title }}</h3>
             <p class="mt-2 text-sm text-ink-2">{{ step.body }}</p>
-            <p v-if="step.bubble" class="bubble mt-3">
-              Time to follow up with <b>{{ step.bubbleName }}</b> — {{ step.bubbleMet }}
+            <p v-if="step.bubble" class="bg-bubble mt-3 rounded-[14px_14px_14px_4px] p-[10px_12px] text-[12.5px] leading-[1.4] text-bubble-ink">
+              Time to follow up with <b class="font-semibold">{{ step.bubbleName }}</b> — {{ step.bubbleMet }}
             </p>
           </div>
         </div>
@@ -94,9 +100,9 @@
     <!-- FEATURES -->
     <section id="features" class="border-line border-t py-16">
       <div class="mx-auto max-w-[1080px] px-6">
-        <p class="kick">What it does</p>
+        <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">What it does</p>
         <h2 class="font-display text-3xl font-bold">Small on purpose.</h2>
-        <p class="lead max-w-[620px] pt-4 text-[17px]">
+        <p class="text-ink-2 max-w-[620px] pt-4 text-[17px]">
           Lanyard does one thing a CRM is too heavy to do well: get you to actually follow up.
         </p>
         <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -112,7 +118,7 @@
     <!-- PHILOSOPHY -->
     <section class="border-line border-t py-16 text-center">
       <div class="mx-auto max-w-[1080px] px-6">
-        <p class="kick">Why it exists</p>
+        <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">Why it exists</p>
         <h2 class="font-display mx-auto max-w-[760px] font-bold leading-tight tracking-[-0.025em]">
           Your network deserves intentional consistency — not eventual consistency.
         </h2>
@@ -125,9 +131,9 @@
     <!-- FINAL CTA -->
     <section id="get" class="border-line bg-sunken border-t py-16 text-center">
       <div class="mx-auto max-w-[1080px] px-6">
-        <p class="kick">Early access</p>
+        <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">Early access</p>
         <h2 class="font-display text-3xl font-bold leading-tight tracking">Follow up before it goes cold.</h2>
-        <p class="lead mx-auto mt-3 max-w-[560px] text-[17px]">
+        <p class="text-ink-2 mx-auto mt-3 max-w-[560px] text-[17px]">
           Lanyard is being built in public. Leave your email and I'll tell you the moment it's ready to try at your next conference.
         </p>
         <div class="mt-6">
@@ -223,58 +229,3 @@ function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
 </script>
-
-<style scoped>
-.kick {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgb(var(--coral));
-  margin-bottom: 14px;
-}
-.lead {
-  color: rgb(var(--ink-2));
-}
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 10px 18px;
-  border-radius: 11px;
-  cursor: pointer;
-  border: 1px solid rgb(var(--line));
-  background: rgb(var(--surface));
-  color: rgb(var(--ink));
-  font-family: inherit;
-  transition: transform 0.1s, filter 0.1s;
-}
-.btn:active {
-  transform: scale(0.98);
-}
-.btn.solid {
-  background: rgb(var(--coral-press));
-  color: #fff;
-  border-color: rgb(var(--coral-press));
-}
-.btn.solid:hover {
-  filter: brightness(0.95);
-}
-.btn.lg {
-  padding: 14px 24px;
-  font-size: 15px;
-}
-.bubble {
-  background: rgb(var(--bubble));
-  color: rgb(var(--bubble-ink));
-  border-radius: 14px 14px 14px 4px;
-  padding: 10px 12px;
-  font-size: 12.5px;
-  line-height: 1.4;
-}
-.bubble b {
-  font-weight: 600;
-}
-</style>

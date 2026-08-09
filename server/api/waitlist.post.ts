@@ -1,12 +1,11 @@
 import { readBody } from 'h3'
 import { useSupabaseAdmin } from '~/server/utils/supabaseAdmin'
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+import { normalizeWaitlistEmail, isValidWaitlistEmail } from '~/server/utils/waitlistEmail'
 
 export default defineEventHandler(async (event) => {
 const body = await readBody<{ email?: string }>(event)
-  const email = body?.email?.trim().toLowerCase() ?? ''
-  if (!EMAIL_RE.test(email)) {
+  const email = normalizeWaitlistEmail(body?.email)
+  if (!isValidWaitlistEmail(email)) {
     throw createError({ statusCode: 400, statusMessage: "That email doesn't look right. Double-check it and try again." })
   }
 
