@@ -3,18 +3,17 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { normalizeE164, hashE164, writeSuppression, isSmsSuppressed } from '~/server/utils/smsSuppression'
 
 function mockAdmin() {
+  let found: unknown = null
+  const maybeSingle = vi.fn(async () => ({ data: found, error: null }))
   const q = {
-    insert: vi.fn(() => ({ onConflict: vi.fn(() => ({ ignore: q.ignore })) })),
-    ignore: vi.fn(async () => ({ error: null })),
-    select: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle: vi.fn(async () => ({ data: null, error: null })) })) })),
+    insert: vi.fn(() => ({ onConflict: vi.fn(() => ({ ignore: vi.fn(async () => ({ error: null })) })) })),
+    upsert: vi.fn(async () => ({ error: null })),
+    select: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle })) })),
   }
   const admin = {
-    from: vi.fn((t: string) => {
-      if (t === 'sms_suppressions') return q
-      return { select: () => ({}) }
-    }),
+    from: vi.fn(() => q),
   } as unknown as SupabaseClient
-  return { admin, q }
+  return { admin, q, setFound: (d: unknown) => { found = d } }
 }
 
 describe('normalizeE164', () => {
@@ -38,11 +37,11 @@ describe('writeSuppression / isSmsSuppressed', () => {
   it('stores only the hash', async () => {
     const { admin, q } = mockAdmin()
     await writeSuppression(admin, '+1 555 000 0000')
-    expect(q.insert).toHaveBeenCalledWith({ phone_hash: hashE164('+15550000000'), reason: 'opted_out' })
+    expect(q.upsert).toHaveBeenCalledWith({ phone_hash: hashE164('+15550000000'), reason: 'opted_out' }, { onConflict: 'phone_hash' })
   })
   it('reports suppressed for a matching hash', async () => {
-    const { admin, q } = mockAdmin()
-    q.select = vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle: vi.fn(async () => ({ data: { id: 1 }, error: null })) })) }))
+    const { admin, setFound } = mockAdmin()
+    setFound({ id: 1 })
     expect(await isSmsSuppressed(admin, '+15550000000')).toBe(true)
   })
   it('reports not suppressed when no match', async () => {

@@ -14,13 +14,11 @@ export function hashE164(phone: string): string {
   return createHash('sha256').update(normalizeE164(phone)).digest('hex')
 }
 
-/** Record a number as suppressed (idempotent — unique on phone_hash). */
+/** Record a number as suppressed (idempotent — unique conflict on phone_hash). */
 export async function writeSuppression(admin: SupabaseClient, phone: string): Promise<void> {
   await admin
     .from('sms_suppressions')
-    .insert({ phone_hash: hashE164(phone), reason: 'opted_out' })
-    .onConflict('phone_hash')
-    .ignore()
+    .upsert({ phone_hash: hashE164(phone), reason: 'opted_out' }, { onConflict: 'phone_hash' })
 }
 
 /** True when the number must never be texted. */
