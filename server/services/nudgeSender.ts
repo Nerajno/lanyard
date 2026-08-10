@@ -6,7 +6,9 @@
 import { buildNudgeActLink } from '~/utils/actLink'
 import type { Contact, Profile } from '~/types'
 import type { DueResult } from '~/utils/due'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { useSupabaseAdmin } from '~/server/utils/supabaseAdmin'
+import { isSmsSuppressed } from '~/server/utils/smsSuppression'
 
 export interface DeliverResult {
   sent: number
@@ -49,7 +51,7 @@ export async function deliverNudges(
   const channels = user.nudge_channel === 'both' ? (['sms', 'email'] as const) : ([user.nudge_channel] as const)
 
   for (const channel of channels) {
-    if (channel === 'sms' && !canSendSms(user)) {
+    if (channel === 'sms' && !(await canSendSms(user, admin))) {
       skipped.push('sms:no-opt-in-or-phone')
       continue
     }
@@ -100,9 +102,10 @@ export async function deliverNudges(
   return { sent, skipped }
 }
 
-function canSendSms(user: Profile): boolean {
+async function canSendSms(user: Profile, admin: SupabaseClient): Promise<boolean> {
   if (!user.phone || !user.sms_opt_in_at) return false
   if (user.sms_opted_out_at) return false
+  if (await isSmsSuppressed(admin, user.phone)) return false
   return true
 }
 

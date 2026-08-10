@@ -19,8 +19,11 @@
     <section class="mt-10">
       <h2 class="font-mono text-xs uppercase tracking-eyebrow text-muted">Account</h2>
       <p v-if="user" class="mt-2 text-sm text-muted">{{ user.email }}</p>
-      <button type="button" class="mt-3 text-sm text-coral hover:underline" @click="onSignOut">Sign out</button>
+      <button type="button" class="mt-3 block text-sm text-coral hover:underline" @click="onSignOut">Sign out</button>
+      <button type="button" class="mt-1 block text-sm text-coral hover:underline" @click="showDeleteConfirm = true">Delete account</button>
     </section>
+
+    <ConfirmDeleteAccount v-if="showDeleteConfirm" @close="showDeleteConfirm = false" />
   </div>
 </template>
 
@@ -35,6 +38,7 @@ const { profile, save } = useProfile()
 const auth = useAuthStore()
 const { user } = storeToRefs(auth)
 const { isDark, toggle: toggleTheme } = useTheme()
+const showDeleteConfirm = ref(false)
 
 async function onSaved() {
   if (!profile.value?.onboarded_at) {

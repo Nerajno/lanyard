@@ -1,5 +1,17 @@
 <template>
   <div class="bg-paper text-ink">
+    <section v-if="restoreOpen" class="border-b border-line bg-coral-soft/40">
+      <div class="mx-auto flex max-w-[1080px] flex-wrap items-center gap-3 px-6 py-4">
+        <p class="text-sm text-ink">Your account is scheduled for deletion. Within 14 days we can restore it — everything is still here.</p>
+        <input v-model="restoreEmail" type="email" placeholder="account email" class="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm focus:border-coral focus:outline-none">
+        <button type="button" class="rounded-lg bg-coral px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:opacity-50" :disabled="restoring" @click="restore">
+          {{ restoring ? 'Sending…' : 'Restore account' }}
+        </button>
+        <button type="button" class="text-sm text-muted underline" @click="dismissRestore">Dismiss</button>
+      </div>
+      <p v-if="restoreMsg" class="mx-auto max-w-[1080px] px-6 pb-3 text-sm text-ink">{{ restoreMsg }}</p>
+    </section>
+
     <!-- HERO -->
     <header class="pb-10 pt-14">
       <div class="mx-auto grid max-w-[1080px] items-center gap-10 px-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -163,6 +175,37 @@
 </template>
 
 <script setup lang="ts">
+const route = useRoute()
+const auth = useAuthStore()
+
+const restoreOpen = ref(Boolean(route.query.deleted))
+const restoreEmail = ref('')
+const restoreMsg = ref('')
+const restoring = ref(false)
+
+function dismissRestore() {
+  restoreOpen.value = false
+  window.history.replaceState(null, '', '/')
+}
+
+async function restore() {
+  if (!restoreEmail.value) {
+    restoreMsg.value = 'Enter the email of the account you deleted.'
+    return
+  }
+  restoring.value = true
+  restoreMsg.value = ''
+  try {
+    await $fetch('/api/account/restore', { method: 'POST', body: { email: restoreEmail.value } })
+    await auth.signInWithEmail(restoreEmail.value)
+    restoreMsg.value = 'Account restored — check your inbox for a sign-in link.'
+  } catch (e) {
+    restoreMsg.value = (e as { data?: { statusMessage?: string } })?.data?.statusMessage ?? 'Could not restore the account. It may be past the 14-day window.'
+  } finally {
+    restoring.value = false
+  }
+}
+
 const steps = [
   {
     icon: '✎',

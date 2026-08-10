@@ -37,6 +37,14 @@ export default defineEventHandler(async (event) => {
   const { data: profiles } = await admin.from('profiles').select('*')
   const { data: allContacts } = await admin.from('contacts').select('*')
 
+  // Users who requested deletion must not keep getting nudged during grace.
+  const { data: pendingDeletions } = await admin
+    .from('account_deletions')
+    .select('user_id')
+    .is('purged_at', null)
+    .is('superseded_at', null)
+  const deleting = new Set((pendingDeletions ?? []).map((r) => r.user_id))
+
   const byUser = new Map<string, Contact[]>()
   for (const c of allContacts ?? []) {
     const list = byUser.get(c.user_id) ?? []
@@ -48,6 +56,7 @@ export default defineEventHandler(async (event) => {
 
   for (const profile of (profiles ?? []) as Profile[]) {
     if (profile.sms_opted_out_at) continue
+    if (deleting.has(profile.user_id)) continue
     if (!shouldDeliverNow(profile.timezone)) continue
 
     const contacts = byUser.get(profile.user_id) ?? []
