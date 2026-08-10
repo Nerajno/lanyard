@@ -2,9 +2,13 @@
   <div>
     <div class="flex items-center justify-between">
       <h1 class="font-display text-3xl font-extrabold tracking-[-0.03em]">Contacts</h1>
-      <NuxtLink to="/app/add" class="rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press">
-        Add
-      </NuxtLink>
+      <div class="flex items-center gap-2 text-sm">
+        <NuxtLink to="/app" class="rounded-lg border px-3 py-1.5 font-mono text-xs uppercase tracking-eyebrow" :class="!showGraduated ? 'border-coral bg-coral-soft text-coral' : 'border-line bg-surface text-muted transition hover:text-coral'">Due</NuxtLink>
+        <NuxtLink to="/app?filter=graduated" class="rounded-lg border px-3 py-1.5 font-mono text-xs uppercase tracking-eyebrow" :class="showGraduated ? 'border-coral bg-coral-soft text-coral' : 'border-line bg-surface text-muted transition hover:text-coral'">Graduated</NuxtLink>
+        <NuxtLink to="/app/add" class="rounded-lg bg-coral px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-coral-press">
+          Add
+        </NuxtLink>
+      </div>
     </div>
 
     <p v-if="error" class="mt-4 text-sm text-coral">{{ error }}</p>
@@ -20,7 +24,7 @@
 
     <template v-else>
       <!-- Active / triage -->
-      <section class="mt-6">
+      <section v-if="!showGraduated" class="mt-6">
         <h2 class="font-mono text-xs uppercase tracking-eyebrow text-muted">Active</h2>
         <div v-if="active.length" class="mt-3 grid gap-4 sm:grid-cols-2">
           <ContactCard
@@ -38,12 +42,13 @@
       </section>
 
       <!-- Graduated -->
-      <div v-if="graduated.length" class="mt-10">
+      <section v-if="showGraduated" class="mt-6">
         <h2 class="font-mono text-xs uppercase tracking-eyebrow text-muted">Graduated</h2>
-        <div class="mt-3 grid gap-4 sm:grid-cols-2">
+        <div v-if="graduated.length" class="mt-3 grid gap-4 sm:grid-cols-2">
           <ContactCard v-for="contact in graduated" :key="contact.id" :contact="contact" @delete="onDelete" />
         </div>
-      </div>
+        <p v-else class="mt-3 text-sm text-muted">No one has finished their three coffees yet.</p>
+      </section>
     </template>
   </div>
 </template>
@@ -54,11 +59,13 @@ import type { Contact, LadderRung } from '~/types'
 definePageMeta({ layout: 'app', middleware: 'app' })
 
 const { contacts, loading, error, markFollowedUp, snoozeContact, archive, remove, remindContact } = useContacts()
+const route = useRoute()
 
 const active = computed(() =>
   [...contacts.value].filter((c) => c.status === 'active').sort((a, b) => a.follow_up_by.localeCompare(b.follow_up_by)),
 )
 const graduated = computed(() => contacts.value.filter((c) => c.status === 'graduated'))
+const showGraduated = computed(() => route.query.filter === 'graduated')
 
 async function onFollowUp(c: Contact) {
   await run(markFollowedUp(c.id))
