@@ -7,6 +7,8 @@ export type Profile = GeneratedDatabase['public']['Tables']['profiles']['Row']
 export type Contact = GeneratedDatabase['public']['Tables']['contacts']['Row']
 export type Nudge = GeneratedDatabase['public']['Tables']['nudges']['Row']
 export type Share = GeneratedDatabase['public']['Tables']['shares']['Row']
+export type SmsSuppression = GeneratedDatabase['public']['Tables']['sms_suppressions']['Row']
+export type AccountDeletion = GeneratedDatabase['public']['Tables']['account_deletions']['Row']
 
 export type InsertContact = GeneratedDatabase['public']['Tables']['contacts']['Insert']
 export type UpdateContact = GeneratedDatabase['public']['Tables']['contacts']['Update']
