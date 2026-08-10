@@ -33,7 +33,8 @@ onMounted(async () => {
     if (ok) {
       await auth.hydrate()
       message.value = 'Signed in.'
-      await navigateTo('/')
+      const redirect = typeof route.query.redirect === 'string' && route.query.redirect.startsWith('/') ? route.query.redirect : '/app'
+      await navigateTo(redirect)
     }
   } catch (e) {
     message.value = e instanceof Error ? e.message : String(e)

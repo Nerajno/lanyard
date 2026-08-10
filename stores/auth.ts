@@ -12,13 +12,15 @@ export const useAuthStore = defineStore('auth', {
       this.user = data.user
       this.ready = true
     },
-    async signInWithEmail(email: string) {
+    async signInWithEmail(email: string, redirectTo?: string): Promise<boolean> {
       const config = useRuntimeConfig()
+      const base = `${config.public.appUrl || window.location.origin}/auth/confirm`
+      const emailRedirectTo = redirectTo ? `${base}?redirect=${encodeURIComponent(redirectTo)}` : base
 
       const { error } = await useSupabase().auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${config.public.appUrl || window.location.origin}/auth/confirm`,
+          emailRedirectTo,
         },
       })
       if (error) throw error
