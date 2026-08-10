@@ -6,6 +6,7 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] Scaffold Nuxt 3 + TS + Tailwind + Pinia
 - [x] Create Supabase project; add `.env` + `.env.example` *(project `ymmlysznstdguegylbjq` created; linked + migrations pushed)*
 - [x] Wire Supabase client + auth (email magic link is fine)
+- [x] Subscribe magic link + email/password + Google/Apple OAuth sign-in (smart form)
 - [ ] Email provider account (Resend/Postmark) + verified sending domain *(build uses Resend; sign up + add key)*
 - [ ] **Start Twilio A2P 10DLC registration now** — it takes days to weeks to approve and blocks all SMS. Email nudges cover the gap. *(build + Verify hooks are in place)*
 
