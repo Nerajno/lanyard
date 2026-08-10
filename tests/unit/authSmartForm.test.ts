@@ -17,9 +17,11 @@ describe('nextAuthFormStep', () => {
   })
   it('maps a sign-up awaiting email confirmation to confirm-email', () => {
     expect(nextAuthFormStep('signup', { kind: 'awaiting-confirmation' })).toEqual({ phase: 'confirm-email' })
+    expect(CHECK_INBOX_MESSAGE).toBe('Check your inbox to confirm your email.')
   })
   it('maps a duplicate-email sign-up to duplicate', () => {
     expect(nextAuthFormStep('signup', { kind: 'duplicate-email' })).toEqual({ phase: 'duplicate' })
+    expect(DUPLICATE_MESSAGE).toBe('This email is already in use — sign in with your password, or use Google or Apple.')
   })
   it('maps a sign-up that returned a session to signed-in', () => {
     expect(nextAuthFormStep('signup', { kind: 'signed-in' })).toEqual({ phase: 'signed-in' })
