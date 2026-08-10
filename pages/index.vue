@@ -20,7 +20,7 @@
             >Get early access</button>
             <button
               class="inline-flex cursor-pointer items-center gap-[8px] rounded-[11px] border border-line bg-surface px-6 py-[14px] text-[15px] font-semibold text-ink transition-transform duration-150 active:scale-[0.98]"
-              @click="scrollToId('how')"
+              @click="scrollToId('how-it-works')"
             >See how it works</button>
           </div>
           <p class="mt-4 text-[12.5px] text-muted">No spam. Just a note when it's ready.</p>
@@ -46,7 +46,7 @@
     </section>
 
     <!-- HOW -->
-    <section id="how" class="border-line border-t py-16">
+    <section id="how-it-works" class="border-line border-t py-16">
       <div class="mx-auto max-w-[1080px] px-6">
         <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">How it works</p>
         <h2 class="font-display font-bold">Three steps, no spreadsheet.</h2>
@@ -69,7 +69,7 @@
     </section>
 
     <!-- THREE COFFEES -->
-    <section id="coffees" class="border-line border-t py-16">
+    <section id="three-coffees" class="border-line border-t py-16">
       <div class="mx-auto max-w-[1080px] px-6">
         <div class="bg-navy mt-2 rounded-3xl px-8 py-12 text-[#eef1f6] md:px-10">
           <p class="font-mono mb-3 text-xs uppercase tracking-[0.12em] text-[#f0a58f]">The idea</p>
@@ -149,9 +149,13 @@
           lanyard<span class="text-coral">.</span> · Progress over perfection
         </div>
         <div class="flex gap-5 text-sm text-muted">
-          <button class="hover:text-coral" @click="scrollToId('how')">How it works</button>
+          <button class="hover:text-coral" @click="scrollToId('how-it-works')">How it works</button>
           <button class="hover:text-coral" @click="scrollToId('features')">What it does</button>
           <button class="hover:text-coral" @click="scrollToId('get')">Early access</button>
+          <NuxtLink to="/pricing" class="hover:text-coral">Pricing</NuxtLink>
+          <NuxtLink to="/about" class="hover:text-coral">About</NuxtLink>
+          <NuxtLink to="/privacy" class="hover:text-coral">Privacy</NuxtLink>
+          <NuxtLink to="/terms" class="hover:text-coral">Terms</NuxtLink>
         </div>
       </div>
     </footer>
