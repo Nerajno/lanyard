@@ -82,8 +82,8 @@ export async function deliverNudges(
         providerMessageId = await sendEmail(user.email!, 'Follow up', emailDirect(contact.how_met, link), cfg)
       }
     } else {
-      // Digest: batch link to the triage list.
-      const triage = `${cfg.appUrl.replace(/\/$/, '')}/contacts`
+      // Digest: batch link to the app triage list.
+      const triage = `${cfg.appUrl.replace(/\/$/, '')}/app`
       if (channel === 'sms') {
         providerMessageId = await sendSms(user.phone!, smsDigest(result.count, triage), cfg)
       } else {

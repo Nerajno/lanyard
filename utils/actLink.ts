@@ -77,5 +77,5 @@ export function verifyActLink(token: string, secret: string, now: Date = new Dat
 
 export function buildNudgeActLink(baseUrl: string, payload: Omit<ActPayload, 'v' | 'exp'>, secret: string): string {
   const token = signActLink(payload, secret)
-  return `${baseUrl.replace(/\/$/, '')}/api/act?t=${encodeURIComponent(token)}`
+  return `${baseUrl.replace(/\/$/, '')}/act/${encodeURIComponent(token)}`
 }

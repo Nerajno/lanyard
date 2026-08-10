@@ -45,15 +45,15 @@ describe('buildNudgeActLink', () => {
     // Guard: a blank secret would silently sign with empty HMAC.
   })
 
-  it('is a URL with the token in the query', () => {
+  it('is a URL with the token in the path (/act/:token)', () => {
     const link = buildNudgeActLink('https://lanyard.app', { nudgeId: 'n1', contactId: 'c1' }, SECRET)
-    expect(link).toMatch(/^https:\/\/lanyard\.app\/api\/act\?t=/)
-    expect(() => verifyActLink(link.split('t=')[1], SECRET)).not.toThrow()
+    expect(link).toMatch(/^https:\/\/lanyard\.app\/act\/[^/]+$/)
+    expect(() => verifyActLink(link.split('/act/')[1], SECRET)).not.toThrow()
   })
 
   it('builds a digest link when flagged', () => {
     const link = buildNudgeActLink('https://lanyard.app/', { nudgeId: 'n2', contactId: 'c1', digest: true }, SECRET)
-    const p = verifyActLink(link.split('t=')[1], SECRET)
+    const p = verifyActLink(link.split('/act/')[1], SECRET)
     expect(p.digest).toBe(true)
   })
 })
