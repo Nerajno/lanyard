@@ -23,6 +23,7 @@ A conference follow-up nudger. Capture a contact, get a timed nudge (SMS or emai
 - `stores/` — Pinia. `server/api/` — Nitro. `supabase/` — schema.sql, functions, migrations.
 
 ## Rules
+- Each new plan (feature/fix work) goes on its own branch — never commit directly to `main`. Create a branch per plan, and finish the branch before starting the next plan.
 - Phase 1 only unless told otherwise (see PRD scope). Don't build QR/LinkedIn/AI opener/calendar yet.
 - **Never scrape LinkedIn** or infer profile data from a LinkedIn URL — store the URL, ask the user for the name.
 - A nudge targeting a **single** contact must include `how_met` verbatim. Digests (2+ due) link to triage instead. Keep the received→sent path one tap.
