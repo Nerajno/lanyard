@@ -816,3 +816,127 @@ git commit -m "docs(auth): record three-way sign-in decision"
 - [ ] **Step 5: Manual smoke (not required for completion, aids handoff)**
 
 With a linked Supabase project (real anon keys in `.env`) and `NUXT_PUBLIC_APP_URL` set, run `npm run dev` and verify: password Sign in (existing account); smart flip (unknown email → Create account → confirm inbox); forgot-password → reset → new password works; Google + Apple OAuth round-trip lands in `/app`; magic link still works. Provider credentials are already configured — no dashboard changes.
+---
+
+## Fix wave (final whole-branch review, 2026-08-10)
+
+Amends the executed plan. Approved by the project owner: restore the confirm-email resend path the spec required; fix the untested error-code mapping; three one-line polish fixes.
+
+### 1. `utils/authSmartForm.ts` — final amendments
+
+Add and export `toErrorResult` (moved out of `composables/useAuthForm.ts`):
+
+```ts
+export function toErrorResult(error: unknown): AuthResult {
+  const code = (error as { code?: string } | null)?.code
+  if (code === 'invalid_credentials') return { kind: 'need-password' }
+  if (code === 'user_already_exists' || code === 'email_exists') return { kind: 'duplicate-email' }
+  return { kind: 'failed', message: error instanceof Error ? error.message : String(error) }
+}
+```
+
+Amend `submitLabel` to route the confirming state back to a resend:
+
+```ts
+export function submitLabel(phase: AuthFormPhase, loading: boolean): string {
+  if (loading) {
+    if (phase.phase === 'signup') return 'Creating account…'
+    if (phase.phase === 'confirm-email') return 'Sending…'
+    return 'Signing in…'
+  }
+  if (phase.phase === 'signup') return 'Create account'
+  if (phase.phase === 'confirm-email') return 'Resend confirmation?'
+  return 'Continue'
+}
+```
+
+Amend `actionForPhase` so the confirming state calls `signUp` (re-send the confirmation email):
+
+```ts
+export function actionForPhase(phase: AuthFormPhase): AuthAction {
+  return phase.phase === 'signup' || phase.phase === 'confirm-email' ? 'signup' : 'signin'
+}
+```
+
+Add tests to `tests/unit/authSmartForm.test.ts`:
+
+```ts
+describe('toErrorResult', () => {
+  it('maps invalid_credentials to need-password', () => {
+    expect(toErrorResult({ code: 'invalid_credentials' })).toEqual({ kind: 'need-password' })
+  })
+  it('maps user_already_exists and email_exists to duplicate-email', () => {
+    expect(toErrorResult({ code: 'user_already_exists' })).toEqual({ kind: 'duplicate-email' })
+    expect(toErrorResult({ code: 'email_exists' })).toEqual({ kind: 'duplicate-email' })
+  })
+  it('maps an Error to failed with its message', () => {
+    expect(toErrorResult(new Error('boom'))).toEqual({ kind: 'failed', message: 'boom' })
+  })
+  it('maps a non-Error to failed with String(error)', () => {
+    expect(toErrorResult('wat')).toEqual({ kind: 'failed', message: 'wat' })
+  })
+})
+
+// in describe('submitLabel'):
+  it('labels confirm-email Resend confirmation?', () => {
+    expect(submitLabel({ phase: 'confirm-email' }, false)).toBe('Resend confirmation?')
+    expect(submitLabel({ phase: 'confirm-email' }, true)).toBe('Sending…')
+  })
+
+// in describe('actionForPhase'):
+  it('returns signup for the confirm-email phase', () => {
+    expect(actionForPhase({ phase: 'confirm-email' })).toBe('signup')
+  })
+```
+
+### 2. `composables/useAuthForm.ts`
+
+Remove the local `toErrorResult` function; import it from the resolver instead:
+
+```ts
+import { actionForPhase, nextAuthFormStep, submitLabel, toErrorResult } from '~/utils/authSmartForm'
+```
+
+(Drop the local `function toErrorResult(...)` definition.)
+
+### 3. `pages/login.vue`
+
+Reset the magic-link confirmation state when the tab changes (a user who tabs away and back must not see a stale "Check your inbox…" for a different email):
+
+```ts
+watch(tab, () => {
+  sent.value = false
+  error.value = null
+})
+```
+
+### 4. `pages/auth/reset-password.vue`
+
+- Success message tone: `:class="updated ? 'text-graduated' : 'text-coral'"` on the message `<p>`.
+- Defend the query casts against `string[]`:
+
+```ts
+const code = typeof route.query.code === 'string' ? route.query.code : undefined
+const token = typeof route.query.token_hash === 'string' ? route.query.token_hash : undefined
+```
+
+### 5. `stores/auth.ts`
+
+Drop the dead post-OAuth `getUser()` in `signInWithProvider` (returns null in the PKCE redirect flow; `plugins/auth.ts` `onAuthStateChange` syncs the session after the round trip):
+
+```ts
+    async signInWithProvider(provider: 'google' | 'apple', redirectTo?: string): Promise<void> {
+      const { error } = await useSupabase().auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: authConfirmUrl(redirectTo) },
+      })
+      if (error) throw error
+    },
+```
+
+### 6. Verification + commit
+
+- `npx vitest run` — expected 16 authSmartForm tests (10 existing + 6 new) passing, full suite green.
+- `npx nuxi typecheck` — PASS.
+- `npm run lint` — PASS, exit 0.
+- Commit: `git add -A && git commit -m "fix(auth): confirm-email resend + tested error mapping (final review)"` (single commit for the fix wave).
