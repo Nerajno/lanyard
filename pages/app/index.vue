@@ -2,7 +2,7 @@
   <div>
     <div class="flex items-center justify-between">
       <h1 class="font-display text-3xl font-extrabold tracking-[-0.03em]">Contacts</h1>
-      <NuxtLink to="/add" class="rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press">
+      <NuxtLink to="/app/add" class="rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press">
         Add
       </NuxtLink>
     </div>
@@ -13,7 +13,7 @@
     <div v-if="!loading && contacts.length === 0" class="mt-16 text-center">
       <p class="font-display text-xl font-bold tracking-[-0.02em]">Met someone? Add them.</p>
       <p class="mt-1 text-sm text-muted">We'll nudge you before it cools.</p>
-      <NuxtLink to="/add" class="mt-3 inline-block rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press">
+      <NuxtLink to="/app/add" class="mt-3 inline-block rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press">
         Add your first contact
       </NuxtLink>
     </div>
@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import type { Contact, LadderRung } from '~/types'
 
-definePageMeta({ middleware: 'auth' })
+definePageMeta({ layout: 'app', middleware: 'app' })
 
 const { contacts, loading, error, markFollowedUp, snoozeContact, archive, remove, remindContact } = useContacts()
 

@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+definePageMeta({ layout: 'app', middleware: 'app' })
 
 interface Stats {
   nudges: { total: number; actedOn: number; actedOnPercent: number; medianLatencyMinutes: number | null }

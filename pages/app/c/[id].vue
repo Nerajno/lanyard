@@ -26,7 +26,7 @@
 import type { ContactFormValues } from '~/components/ContactForm.vue'
 import { presetOf, resolveLadder } from '~/utils/cadence'
 
-definePageMeta({ middleware: 'auth' })
+definePageMeta({ layout: 'app', middleware: 'app' })
 
 const route = useRoute()
 const { contacts, loading, update, remove } = useContacts()
@@ -57,7 +57,7 @@ async function onSubmit(values: ContactFormValues) {
       phone: values.phone,
       cadence_ladder: resolveLadder(values.ladderPreset, values.customLadder),
     })
-    await navigateTo('/')
+    await navigateTo('/app')
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   }
@@ -68,7 +68,7 @@ async function onDelete() {
   if (!confirm(`Delete ${contact.value.name}?`)) return
   try {
     await remove(contact.value.id)
-    await navigateTo('/')
+    await navigateTo('/app')
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   }

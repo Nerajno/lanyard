@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import type { ContactFormValues } from '~/components/ContactForm.vue'
 
-definePageMeta({ middleware: 'auth' })
+definePageMeta({ layout: 'app', middleware: 'app' })
 
 const { add } = useContacts()
 const submitting = ref(false)
@@ -32,7 +32,7 @@ async function onSubmit(values: ContactFormValues) {
       ladderPreset: values.ladderPreset,
       customLadder: values.customLadder,
     })
-    await navigateTo('/')
+    await navigateTo('/app')
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   } finally {

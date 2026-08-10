@@ -75,7 +75,7 @@
 <script setup lang="ts">
 import { useProfile } from '~/composables/useProfile'
 
-definePageMeta({ middleware: 'auth' })
+definePageMeta({ layout: 'app', middleware: 'app' })
 
 const { profile, save, optInSms } = useProfile()
 
