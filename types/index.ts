@@ -6,11 +6,14 @@ import type { Database as GeneratedDatabase } from '~/types/database'
 export type Profile = GeneratedDatabase['public']['Tables']['profiles']['Row']
 export type Contact = GeneratedDatabase['public']['Tables']['contacts']['Row']
 export type Nudge = GeneratedDatabase['public']['Tables']['nudges']['Row']
+export type Share = GeneratedDatabase['public']['Tables']['shares']['Row']
 
 export type InsertContact = GeneratedDatabase['public']['Tables']['contacts']['Insert']
 export type UpdateContact = GeneratedDatabase['public']['Tables']['contacts']['Update']
 export type InsertProfile = GeneratedDatabase['public']['Tables']['profiles']['Insert']
 export type UpdateProfile = GeneratedDatabase['public']['Tables']['profiles']['Update']
+export type InsertShare = GeneratedDatabase['public']['Tables']['shares']['Insert']
+export type UpdateShare = GeneratedDatabase['public']['Tables']['shares']['Update']
 
 export type ContactStatus = Contact['status']
 

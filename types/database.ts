@@ -21,6 +21,7 @@ export interface Database {
           quiet_hours_end: number
           sms_opt_in_at: string | null
           sms_opted_out_at: string | null
+          onboarded_at: string | null
           created_at: string
           updated_at: string
         }
@@ -35,6 +36,7 @@ export interface Database {
           quiet_hours_end?: number
           sms_opt_in_at?: string | null
           sms_opted_out_at?: string | null
+          onboarded_at?: string | null
         }
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>
       }
@@ -92,6 +94,24 @@ export interface Database {
           provider_message_id?: string | null
         }
         Update: Partial<Database['public']['Tables']['nudges']['Insert']>
+      }
+      shares: {
+        Row: {
+          id: string
+          user_id: string
+          how_met_default: string | null
+          expires_at: string
+          used_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id: string
+          user_id: string
+          how_met_default?: string | null
+          expires_at: string
+          used_at?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['shares']['Insert']>
       }
     }
   }
