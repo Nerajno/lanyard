@@ -113,6 +113,42 @@ export interface Database {
         }
         Update: Partial<Database['public']['Tables']['shares']['Insert']>
       }
+      sms_suppressions: {
+        Row: {
+          id: number
+          phone_hash: string
+          reason: string
+          created_at: string
+        }
+        Insert: {
+          id?: never
+          phone_hash: string
+          reason?: string
+          created_at?: never
+        }
+        Update: Partial<Database['public']['Tables']['sms_suppressions']['Insert']>
+      }
+      account_deletions: {
+        Row: {
+          id: string
+          user_id: string
+          email: string
+          requested_at: string
+          purge_at: string
+          purged_at: string | null
+          superseded_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          email: string
+          requested_at?: string
+          purge_at: string
+          purged_at?: string | null
+          superseded_at?: string | null
+        }
+        Update: Partial<Database['public']['Tables']['account_deletions']['Insert']>
+      }
     }
   }
 }

@@ -58,6 +58,27 @@ Latency = `acted_at - sent_at`. Impossible to backfill, so write it from day one
 
 RLS: `user_id = auth.uid()` on select/insert/update/delete, all three tables.
 
+`sms_suppressions` — numbers to never text again.
+| col | type | notes |
+|---|---|---|
+| id | bigint identity pk | |
+| phone_hash | text unique | SHA-256 of normalized E.164; never the raw number |
+| reason | text | `opted_out` |
+| created_at | timestamptz | |
+
+RLS enabled, **no public policies** — written by the delete flow and read by the send guard via the service-role client. No FK, so it outlives `auth.users` (indefinite retention = a recycled number is never texted again).
+
+`account_deletions` — grace-window ledger for account deletion.
+| col | type | notes |
+|---|---|---|
+| id | uuid pk | |
+| user_id | uuid | no FK — the audit row must outlive the purge |
+| email | text | normalized real email (GoTrue obfuscates it on soft delete); undo/purge lookups key here |
+| requested_at / purge_at | timestamptz | `purge_at = requested_at + 14 days` |
+| purged_at / superseded_at | timestamptz | purge done / restoration won |
+
+RLS enabled, **no public policies** (service-role only). Partial index on `purge_at` where `purged_at is null and superseded_at is null`.
+
 Later cols (P2/P3, all nullable): `title`, `company`, `event_name`, `socials jsonb` (`{linkedin, github, x, site}`), `photo_url`, `note`, `follow_up_reason` (what to actually do next — the field that makes the nudge actionable), `source` (manual/badge_qr/link), `opener_draft`.
 
 Social handles → `socials jsonb` (or a `contact_socials` child table); one column per platform doesn't scale. Manual capture requires `name` + `how_met` + one of email/phone; everything above is optional and best filled from a badge vCard or the share-link, not typed at a booth.
@@ -84,6 +105,9 @@ Fallback if Netlify scheduling is fiddly: any external cron (GitHub Actions, cro
 - **Act:** act-link (signed, single-purpose token so it works from a phone without a fresh login) → stamps `nudges.opened_at`, opens `sms:<phone>?&body=…` or `mailto:<email>?subject=…&body=…` prefilled, and marks the touchpoint: `touchpoints_done += 1`, `acted_at` stamped. If `touchpoints_done < 3` → `follow_up_by = acted_at + cadence_ladder[touchpoints_done + 1]`; if `= 3` → `status = 'graduated'`, nudging stops.
 - **Snooze:** `follow_up_by += 3d`, ladder position unchanged.
 - **Triage list:** active contacts `order by follow_up_by asc`, urgency color from days-until-due; separate graduated section — visible proof the loop worked.
+
+## Account deletion
+Setting → *Delete account* asks the user to type their email, offers a data export, then calls `POST /api/account/delete` (service role only): writes the `account_deletions` grace row, records an `sms_suppressions` hash if the account had opted out of SMS, and soft-deletes the auth user. A Netlify **`@daily`** schedule (`netlify/functions/purge-cron` → `/api/cron/purge`, same `NUXT_CRON_SECRET` guard as the nudge cron) hard-deletes users past the 14-day window; the FK cascades remove every owned row. Undo within grace (`POST /api/account/restore`, reachable signed-out from the home banner) recreates the auth user and reparents `profiles`/`contacts`/`nudges`/`shares` to the new uid. The client clears its local session after the delete call (sign-out throws because the auth user is already gone — caught). Pending deletions are skipped by the nudge loop, and `isSmsSuppressed` hard-blocks any SMS to a hashed number.
 
 ## Later (tagged)
 - **P2 capture:** public share-link page (unauth insert via RLS policy or edge fn). QR scanner parses payload and branches: **vCard** → autofill all fields; **URL** (LinkedIn / attendee profile) → store URL, prompt for name; **opaque ID** (paid lead-retrieval badges) → store raw value, manual fallback. Rule: autofill when parseable, always allow manual. No dependency on any event platform API.

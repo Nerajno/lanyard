@@ -63,6 +63,16 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [ ] Add real people from your next event — *human action*
 - [x] Track from `nudges`: median nudge→act latency, % acted on, % reaching all three coffees — *see `/api/stats` + `/stats` page*
 
+## 7. Account deletion
+- [x] Migration: `sms_suppressions` + `account_deletions` (RLS on, no public policies); FKs already cascade
+- [x] Delete route: typed-email confirm → grace ledger → suppression → soft delete (service role only)
+- [x] Export route (`GET /api/account/export`) → "Download my data"
+- [x] Restore route: recreate auth user + reparent rows within 14 days
+- [x] Daily purge cron (`@daily`) → hard delete past grace
+- [x] Nudge loop skips pending deletions; sender hard-blocks suppressed numbers
+- [x] Settings UI + confirm dialog + post-delete redirect + home restore banner
+- [x] Vitest: delete happy/failure/idempotent, suppression hash, purge/restore plans
+
 ## Parked (do NOT start in Phase 1)
 QR scan · LinkedIn attach · share-link capture · email/calendar · AI opener
 
