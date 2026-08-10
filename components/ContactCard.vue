@@ -47,7 +47,7 @@
       <button v-if="contact.status !== 'graduated'" class="rounded-lg px-3 py-1.5 text-xs text-coral transition-colors hover:bg-coral-soft" @click="$emit('delete', contact)">
         Delete
       </button>
-      <NuxtLink :to="`/contacts/${contact.id}/edit`" class="rounded-lg px-3 py-1.5 text-xs text-muted transition-colors hover:bg-paper">
+      <NuxtLink :to="`/app/c/${contact.id}`" class="rounded-lg px-3 py-1.5 text-xs text-muted transition-colors hover:bg-paper">
         Edit
       </NuxtLink>
       <span v-if="contact.status === 'graduated'" class="font-mono text-xs font-medium text-graduated">Graduated — all 3 coffees</span>

@@ -34,6 +34,13 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    '/contacts': { redirect: { to: '/app', statusCode: 301 } },
+    '/add': { redirect: { to: '/app/add', statusCode: 301 } },
+    '/settings': { redirect: { to: '/app/settings', statusCode: 301 } },
+    '/stats': { redirect: { to: '/app/stats', statusCode: 301 } },
+  },
+
   app: {
     head: {
       title: 'lanyard.',
