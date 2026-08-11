@@ -4,3 +4,7 @@
 # Hourly trigger for the nudge loop (see README → Deploy → Netlify).
 [functions."nudge-cron"]
   schedule = "@hourly"
+
+# Daily trigger for hard-deleting accounts past the 14-day grace window.
+[functions."purge-cron"]
+  schedule = "@daily"

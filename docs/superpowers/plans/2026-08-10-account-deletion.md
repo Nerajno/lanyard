@@ -587,7 +587,7 @@ export async function restoreAccount(admin: SupabaseClient, email: string, now: 
   //    on_auth_user_created trigger re-creates an empty profiles row for it.
   const { data: created, error: createError } = await admin.auth.admin.createUser({ email: normalized })
   if (createError || !created) throw new AccountDeletionError('Could not restore your account. Try again.')
-  const newId = created.id
+  const newId = created.user.id
 
   // 2. Reparent: copy the old profile into the new trigger-created row, drop the
   //    old one, then move every owned row to the new uid.
@@ -607,7 +607,7 @@ export async function restoreAccount(admin: SupabaseClient, email: string, now: 
 
   // 3. The old user is now an empty shell — hard delete (cascade cleans up the
   //    trigger-created profile if reparenting above missed anything).
-  await admin.auth.admin.deleteUser(oldId, { shouldSoftDelete: false })
+  await admin.auth.admin.deleteUser(oldId, false)
 
   // 4. Close the grace record.
   await admin.from('account_deletions').update({ superseded_at: now.toISOString() }).eq('id', pending.id)
@@ -617,17 +617,21 @@ export async function restoreAccount(admin: SupabaseClient, email: string, now: 
 
 /** Hard-purge soft-deleted accounts whose grace window has passed. */
 export async function purgeDueAccounts(admin: SupabaseClient, now: Date): Promise<{ purged: number; failed: number }> {
+  const nowIso = now.toISOString()
   const { data: due } = await admin
     .from('account_deletions')
-    .select('user_id')
-    .lte('purge_at', now.toISOString())
+    .select('user_id, purge_at')
+    .lte('purge_at', nowIso)
     .is('purged_at', null)
     .is('superseded_at', null)
 
   let purged = 0
   let failed = 0
-  for (const row of due ?? []) {
-    const { error } = await admin.auth.admin.deleteUser(row.user_id, { shouldSoftDelete: false })
+  for (const row of (due ?? [])) {
+    // Double guard on the window (the query already filters); keeps the unit
+    // test meaningful against loose mocks and protects against clock skew.
+    if (row.purge_at > nowIso) continue
+    const { error } = await admin.auth.admin.deleteUser(row.user_id, false)
     if (error) {
       failed++
       continue
@@ -675,11 +679,13 @@ git commit -m "feat(account-deletion): delete/restore/purge logic + tests"
 // Permanent account deletion: typed-email confirm → 14-day grace ledger →
 // suppression → side-effect cancels → GoTrue soft delete. Server-only; the
 // service-role key never leaves this route.
+// Authorized with the caller's Supabase JWT (Bearer), matching profile/phone.ts.
+import type { H3Event } from 'h3'
 import { useSupabaseAdmin } from '~/server/utils/supabaseAdmin'
 import { AccountDeletionError, requestAccountDeletion } from '~/server/utils/accountDeletion'
 
 export default defineEventHandler(async (event) => {
-  const user = await useSupabaseUser()
+  const { data: { user } } = await useSupabaseAdmin().auth.getUser(authToken(event))
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Sign in first' })
 
   const { confirmEmail } = await readBody<{ confirmEmail?: string }>(event)
@@ -710,14 +716,17 @@ export default defineEventHandler(async (event) => {
 ```ts
 // GDPR-style data export: the signed-in user's contacts as JSON.
 // Read-only; feeds the "Download my data" button in the delete dialog.
+// Authorized with the caller's Supabase JWT (Bearer).
+import type { H3Event } from 'h3'
 import { useSupabaseAdmin } from '~/server/utils/supabaseAdmin'
 import type { Contact } from '~/types'
 
 export default defineEventHandler(async (event) => {
-  const user = await useSupabaseUser()
+  const admin = useSupabaseAdmin()
+  const { data: { user } } = await admin.auth.getUser(authToken(event))
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Sign in first' })
 
-  const { data } = await useSupabaseAdmin()
+  const { data } = await admin
     .from('contacts')
     .select('*')
     .eq('user_id', user.id)
@@ -725,6 +734,10 @@ export default defineEventHandler(async (event) => {
 
   return { contacts: (data ?? []) as Contact[] }
 })
+
+function authToken(event: H3Event): string {
+  return (getHeader(event, 'authorization') ?? '').replace(/^Bearer\s+/i, '')
+}
 ```
 
 - [ ] **Step 3: Write the restore route**
