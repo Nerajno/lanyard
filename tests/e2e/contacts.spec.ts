@@ -4,7 +4,7 @@ test('adds a contact from the manual form and sees it in the list', async ({ pag
   await goto('/login', { waitUntil: 'hydration' })
   await page.locator('#email').fill('e2e@lanyard.test')
   await page.locator('#password').fill('e2epass123')
-  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await expect(page).toHaveURL(/\/app(\/|$)/)
 
   await page.getByRole('link', { name: 'Add' }).click()
@@ -24,7 +24,7 @@ test('blocks a contact with no email or phone', async ({ page, goto }) => {
   await goto('/login', { waitUntil: 'hydration' })
   await page.locator('#email').fill('e2e@lanyard.test')
   await page.locator('#password').fill('e2epass123')
-  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await expect(page).toHaveURL(/\/app(\/|$)/)
 
   await page.getByRole('link', { name: 'Add' }).click()

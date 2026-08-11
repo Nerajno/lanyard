@@ -8,7 +8,7 @@ test('changes the password and signs in with the new one', async ({ page, goto }
   await goto('/login', { waitUntil: 'hydration' })
   await page.locator('#email').fill('pw@lanyard.test')
   await page.locator('#password').fill('pwpass123')
-  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await expect(page).toHaveURL(/\/app(\/|$)/)
 
   await page.getByRole('link', { name: 'Settings' }).click()
@@ -27,6 +27,6 @@ test('changes the password and signs in with the new one', async ({ page, goto }
   await page.getByRole('link', { name: 'Log in' }).click()
   await page.locator('#email').fill('pw@lanyard.test')
   await page.locator('#password').fill('pwnew456')
-  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.getByRole('button', { name: 'Continue', exact: true }).click()
   await expect(page).toHaveURL(/\/app(\/|$)/)
 })
