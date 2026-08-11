@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import type { User } from '@supabase/supabase-js'
+import { buildPasswordUpdate } from '~/utils/changePassword'
 
 function authConfirmUrl(to?: string): string {
   const config = useRuntimeConfig()
@@ -48,6 +49,11 @@ export const useAuthStore = defineStore('auth', {
       const base = `${config.public.appUrl || window.location.origin}/auth/reset-password`
       const { error } = await useSupabase().auth.resetPasswordForEmail(email, { redirectTo: base })
       if (error) throw error
+    },
+    async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+      const { error } = await useSupabase().auth.updateUser(buildPasswordUpdate(currentPassword, newPassword))
+      if (error) throw error
+      await useSupabase().auth.signOut({ scope: 'others' })
     },
     async signOut() {
       this.user = null
