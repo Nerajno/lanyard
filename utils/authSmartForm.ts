@@ -36,10 +36,23 @@ export function nextAuthFormStep(action: AuthAction, result: AuthResult): AuthFo
 }
 
 export function actionForPhase(phase: AuthFormPhase): AuthAction {
-  return phase.phase === 'signup' ? 'signup' : 'signin'
+  return phase.phase === 'signup' || phase.phase === 'confirm-email' ? 'signup' : 'signin'
 }
 
 export function submitLabel(phase: AuthFormPhase, loading: boolean): string {
-  if (loading) return phase.phase === 'signup' ? 'Creating account…' : 'Signing in…'
-  return phase.phase === 'signup' ? 'Create account' : 'Continue'
+  if (loading) {
+    if (phase.phase === 'signup') return 'Creating account…'
+    if (phase.phase === 'confirm-email') return 'Sending…'
+    return 'Signing in…'
+  }
+  if (phase.phase === 'signup') return 'Create account'
+  if (phase.phase === 'confirm-email') return 'Resend confirmation?'
+  return 'Continue'
+}
+
+export function toErrorResult(error: unknown): AuthResult {
+  const code = (error as { code?: string } | null)?.code
+  if (code === 'invalid_credentials') return { kind: 'need-password' }
+  if (code === 'user_already_exists' || code === 'email_exists') return { kind: 'duplicate-email' }
+  return { kind: 'failed', message: error instanceof Error ? error.message : String(error) }
 }

@@ -6,9 +6,9 @@
       <OAuthButtons />
 
       <div class="flex items-center gap-3 text-muted">
-        <span class="h-px flex-1 bg-line"></span>
+        <span class="h-px flex-1 bg-line"/>
         <span class="font-mono text-xs uppercase tracking-eyebrow">or</span>
-        <span class="h-px flex-1 bg-line"></span>
+        <span class="h-px flex-1 bg-line"/>
       </div>
 
       <div class="flex rounded-lg border border-line bg-surface p-1">
@@ -70,6 +70,11 @@ const email = ref('')
 const sending = ref(false)
 const error = ref<string | null>(null)
 const sent = ref(false)
+
+watch(tab, () => {
+  sent.value = false
+  error.value = null
+})
 
 async function send() {
   sending.value = true

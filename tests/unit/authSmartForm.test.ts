@@ -3,10 +3,27 @@ import {
   nextAuthFormStep,
   actionForPhase,
   submitLabel,
+  toErrorResult,
   SIGNUP_PROMPT,
   CHECK_INBOX_MESSAGE,
   DUPLICATE_MESSAGE,
 } from '~/utils/authSmartForm'
+
+describe('toErrorResult', () => {
+  it('maps invalid_credentials to need-password', () => {
+    expect(toErrorResult({ code: 'invalid_credentials' })).toEqual({ kind: 'need-password' })
+  })
+  it('maps user_already_exists and email_exists to duplicate-email', () => {
+    expect(toErrorResult({ code: 'user_already_exists' })).toEqual({ kind: 'duplicate-email' })
+    expect(toErrorResult({ code: 'email_exists' })).toEqual({ kind: 'duplicate-email' })
+  })
+  it('maps an Error to failed with its message', () => {
+    expect(toErrorResult(new Error('boom'))).toEqual({ kind: 'failed', message: 'boom' })
+  })
+  it('maps a non-Error to failed with String(error)', () => {
+    expect(toErrorResult('wat')).toEqual({ kind: 'failed', message: 'wat' })
+  })
+})
 
 describe('nextAuthFormStep', () => {
   it('maps a successful sign-in to signed-in', () => {
@@ -46,6 +63,10 @@ describe('submitLabel', () => {
     expect(submitLabel({ phase: 'signin' }, true)).toBe('Signing in…')
     expect(submitLabel({ phase: 'signup', message: '' }, true)).toBe('Creating account…')
   })
+  it('labels confirm-email Resend confirmation?', () => {
+    expect(submitLabel({ phase: 'confirm-email' }, false)).toBe('Resend confirmation?')
+    expect(submitLabel({ phase: 'confirm-email' }, true)).toBe('Sending…')
+  })
 })
 
 describe('actionForPhase', () => {
@@ -53,5 +74,8 @@ describe('actionForPhase', () => {
     expect(actionForPhase({ phase: 'signup', message: '' })).toBe('signup')
     expect(actionForPhase({ phase: 'idle' })).toBe('signin')
     expect(actionForPhase({ phase: 'error', message: '' })).toBe('signin')
+  })
+  it('returns signup for the confirm-email phase', () => {
+    expect(actionForPhase({ phase: 'confirm-email' })).toBe('signup')
   })
 })

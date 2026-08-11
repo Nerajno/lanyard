@@ -1,13 +1,6 @@
 import { ref, computed, watch } from 'vue'
 import type { AuthFormPhase, AuthResult } from '~/utils/authSmartForm'
-import { actionForPhase, nextAuthFormStep, submitLabel } from '~/utils/authSmartForm'
-
-function toErrorResult(error: unknown): AuthResult {
-  const code = (error as { code?: string } | null)?.code
-  if (code === 'invalid_credentials') return { kind: 'need-password' }
-  if (code === 'user_already_exists' || code === 'email_exists') return { kind: 'duplicate-email' }
-  return { kind: 'failed', message: error instanceof Error ? error.message : String(error) }
-}
+import { actionForPhase, nextAuthFormStep, submitLabel, toErrorResult } from '~/utils/authSmartForm'
 
 export function useAuthForm() {
   const auth = useAuthStore()

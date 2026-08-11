@@ -42,7 +42,6 @@ export const useAuthStore = defineStore('auth', {
         options: { redirectTo: authConfirmUrl(redirectTo) },
       })
       if (error) throw error
-      this.user = (await useSupabase().auth.getUser()).data.user ?? null
     },
     async sendPasswordReset(email: string): Promise<void> {
       const config = useRuntimeConfig()

@@ -17,7 +17,7 @@
           >
         </div>
 
-        <p v-if="message" class="text-sm text-coral">{{ message }}</p>
+        <p v-if="message" class="text-sm" :class="updated ? 'text-graduated' : 'text-coral'">{{ message }}</p>
 
         <button
           type="submit"
@@ -49,8 +49,8 @@ const message = ref('')
 const password = ref('')
 
 onMounted(async () => {
-  const code = route.query.code as string | undefined
-  const token = route.query.token_hash as string | undefined
+  const code = typeof route.query.code === 'string' ? route.query.code : undefined
+  const token = typeof route.query.token_hash === 'string' ? route.query.token_hash : undefined
   try {
     if (code) {
       const { error } = await sb.auth.exchangeCodeForSession(code)
