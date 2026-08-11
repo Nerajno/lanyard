@@ -90,6 +90,34 @@ Plan: `docs/superpowers/plans/2026-08-10-auth-methods.md`. Spec: `docs/superpowe
 
 Branch gate as of 2026-08-10: 61 tests pass, typecheck 0, lint 0.
 
+## 9. Audit remediation — security & architecture (2026-08-10)
+
+From security-auditor + system-design-engineer audits. Ordered by severity; do the Critical before anything else. Before merging: `npm audit`, and add integration tests for H2 so the auth-header class of bug can't regress.
+
+### Critical
+- [ ] **C1 — Fix Supabase keys: the "anon" key is actually a `service_role` key** — JWT payload in `.env:6` decodes to `role: service_role`, shipped client-side via `NUXT_PUBLIC_*` (`composables/useSupabase.ts:19-26`). Total RLS bypass for every user's data. Generate a real anon key + a *separate* service_role key, update `.env` + Netlify env, and **rotate** the exposed key regardless.
+
+### High
+- [ ] **H2 — Fix the 401 auth-header cluster**: `account/delete` (`server/api/account/delete.ts:10`), `account/export` (`export.ts:10`), `profile/phone` (`profile/phone.ts:17`) require `Authorization: Bearer`, but client sends no header (`composables/useDeleteAccount.ts:9`, `components/ConfirmDeleteAccount.vue:64`, `components/NudgePrefsForm.vue:90,101`) → account deletion, data export, and SMS verification are all dead. Add a shared `requireUser(event)` helper (Bearer or `sb-*` session cookie — see `pages/app/stats.vue:54` for the working pattern) + one integration test per route.
+- [ ] **H3 — Fail closed on missing secrets**: `server/api/cron/nudge.ts:21-27`, `cron/purge.ts:11-17`, `twilio/sms-status.ts:13` all `if (secret)` and skip auth when the env var is unset → anyone can trigger real sends / forged STOPs. Reject with `createError(500)` when unset. Also remove the query-string secret path (`getQuery(event).token` at `cron/nudge.ts:23`, `cron/purge.ts:13`) — it leaks into logs.
+- [ ] **H4 — Nudge loop failure isolation**: `server/api/cron/nudge.ts:57-100` has no per-user try/catch — one send failure aborts the entire run. Wrap per-user delivery, record errors in `summary`, continue.
+- [ ] **H5 — Failed sends consume the daily cap**: `server/services/nudgeSender.ts:68-72` inserts the `nudges` row (with `sent_at`) *before* the provider call → a throw persists the row and suppresses re-sends for 26h. Insert after success, or add a `status`/`delivery_error` column and exclude failures from the guard.
+- [ ] **H6 — Act-link replay + `mailto:` injection**: `server/routes/act/[token].get.ts:46-56` advances the ladder on every GET (re-clicks/forwarded links = premature graduation); `:61-66` builds `mailto:` from unvalidated contact email (crafted address can inject `?bcc=` → messages blind-copied to attacker). Make the advance first-act-wins per nudge (`nudge.acted_at`), validate email format on the share POST (`server/api/share/[token].post.ts:19-22`), and URI-encode the address in `composerUrl`.
+
+### Medium
+- [ ] **M1 — Client state into Pinia**: `useContacts`/`useProfile` are per-instance (`composables/useContacts.ts:24-26`, `useProfile.ts:13-15`) → duplicate fetches, stale reads, SSR+client double-fetch on every `/app` page. Move to stores (mirror `stores/auth.ts`), one loader keyed on `user.id`, `useAsyncData` for SSR.
+- [ ] **M2 — SQL-side cron candidate selection**: `cron/nudge.ts:37-38` pulls full `profiles`/`contacts` tables then filters in JS (O(all rows) per hour). Push due/opt-out/pending-deletion predicates into one SQL query (uses the never-used `contacts_user_active_due` index); add a bare `nudges(sent_at)` index.
+- [ ] **M3 — Rate-limit + validate the public surface**: `/api/waitlist`, `/api/share/:token`, and `/api/account/restore` (`server/api/account/restore.ts:7-19`) have no limits; restore also needs proof of email control (currently an enumeration oracle that can resurrect a deliberately-deleted account).
+- [ ] **M4 — Quiet-hours drift**: `quiet_hours_start/end` columns exist but nothing reads them — `server/utils/localWindow.ts:13-15` hardcodes 09:00–21:00, no UI. Implement or delete the columns + update `decisions.md`.
+- [ ] **M5 — Atomic share claim**: `server/api/share/[token].post.ts:12-38` is check-then-set; two concurrent claims both pass → duplicate contacts, one-time-use violated. `update shares set used_at = now() where id = :t and used_at is null returning *`, insert contact only on a returned row.
+- [ ] **M6 — Decide the "acted" metric**: `acted_at` stamps on link *click*, not message *sent* (`act/[token].get.ts:53-56`) — inflates the headline nudge→sent metric. Decide semantics now (cheap pre-data), record in `decisions.md`, rename if it's really "composer opened".
+
+### Low / hygiene (batch when convenient)
+- [ ] **L — Cleanup batch**: dead exports (`duePerUser`, `useSupabaseUser`, `DEFAULT_QUIET_HOURS`, `ActPayload.digest` + its dead branch in `act/[token].get.ts:35-37`); identical ternary branches at `components/ContactCard.vue:111`; partial unique index on `profiles.phone`; `error.vue` shows "Page not found." for every error incl. 500s; CI never compiles `netlify/functions/*.mts` (add to `.github/workflows/ci.yml`); dev deps in `dependencies` (`package.json:16-31`) → move to `devDependencies`; `qrcode@1.5.4` is from 2018; note the missing `0002` migration in the migrations dir; `NUXT_PUBLIC_APP_URL` not set on Netlify (live act-links would point at `localhost:3000` — release-blocking).
+
+### Done well — keep
+RLS on every table (policies + enable in same migration, zero public policies on service tables), SMS opt-in/out + suppression enforced in code not just docs, never auto-sends, service-role client strictly server-side, HMAC-signed act-links with TTL + constant-time compare, no `v-html`/XSS vectors, domain logic centralized in `utils/` shared by server + client.
+
 ## Parked (do NOT start in Phase 1)
 QR scan · LinkedIn attach · share-link capture · email/calendar · AI opener
 
