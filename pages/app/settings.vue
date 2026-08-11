@@ -21,6 +21,12 @@
       <p v-if="user" class="mt-2 text-sm text-muted">{{ user.email }}</p>
       <button type="button" class="mt-3 block text-sm text-coral hover:underline" @click="onSignOut">Sign out</button>
       <button type="button" class="mt-1 block text-sm text-coral hover:underline" @click="showDeleteConfirm = true">Delete account</button>
+      <div class="mt-6 rounded-lg border border-line bg-surface p-4">
+        <h3 class="font-mono text-xs uppercase tracking-eyebrow text-muted">Password</h3>
+        <div class="mt-3">
+          <ChangePasswordForm />
+        </div>
+      </div>
     </section>
 
     <ConfirmDeleteAccount v-if="showDeleteConfirm" @close="showDeleteConfirm = false" />
