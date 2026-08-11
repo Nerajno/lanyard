@@ -23,7 +23,7 @@ Add a signed-in "change password" form to Settings that requires the current pas
 4. `useAuthStore().changePassword(currentPassword, newPassword)`:
    - `updateUser(buildPasswordUpdate(...))`; throw on error.
    - `signOut({ scope: 'others' })`.
-5. Success → inline `text-graduated` message; fields clear. Wrong current → `invalid_credentials` mapped to "Current password is incorrect."
+5. Success → inline `text-graduated` message; fields clear. Wrong current → `current_password_invalid` / `current_password_required` mapped to "Current password is incorrect."
 
 ## Files
 

@@ -53,7 +53,7 @@ export const useAuthStore = defineStore('auth', {
     async changePassword(currentPassword: string, newPassword: string): Promise<void> {
       const { error } = await useSupabase().auth.updateUser(buildPasswordUpdate(currentPassword, newPassword))
       if (error) throw error
-      await useSupabase().auth.signOut({ scope: 'others' })
+      void useSupabase().auth.signOut({ scope: 'others' })
     },
     async signOut() {
       this.user = null

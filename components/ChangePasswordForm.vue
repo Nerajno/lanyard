@@ -52,6 +52,7 @@ const error = ref<string | null>(null)
 const success = ref(false)
 
 async function submit() {
+  if (busy.value) return
   error.value = null
   success.value = false
   if (newPassword.value.length < 8) { error.value = 'New password must be at least 8 characters.'; return }
@@ -66,7 +67,12 @@ async function submit() {
     confirmPassword.value = ''
   } catch (e) {
     const code = (e as { code?: string } | null)?.code
-    error.value = code === 'invalid_credentials' ? 'Current password is incorrect.' : (e instanceof Error ? e.message : String(e))
+    if (code === 'reauthentication_needed') {
+      error.value = "Sign in again, then retry — sessions older than 24 hours can't change the password."
+    } else {
+      const isBadCurrent = code === 'current_password_invalid' || code === 'current_password_required'
+      error.value = isBadCurrent ? 'Current password is incorrect.' : (e instanceof Error ? e.message : String(e))
+    }
   } finally {
     busy.value = false
   }

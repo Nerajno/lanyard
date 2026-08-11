@@ -205,7 +205,8 @@ async function submit() {
     confirmPassword.value = ''
   } catch (e) {
     const code = (e as { code?: string } | null)?.code
-    error.value = code === 'invalid_credentials' ? 'Current password is incorrect.' : (e instanceof Error ? e.message : String(e))
+    const isBadCurrent = code === 'current_password_invalid' || code === 'current_password_required'
+    error.value = isBadCurrent ? 'Current password is incorrect.' : (e instanceof Error ? e.message : String(e))
   } finally {
     busy.value = false
   }
@@ -256,7 +257,7 @@ git commit -m "feat(auth): in-app change password form in Settings"
 
 - [ ] **Step 3: Manual verification checklist** (documented in PR body, not automated):
 1. Password user: change with correct current → "Password updated", other logged-in device is signed out, this device stays in.
-2. Wrong current password → "Current password is incorrect.", no session change.
+2. Wrong current password → `current_password_invalid` / `current_password_required` mapped to "Current password is incorrect.", no session change.
 3. OAuth/magic-link user: blank current password + set first password → succeeds.
 4. Confirm-mismatch and <8-length client guards fire without a network call.
 
