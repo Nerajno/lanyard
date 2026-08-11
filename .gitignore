@@ -24,3 +24,10 @@ coverage/
 # Claude Code — machine-local overrides only; .claude/settings.json IS committed
 .claude/settings.local.json
 .worktrees
+
+# Playwright
+test-results/
+playwright-report/
+
+# Nuxt test-utils generated config
+.nuxtrc
