@@ -6,8 +6,10 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] Scaffold Nuxt 3 + TS + Tailwind + Pinia
 - [x] Create Supabase project; add `.env` + `.env.example` *(project `ymmlysznstdguegylbjq` created; linked + migrations pushed)*
 - [x] Wire Supabase client + auth (email magic link is fine)
-- [ ] Email provider account (Resend/Postmark) + verified sending domain *(build uses Resend; sign up + add key)*
+- [ ] Email provider account (Resend/Postmark) + verified sending domain *(build uses Resend; sign up, then fill `NUXT_EMAIL_API_KEY` + `NUXT_EMAIL_FROM` — both empty)*
 - [ ] **Start Twilio A2P 10DLC registration now** — it takes days to weeks to approve and blocks all SMS. Email nudges cover the gap. *(build + Verify hooks are in place)*
+
+> **Phase 1 is blocked here.** §5 is code-complete and tested, but every `NUXT_EMAIL_*` and `NUXT_TWILIO_*` key is empty, so **no nudge can send on either channel** — the loop is inert end to end. Resend is the short path (an afternoon) and unblocks email while 10DLC clears; file the 10DLC registration in parallel, since waiting doesn't speed it up.
 
 ## 1. Schema (see Architecture.md)
 - [x] `profiles` table migration (phone, verified_at, nudge_channel, timezone, quiet_hours, opt-in/opt-out) *(applied to remote; `quiet_hours` → `quiet_hours_start`/`quiet_hours_end` smallint — overnight windows can't be an int4range)*
@@ -15,7 +17,7 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] `nudges` table migration
 - [x] RLS policies (`user_id = auth.uid()`) for all CRUD on all three
 - [x] `0003_custom_cadence`: `cadence_ladder` → `jsonb` `{value,unit}` rungs (`min`/`hour`/`day`), `follow_up_by` → `timestamptz`, new one-shot `remind_at`, supporting index — RLS unchanged (covered by existing policies) *(applied to remote)*
-- [ ] Seed a couple rows for local testing *(removed — `0002_seed.sql` referenced a fake auth user that broke `db push`; seed via a real user or `supabase/seed.sql` for local only)*
+- [x] ~~Seed a couple rows for local testing~~ — *dropped. `0002_seed.sql` referenced a fake auth user and broke `db push`. Seed via a real signed-in user, or `supabase/seed.sql` for local only.*
 
 ## 2. Add contact
 - [x] Add page/form: name, how_met, email, phone, ladder preset chips (warm / default / slow / custom)
@@ -48,7 +50,7 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] "Who is due" query as a testable function (Vitest against fixtures)
 - [x] Instant-based due: `computeDue` checks `follow_up_by`/`remind_at` against `now`, covering `min`/`hour`/`day` rungs
 - [x] Sub-day nudges bypass the per-day cap (`shouldDeliverForUser` / `splitSubDay`); cron clears `remind_at` after its beat
-- [ ] Twilio account + from-number; store secrets *(provision account; fill TWILIO_* + Verify SID)*
+- [ ] Twilio account + from-number; store secrets *(provision account; fill `NUXT_TWILIO_SID` / `_TOKEN` / `_FROM` / `_VERIFY_SID` — all empty)*
 - [x] Email send path (provider SDK)
 - [x] Signed act-link tokens (`ACT_LINK_SIGNING_SECRET`) — must work from a phone without a fresh login
 - [x] Act route: stamp `opened_at`, open prefilled `sms:`/`mailto:`, mark touchpoint
@@ -58,8 +60,8 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 
 ## 6. Dogfood
 - [ ] Deploy (Netlify + Supabase) — *Supabase project exists + migrations pushed; Netlify side pending*
-- [ ] Swap `vercel.json` for `netlify.toml` + `netlify/functions/nudge-cron.mts` (host decision changed; see decisions.md)
-- [ ] Set `NUXT_PUBLIC_APP_URL` on Netlify — act-links are built from it
+- [x] Swap `vercel.json` for `netlify.toml` + `netlify/functions/nudge-cron.mts` (host decision changed; see decisions.md) *(`vercel.json` removed; `netlify.toml` + `nudge-cron.mts` + `purge-cron.mts` in place)*
+- [ ] Set `NUXT_PUBLIC_APP_URL` on Netlify — act-links are built from it *(set locally to `http://localhost:3000`; the real origin still needs setting on Netlify or live nudges link to localhost)*
 - [ ] Add real people from your next event — *human action*
 - [x] Track from `nudges`: median nudge→act latency, % acted on, % reaching all three coffees — *see `/api/stats` + `/stats` page*
 
@@ -72,6 +74,21 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] Nudge loop skips pending deletions; sender hard-blocks suppressed numbers
 - [x] Settings UI + confirm dialog + post-delete redirect + home restore banner
 - [x] Vitest: delete happy/failure/idempotent, suppression hash, purge/restore plans
+
+## 8. Auth methods — *in flight on `feature/auth-methods`*
+Plan: `docs/superpowers/plans/2026-08-10-auth-methods.md`. Spec: `docs/superpowers/specs/2026-08-10-auth-methods-design.md`.
+- [x] Pure smart-form phase resolver + tests
+- [x] Auth store actions: password sign-in/sign-up, OAuth, password reset
+- [x] Smart-form composable + component
+- [x] Google + Apple OAuth buttons
+- [x] Two-tab login page
+- [x] Forgot-password reset page
+- [x] Three-way sign-in decision recorded in `decisions.md`
+- [ ] Final-review fix wave — uncommitted in the worktree (`useAuthForm.ts`, `utils/authSmartForm.ts`, + test)
+- [ ] Plan Task 7: sync docs, run the full gate, commit
+- [ ] Merge to `main`, remove the worktree
+
+Branch gate as of 2026-08-10: 61 tests pass, typecheck 0, lint 0.
 
 ## Parked (do NOT start in Phase 1)
 QR scan · LinkedIn attach · share-link capture · email/calendar · AI opener
