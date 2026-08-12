@@ -14,7 +14,7 @@
 - **No behavioral change:** test names, assertions, selectors, seed users, and creds are identical to the current specs. This plan only moves code between files and swaps inline login dances for `loginAs`.
 - **No config/seed/infra changes:** `playwright.config.ts`, `supabase/seed.sql`, `.github/workflows/ci.yml`, `tests/component/`, and `tests/unit/` are untouched.
 - **Seed users (read-only for this plan):** `e2e@lanyard.test` / `e2epass123` (default); `pw@lanyard.test` / `pwpass123` (password-change spec only, mutates its own password to `pwnew456`).
-- **Verification:** `npm run test:e2e` requires a running local Supabase stack (`supabase start` + `supabase db reset`). If the stack isn't up, start it before running the suite.
+- **Verification (amended during execution):** `npm run test:e2e` requires a running local Supabase stack (`supabase start` + `supabase db reset`). On the dev machine's Node v22.17.1, the `@nuxt/test-utils` fixture mode (no `E2E_BASE_URL`) crashes at `loadKit` before any test runs — this is pre-existing and affects the untouched original specs too. The working local gate is the CI-equivalent path: `npm run build` once, then `E2E_BASE_URL=http://localhost:3000 npm run test:e2e -- <spec files>` (Playwright serves `.output`). Use that path everywhere below.
 - **Typecheck gate:** `loginAs` is typechecked via `npx nuxi typecheck`; the exact `goto` type is `(url: string, options?: GotoOptions) => Promise<Response | null>` from `@nuxt/test-utils/playwright`. Use `Parameters<TestOptions['goto']>` style or import types so it typechecks.
 
 ---
