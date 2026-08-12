@@ -1,15 +1,8 @@
 import { test, expect } from '@nuxt/test-utils/playwright'
-
-// Uses the dedicated pw@lanyard.test user so the password mutation never
-// affects the sign-in/add-contact flows. Each `supabase db reset` re-seeds it
-// to pwpass123, so the flow is deterministic across CI runs.
+import { loginAs } from './helpers'
 
 test('changes the password and signs in with the new one', async ({ page, goto }) => {
-  await goto('/login', { waitUntil: 'hydration' })
-  await page.locator('#email').fill('pw@lanyard.test')
-  await page.locator('#password').fill('pwpass123')
-  await page.getByRole('button', { name: 'Continue', exact: true }).click()
-  await expect(page).toHaveURL(/\/app(\/|$)/)
+  await loginAs(page, goto, { email: 'pw@lanyard.test', password: 'pwpass123' })
 
   await page.getByRole('link', { name: 'Settings' }).click()
   await expect(page).toHaveURL(/\/app\/settings/)
