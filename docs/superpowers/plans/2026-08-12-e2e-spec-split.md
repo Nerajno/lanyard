@@ -90,7 +90,7 @@ git commit -m "test(e2e): add shared loginAs helper"
 
 ```ts
 import { test, expect } from '@nuxt/test-utils/playwright'
-import { loginAs, E2E_USER } from './helpers'
+import { loginAs } from './helpers'
 
 test('signs in with the seeded user and lands in the app', async ({ page, goto }) => {
   await loginAs(page, goto)
