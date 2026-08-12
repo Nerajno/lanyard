@@ -60,6 +60,7 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 
 ## 6. Dogfood
 - [ ] Deploy (Netlify + Supabase) — *Supabase project exists + migrations pushed; Netlify side pending*
+  - ⚠️ **Blocked by §9 C1.** The client bundle currently carries a `service_role` key; deploying publishes it. Fix and rotate first.
 - [x] Swap `vercel.json` for `netlify.toml` + `netlify/functions/nudge-cron.mts` (host decision changed; see decisions.md) *(`vercel.json` removed; `netlify.toml` + `nudge-cron.mts` + `purge-cron.mts` in place)*
 - [ ] Set `NUXT_PUBLIC_APP_URL` on Netlify — act-links are built from it *(set locally to `http://localhost:3000`; the real origin still needs setting on Netlify or live nudges link to localhost)*
 - [ ] Add real people from your next event — *human action*
@@ -96,6 +97,20 @@ From security-auditor + system-design-engineer audits. Ordered by severity; do t
 
 ### Critical
 - [ ] **C1 — Fix Supabase keys: the "anon" key is actually a `service_role` key** — JWT payload in `.env:6` decodes to `role: service_role`, shipped client-side via `NUXT_PUBLIC_*` (`composables/useSupabase.ts:19-26`). Total RLS bypass for every user's data. Generate a real anon key + a *separate* service_role key, update `.env` + Netlify env, and **rotate** the exposed key regardless.
+
+  **Verified 2026-08-11 by decoding both JWT payloads — worse than described.** Both slots hold the *same* token:
+  ```
+  NUXT_PUBLIC_SUPABASE_ANON_KEY   role=service_role  ref=ymmlysznstdguegylbjq
+  NUXT_SUPABASE_SERVICE_ROLE      role=service_role  ref=ymmlysznstdguegylbjq
+  identical values: true
+  ```
+  There is no anon key in `.env` at all. Anyone opening devtools on a built page gets full read/write on every user's `contacts`, `profiles`, and `nudges`.
+
+  *Blast radius (checked, and it's contained):* `.env` has never been committed — `git log --all -- .env` is empty — the token appears in no tracked file, and Netlify deploy is still pending (§6). Exposure is local dev only, **so long as C1 is fixed before the first deploy.** Deploying first publishes it.
+
+  Steps: Supabase dashboard → Project Settings → API → copy the **anon/public** key into `NUXT_PUBLIC_SUPABASE_ANON_KEY`; keep the service_role key in `NUXT_SUPABASE_SERVICE_ROLE` only; then rotate. Treat the old token as compromised regardless of the clean git history. Re-verify with `scratchpad/check-jwt.mjs` (prints role claims, never key values).
+
+  **This blocks §6 deploy.** Nothing in §6 should start until it's green.
 
 ### High
 - [ ] **H2 — Fix the 401 auth-header cluster**: `account/delete` (`server/api/account/delete.ts:10`), `account/export` (`export.ts:10`), `profile/phone` (`profile/phone.ts:17`) require `Authorization: Bearer`, but client sends no header (`composables/useDeleteAccount.ts:9`, `components/ConfirmDeleteAccount.vue:64`, `components/NudgePrefsForm.vue:90,101`) → account deletion, data export, and SMS verification are all dead. Add a shared `requireUser(event)` helper (Bearer or `sb-*` session cookie — see `pages/app/stats.vue:54` for the working pattern) + one integration test per route.
