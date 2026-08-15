@@ -11,6 +11,27 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  // Keep the dev file watcher off build/test artifacts — watching them
+  // exhausts macOS file descriptors (EMFILE: too many open files, watch).
+  vite: {
+    server: {
+      watch: {
+        ignored: [
+          '**/node_modules/**',
+          '**/.git/**',
+          '**/.nuxt/**',
+          '**/.output/**',
+          '**/dist/**',
+          '**/coverage/**',
+          '**/playwright-report/**',
+          '**/test-results/**',
+          '**/supabase/.temp/**',
+          '**/supabase/.branches/**',
+        ],
+      },
+    },
+  },
+
   typescript: {
     strict: true,
     typeCheck: true,
