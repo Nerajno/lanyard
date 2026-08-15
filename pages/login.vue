@@ -3,7 +3,7 @@
     <h1 class="font-display text-3xl font-extrabold tracking-[-0.03em]">Sign in</h1>
 
     <div class="mt-6 space-y-4">
-      <OAuthButtons />
+      <AuthOAuthButtons />
 
       <div class="flex items-center gap-3 text-muted">
         <span class="h-px flex-1 bg-line"/>
@@ -30,7 +30,7 @@
         </button>
       </div>
 
-      <PasswordAuthForm v-if="tab === 'password'" />
+      <AuthPasswordAuthForm v-if="tab === 'password'" />
 
       <form v-else class="space-y-4" @submit.prevent="send">
         <div>
