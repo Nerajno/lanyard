@@ -14,8 +14,7 @@
     "test:component": "vitest run --project component",
     "test:e2e": "playwright test",
     "test:watch": "vitest",
-    "test:component": "vitest run --project component",
-    "test:e2e": "playwright test",
+    "smoke:send": "node scripts/smoke-send.mjs",
     "typecheck": "nuxi typecheck"
   },
   "dependencies": {
@@ -31,6 +30,8 @@
     "eslint-plugin-vue": "^10.10.0",
     "nuxt": "^3.21.11",
     "qrcode": "^1.5.4",
+    "resend": "^6.20.0",
+    "twilio": "^6.1.0",
     "vitest": "^3.2.7",
     "vue-tsc": "^3.3.9"
   },
