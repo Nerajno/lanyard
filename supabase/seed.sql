@@ -37,13 +37,20 @@ insert into auth.identities (
 on conflict (id) do nothing;
 
 -- Fully onboarded profile so /app/* middlewares pass.
+-- The on_auth_user_created trigger already made a bare profile row (NULL
+-- onboarded_at) when auth.users was inserted above; upgrade it in place so the
+-- onboarding middleware doesn't bounce the e2e user to /app/onboarding.
 insert into public.profiles (
   user_id, email, nudge_channel, timezone, onboarded_at
 ) values (
   '11111111-1111-1111-1111-111111111111',
   'e2e@lanyard.test', 'email', 'UTC', now()
 )
-on conflict (user_id) do nothing;
+on conflict (user_id) do update set
+  email = excluded.email,
+  nudge_channel = excluded.nudge_channel,
+  timezone = excluded.timezone,
+  onboarded_at = excluded.onboarded_at;
 
 -- Password-change user: the change-password e2e mutates its password, so it
 -- must not be the same identity the sign-in/add-contact flows rely on.
@@ -87,4 +94,8 @@ insert into public.profiles (
   '22222222-2222-2222-2222-222222222222',
   'pw@lanyard.test', 'email', 'UTC', now()
 )
-on conflict (user_id) do nothing;
+on conflict (user_id) do update set
+  email = excluded.email,
+  nudge_channel = excluded.nudge_channel,
+  timezone = excluded.timezone,
+  onboarded_at = excluded.onboarded_at;

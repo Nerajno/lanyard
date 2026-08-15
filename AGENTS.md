@@ -24,6 +24,7 @@ A conference follow-up nudger. Capture a contact, get a timed nudge (SMS or emai
 
 ## Rules
 - Each new plan (feature/fix work) goes on its own branch — never commit directly to `main`. Create a branch per plan, and finish the branch before starting the next plan.
+- Before opening or updating a PR, present a concise summary of the changes (what, why, files touched, verification) and wait for the user's explicit approval.
 - Phase 1 only unless told otherwise (see PRD scope). Don't build QR/LinkedIn/AI opener/calendar yet.
 - **Never scrape LinkedIn** or infer profile data from a LinkedIn URL — store the URL, ask the user for the name.
 - A nudge targeting a **single** contact must include `how_met` verbatim. Digests (2+ due) link to triage instead. Keep the received→sent path one tap.
