@@ -1,0 +1,40 @@
+# Path-based PR labels (actions/labeler).
+# Match against the labels that already exist in the repo. Rules are evaluated
+# against the changed file paths of a PR; more than one can match. Semantic
+# labels (enhancement / bug) are added by the PR author per AGENTS.md.
+
+infrastructure:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/**"
+          - "supabase/migrations/**"
+          - "supabase/config.toml"
+          - "supabase/seed.sql"
+          - "netlify/**"
+          - "package.json"
+          - "package-lock.json"
+
+security:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "server/utils/**"
+          - "server/api/twilio/**"
+          - "server/api/account/**"
+          - "server/api/profile/**"
+          - "server/services/nudgeSender.ts"
+          - "server/services/providers/**"
+          - ".env.example"
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.md"
+          - "docs/**"
+          - "README*"
+
+chore:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "AGENTS.md"
+          - "CLAUDE.md"
+          - ".github/copilot-instructions.md"
