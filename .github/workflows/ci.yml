@@ -5,6 +5,13 @@ on:
     branches: [main]
   pull_request:
 
+env:
+  # Public Supabase config is required for the app to boot (auth plugin
+  # hydrates on every page). These are publishable-by-design, not secrets;
+  # stored as secrets so they stay out of the repo.
+  NUXT_PUBLIC_SUPABASE_URL: ${{ secrets.NUXT_PUBLIC_SUPABASE_URL }}
+  NUXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NUXT_PUBLIC_SUPABASE_ANON_KEY }}
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -26,10 +33,56 @@ jobs:
         run: npm run lint
 
       - name: Unit tests
-        run: npm test
+        run: npm run test:unit
 
       - name: Typecheck
         run: npx nuxi typecheck
 
       - name: Build
         run: npm run build
+
+  component:
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Prepare (Nuxt types)
+        run: npm run postinstall
+
+      - name: Component tests
+        run: npm run test:component
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: component
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Prepare (Nuxt types)
+        run: npm run postinstall
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Build
+        run: npm run build
+
+      - name: E2E tests
+        run: npm run test:e2e
