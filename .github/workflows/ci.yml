@@ -64,6 +64,7 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     needs: component
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -85,4 +86,28 @@ jobs:
         run: npm run build
 
       - name: E2E tests
+        run: npm run test:e2e
+      - name: Start local Supabase stack
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start stack + apply migrations + e2e seed
+        run: |
+          supabase start
+          supabase db reset
+
+      - name: Capture Supabase env
+        run: |
+          supabase status -o env \
+            --override-name api.url=NUXT_PUBLIC_SUPABASE_URL \
+            --override-name auth.anon_key=NUXT_PUBLIC_SUPABASE_ANON_KEY \
+            >> "$GITHUB_ENV"
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E tests
+        env:
+          NUXT_PUBLIC_APP_URL: http://localhost:3000
         run: npm run test:e2e

@@ -7,6 +7,9 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] Create Supabase project; add `.env` + `.env.example` *(project `ymmlysznstdguegylbjq` created; linked + migrations pushed)*
 - [x] Wire Supabase client + auth (email magic link is fine)
 - [ ] Email provider account (Resend/Postmark) + verified sending domain *(build uses Resend; sign up, then fill `NUXT_EMAIL_API_KEY` + `NUXT_EMAIL_FROM` — both empty)*
+- [x] Subscribe magic link + email/password + Google/Apple OAuth sign-in (smart form)
+- [x] In-app change password (Settings) with current-password + revoke other devices
+- [ ] Email provider account (Resend/Postmark) + verified sending domain *(build uses Resend; sign up + add key)*
 - [ ] **Start Twilio A2P 10DLC registration now** — it takes days to weeks to approve and blocks all SMS. Email nudges cover the gap. *(build + Verify hooks are in place)*
 
 > **Phase 1 is blocked here.** §5 is code-complete and tested, but every `NUXT_EMAIL_*` and `NUXT_TWILIO_*` key is empty, so **no nudge can send on either channel** — the loop is inert end to end. Resend is the short path (an afternoon) and unblocks email while 10DLC clears; file the 10DLC registration in parallel, since waiting doesn't speed it up.
