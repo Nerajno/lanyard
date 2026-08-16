@@ -8,10 +8,10 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] Wire Supabase client + auth (email magic link is fine)
 - [x] Subscribe magic link + email/password + Google/Apple OAuth sign-in (smart form)
 - [x] In-app change password (Settings) with current-password + revoke other devices
-- [ ] Email provider account (Resend/Postmark) + verified sending domain *(build uses Resend; sign up, then fill `NUXT_EMAIL_API_KEY` + `NUXT_EMAIL_FROM` — both empty)*
-- [ ] **Start Twilio A2P 10DLC registration now** — it takes days to weeks to approve and blocks all SMS. Email nudges cover the gap. *(build + Verify hooks are in place)*
+- [x] Email provider account (Resend) + verified sending domain *(done — `NUXT_EMAIL_API_KEY` + `NUXT_EMAIL_FROM` filled in `.env`; wired via `server/services/providers/resend.ts` + smoke script)*
+- [ ] **Twilio A2P 10DLC registration** — takes days to weeks to approve and blocks production SMS. Email nudges cover the gap. *(account + Verify hooks are in place: `NUXT_TWILIO_*` filled, wired via `server/services/providers/twilio.ts`)*
 
-> **Phase 1 is blocked here.** §5 is code-complete and tested, but every `NUXT_EMAIL_*` and `NUXT_TWILIO_*` key is empty, so **no nudge can send on either channel** — the loop is inert end to end. Resend is the short path (an afternoon) and unblocks email while 10DLC clears; file the 10DLC registration in parallel, since waiting doesn't speed it up.
+> **Status:** the loop is no longer inert — all `NUXT_EMAIL_*` and `NUXT_TWILIO_*` keys are filled and the send path is live (`feature/twilio-resend-sdk`, commit `558ed09`). Email nudges work now; SMS awaits 10DLC approval.
 
 ## 1. Schema (see Architecture.md)
 - [x] `profiles` table migration (phone, verified_at, nudge_channel, timezone, quiet_hours, opt-in/opt-out) *(applied to remote; `quiet_hours` → `quiet_hours_start`/`quiet_hours_end` smallint — overnight windows can't be an int4range)*
@@ -49,10 +49,13 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] Quick nudge ("Nudge me later") → one-shot `remind_at`; never consumes a rung
 
 ## 5. The nudge (core — don't skip to polish before this works)
+
+*Send-path work lives on `feature/twilio-resend-sdk` (49 commits ahead of `main`; commit `558ed09` wired real Twilio + Resend SDKs and fixed H2–H5). Review + merge before deploy.*
+
 - [x] "Who is due" query as a testable function (Vitest against fixtures)
 - [x] Instant-based due: `computeDue` checks `follow_up_by`/`remind_at` against `now`, covering `min`/`hour`/`day` rungs
 - [x] Sub-day nudges bypass the per-day cap (`shouldDeliverForUser` / `splitSubDay`); cron clears `remind_at` after its beat
-- [ ] Twilio account + from-number; store secrets *(provision account; fill `NUXT_TWILIO_SID` / `_TOKEN` / `_FROM` / `_VERIFY_SID` — all empty)*
+- [x] Twilio account + from-number; store secrets *(done — `NUXT_TWILIO_SID` / `_TOKEN` / `_FROM` / `_VERIFY_SID` all filled; SDK provider in `server/services/providers/twilio.ts`; delivery gated on 10DLC approval)*
 - [x] Email send path (provider SDK)
 - [x] Signed act-link tokens (`ACT_LINK_SIGNING_SECRET`) — must work from a phone without a fresh login
 - [x] Act route: stamp `opened_at`, open prefilled `sms:`/`mailto:`, mark touchpoint
@@ -62,7 +65,7 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 
 ## 6. Dogfood
 - [ ] Deploy (Netlify + Supabase) — *Supabase project exists + migrations pushed; Netlify side pending*
-  - ⚠️ **Blocked by §9 C1.** The client bundle currently carries a `service_role` key; deploying publishes it. Fix and rotate first.
+  - ⚠️ **Blocked by §9 C1.** The client bundle currently carries a `service_role` key; deploying publishes it. Fix and rotate first. *(C1 still open as of 2026-08-15.)*
 - [x] Swap `vercel.json` for `netlify.toml` + `netlify/functions/nudge-cron.mts` (host decision changed; see decisions.md) *(`vercel.json` removed; `netlify.toml` + `nudge-cron.mts` + `purge-cron.mts` in place)*
 - [ ] Set `NUXT_PUBLIC_APP_URL` on Netlify — act-links are built from it *(set locally to `http://localhost:3000`; the real origin still needs setting on Netlify or live nudges link to localhost)*
 - [ ] Add real people from your next event — *human action*
@@ -87,7 +90,7 @@ Plan: `docs/superpowers/plans/2026-08-10-auth-methods.md`. Spec: `docs/superpowe
 - [x] Two-tab login page
 - [x] Forgot-password reset page
 - [x] Three-way sign-in decision recorded in `decisions.md`
-- [ ] Final-review fix wave — uncommitted in the worktree (`useAuthForm.ts`, `utils/authSmartForm.ts`, + test)
+- [x] Final-review fix wave — *committed in the worktree (`3f90256` confirm-email resend + tested error mapping); worktree clean*
 - [ ] Plan Task 7: sync docs, run the full gate, commit
 - [ ] Merge to `main`, remove the worktree
 
@@ -95,7 +98,7 @@ Branch gate as of 2026-08-10: 61 tests pass, typecheck 0, lint 0.
 
 ## 9. Audit remediation — security & architecture (2026-08-10)
 
-From security-auditor + system-design-engineer audits. Ordered by severity; do the Critical before anything else. Before merging: `npm audit`, and add integration tests for H2 so the auth-header class of bug can't regress.
+From security-auditor + system-design-engineer audits. Ordered by severity; do the Critical before anything else. **Fixed as of `558ed09` (feature/twilio-resend-sdk): H2, H3, H4, H5.** Before merging: `npm audit`, and add integration tests for H2 so the auth-header class of bug can't regress.
 
 ### Critical
 - [ ] **C1 — Fix Supabase keys: the "anon" key is actually a `service_role` key** — JWT payload in `.env:6` decodes to `role: service_role`, shipped client-side via `NUXT_PUBLIC_*` (`composables/useSupabase.ts:19-26`). Total RLS bypass for every user's data. Generate a real anon key + a *separate* service_role key, update `.env` + Netlify env, and **rotate** the exposed key regardless.
@@ -108,6 +111,8 @@ From security-auditor + system-design-engineer audits. Ordered by severity; do t
   ```
   There is no anon key in `.env` at all. Anyone opening devtools on a built page gets full read/write on every user's `contacts`, `profiles`, and `nudges`.
 
+  **Still open as of 2026-08-15** — `.env` still holds `role: service_role` in the anon slot. This is the last gate on deploy.
+
   *Blast radius (checked, and it's contained):* `.env` has never been committed — `git log --all -- .env` is empty — the token appears in no tracked file, and Netlify deploy is still pending (§6). Exposure is local dev only, **so long as C1 is fixed before the first deploy.** Deploying first publishes it.
 
   Steps: Supabase dashboard → Project Settings → API → copy the **anon/public** key into `NUXT_PUBLIC_SUPABASE_ANON_KEY`; keep the service_role key in `NUXT_SUPABASE_SERVICE_ROLE` only; then rotate. Treat the old token as compromised regardless of the clean git history. Re-verify with `scratchpad/check-jwt.mjs` (prints role claims, never key values).
@@ -115,10 +120,10 @@ From security-auditor + system-design-engineer audits. Ordered by severity; do t
   **This blocks §6 deploy.** Nothing in §6 should start until it's green.
 
 ### High
-- [ ] **H2 — Fix the 401 auth-header cluster**: `account/delete` (`server/api/account/delete.ts:10`), `account/export` (`export.ts:10`), `profile/phone` (`profile/phone.ts:17`) require `Authorization: Bearer`, but client sends no header (`composables/useDeleteAccount.ts:9`, `components/ConfirmDeleteAccount.vue:64`, `components/NudgePrefsForm.vue:90,101`) → account deletion, data export, and SMS verification are all dead. Add a shared `requireUser(event)` helper (Bearer or `sb-*` session cookie — see `pages/app/stats.vue:54` for the working pattern) + one integration test per route.
-- [ ] **H3 — Fail closed on missing secrets**: `server/api/cron/nudge.ts:21-27`, `cron/purge.ts:11-17`, `twilio/sms-status.ts:13` all `if (secret)` and skip auth when the env var is unset → anyone can trigger real sends / forged STOPs. Reject with `createError(500)` when unset. Also remove the query-string secret path (`getQuery(event).token` at `cron/nudge.ts:23`, `cron/purge.ts:13`) — it leaks into logs.
-- [ ] **H4 — Nudge loop failure isolation**: `server/api/cron/nudge.ts:57-100` has no per-user try/catch — one send failure aborts the entire run. Wrap per-user delivery, record errors in `summary`, continue.
-- [ ] **H5 — Failed sends consume the daily cap**: `server/services/nudgeSender.ts:68-72` inserts the `nudges` row (with `sent_at`) *before* the provider call → a throw persists the row and suppresses re-sends for 26h. Insert after success, or add a `status`/`delivery_error` column and exclude failures from the guard.
+- [x] **H2 — Fix the 401 auth-header cluster**: `account/delete` (`server/api/account/delete.ts:10`), `account/export` (`export.ts:10`), `profile/phone` (`profile/phone.ts:17`) require `Authorization: Bearer`, but client sends no header (`composables/useDeleteAccount.ts:9`, `components/ConfirmDeleteAccount.vue:64`, `components/NudgePrefsForm.vue:90,101`) → account deletion, data export, and SMS verification are all dead. Add a shared `requireUser(event)` helper (Bearer or `sb-*` session cookie — see `pages/app/stats.vue:54` for the working pattern) + one integration test per route. *(Done: `server/utils/requireUser.ts`; delete/export/phone all reuse it. Add the integration tests before merge.)*
+- [x] **H3 — Fail closed on missing secrets**: `server/api/cron/nudge.ts:21-27`, `cron/purge.ts:11-17`, `twilio/sms-status.ts:13` all `if (secret)` and skip auth when the env var is unset → anyone can trigger real sends / forged STOPs. Reject with `createError(500)` when unset. Also remove the query-string secret path (`getQuery(event).token` at `cron/nudge.ts:23`, `cron/purge.ts:13`) — it leaks into logs. *(Done in `558ed09`: fail-closed, query-token path removed.)*
+- [x] **H4 — Nudge loop failure isolation**: `server/api/cron/nudge.ts:57-100` has no per-user try/catch — one send failure aborts the entire run. Wrap per-user delivery, record errors in `summary`, continue. *(Done in `558ed09`.)*
+- [x] **H5 — Failed sends consume the daily cap**: `server/services/nudgeSender.ts:68-72` inserts the `nudges` row (with `sent_at`) *before* the provider call → a throw persists the row and suppresses re-sends for 26h. Insert after success, or add a `status`/`delivery_error` column and exclude failures from the guard. *(Done in `558ed09` via `delivery_status` `pending→sent/failed`; the guard only counts `sent`.)*
 - [ ] **H6 — Act-link replay + `mailto:` injection**: `server/routes/act/[token].get.ts:46-56` advances the ladder on every GET (re-clicks/forwarded links = premature graduation); `:61-66` builds `mailto:` from unvalidated contact email (crafted address can inject `?bcc=` → messages blind-copied to attacker). Make the advance first-act-wins per nudge (`nudge.acted_at`), validate email format on the share POST (`server/api/share/[token].post.ts:19-22`), and URI-encode the address in `composerUrl`.
 
 ### Medium
