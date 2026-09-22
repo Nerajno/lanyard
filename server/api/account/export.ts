@@ -1,13 +1,13 @@
 // GDPR-style data export: the signed-in user's contacts as JSON.
 // Read-only; feeds the "Download my data" button in the delete dialog.
-// Authorized with the caller's Supabase JWT (Bearer).
-import type { H3Event } from 'h3'
+// Authorized with the caller's Supabase JWT (Bearer or sb-* cookie).
 import { useSupabaseAdmin } from '~/server/utils/supabaseAdmin'
+import { requireUser } from '~/server/utils/requireUser'
 import type { Contact } from '~/types'
 
 export default defineEventHandler(async (event) => {
   const admin = useSupabaseAdmin()
-  const { data: { user } } = await admin.auth.getUser(authToken(event))
+  const user = await requireUser(event)
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Sign in first' })
 
   const { data } = await admin
@@ -18,7 +18,3 @@ export default defineEventHandler(async (event) => {
 
   return { contacts: (data ?? []) as Contact[] }
 })
-
-function authToken(event: H3Event): string {
-  return (getHeader(event, 'authorization') ?? '').replace(/^Bearer\s+/i, '')
-}

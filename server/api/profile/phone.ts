@@ -1,31 +1,45 @@
 // Phone verification for the nudge destination.
 // POST  ?action=send    → sends a one-time code via Twilio Verify
 // POST  ?action=verify  → checks the code and records phone_verified_at
-// Authorized with the caller's Supabase JWT (Bearer). Consent was captured in
-// the UI before this endpoint is used.
-import type { H3Event } from 'h3'
+// Authorized with the caller's Supabase JWT (Bearer or sb-* cookie). Consent was
+// captured in the UI before this endpoint is used. H2: previously this route
+// silently did nothing when no token was sent — it now rejects loudly.
 import { useSupabaseAdmin } from '~/server/utils/supabaseAdmin'
+import { requireUser } from '~/server/utils/requireUser'
+import { TwilioVerify } from '~/server/services/providers/twilio'
 
 export default defineEventHandler(async (event) => {
   const action = getQuery(event).action
   const body = await readBody<{ phone?: string; code?: string }>(event)
 
-  const { supabaseServiceRole } = useRuntimeConfig()
+  const { supabaseServiceRole, twilioSid, twilioToken, twilioVerifySid } = useRuntimeConfig()
   if (!supabaseServiceRole) throw createError({ statusCode: 500, statusMessage: 'Supabase not configured' })
 
   const client = useSupabaseAdmin()
-  const { data: { user } } = await client.auth.getUser(authToken(event))
+  const user = await requireUser(event)
   if (!user) throw createError({ statusCode: 401, statusMessage: 'Sign in first' })
+
+  // Fail-closed: without Verify credentials no phone can be verified.
+  const verify = new TwilioVerify({ sid: twilioSid as string, token: twilioToken as string, verifySid: twilioVerifySid as string })
 
   if (action === 'send') {
     if (!body.phone) throw createError({ statusCode: 400, statusMessage: 'phone required' })
-    await sendVerifyCode(body.phone)
+    try {
+      await verify.sendCode(body.phone)
+    } catch {
+      throw createError({ statusCode: 502, statusMessage: 'Could not send code' })
+    }
     return { ok: true }
   }
 
   if (action === 'verify') {
     if (!body.phone || !body.code) throw createError({ statusCode: 400, statusMessage: 'phone and code required' })
-    const approved = await checkVerifyCode(body.phone, body.code)
+    let approved: boolean
+    try {
+      approved = await verify.checkCode(body.phone, body.code)
+    } catch {
+      approved = false
+    }
     if (!approved) throw createError({ statusCode: 400, statusMessage: 'Code incorrect or expired' })
     await client
       .from('profiles')
@@ -36,32 +50,3 @@ export default defineEventHandler(async (event) => {
 
   throw createError({ statusCode: 400, statusMessage: 'unknown action' })
 })
-
-function authToken(event: H3Event): string {
-  return (getHeader(event, 'authorization') ?? '').replace(/^Bearer\s+/i, '')
-}
-
-async function sendVerifyCode(phone: string): Promise<void> {
-  const { twilioVerifySid } = useRuntimeConfig()
-  if (!twilioVerifySid) throw createError({ statusCode: 500, statusMessage: 'TWILIO_VERIFY_SID not configured' })
-  const res = await twilio(`/Services/${twilioVerifySid}/Verifications`, `To=${encodeURIComponent(phone)}&Channel=sms`)
-  if (!res.ok) throw createError({ statusCode: 502, statusMessage: 'Could not send code' })
-}
-
-async function checkVerifyCode(phone: string, code: string): Promise<boolean> {
-  const { twilioVerifySid } = useRuntimeConfig()
-  if (!twilioVerifySid) return false
-  const res = await twilio(`/Services/${twilioVerifySid}/VerificationCheck`, `To=${encodeURIComponent(phone)}&Code=${encodeURIComponent(code)}`)
-  if (!res.ok) return false
-  const data = (await res.json()) as { status?: string }
-  return data.status === 'approved'
-}
-
-function twilio(path: string, body: string): Promise<Response> {
-  const { twilioSid, twilioToken } = useRuntimeConfig()
-  return fetch(`https://verify.twilio.com/v2${path}`, {
-    method: 'POST',
-    headers: { Authorization: `Basic ${Buffer.from(`${twilioSid}:${twilioToken}`).toString('base64')}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-    body,
-  })
-}

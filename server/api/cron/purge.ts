@@ -8,12 +8,13 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const secret = config.cronSecret as string
 
-  if (secret) {
-    const bearer = (getHeader(event, 'authorization') ?? '').replace(/^Bearer\s+/i, '')
-    const supplied = getHeader(event, 'x-cron-secret') ?? bearer ?? getQuery(event).token
-    if (typeof supplied !== 'string' || supplied !== secret) {
-      throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-    }
+  // H3: fail closed. Without a configured CRON_SECRET this route must not run.
+  if (!secret) {
+    throw createError({ statusCode: 500, statusMessage: 'CRON_SECRET not configured' })
+  }
+  const supplied = (getHeader(event, 'authorization') ?? '').replace(/^Bearer\s+/i, '') || getHeader(event, 'x-cron-secret') || ''
+  if (!supplied || supplied !== secret) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
   return purgeDueAccounts(useSupabaseAdmin(), new Date())

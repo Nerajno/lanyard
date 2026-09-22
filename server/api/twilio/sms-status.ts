@@ -1,16 +1,24 @@
 // Twilio message + delivery webhook.
 // - Honor STOP / HELP (legal requirement for SMS to users):
 //   STOP → set sms_opted_out_at (+ clear opt-in) so the sender hard-blocks.
-import { createHmac, timingSafeEqual } from 'node:crypto'
-import type { H3Event } from 'h3'
+// H3: previously, without a configured twilioToken this route accepted ANY
+// unsigned POST (signature check was silently skipped). It now fails closed —
+// no token → 500; token present but signature bad → 400.
 import { useSupabaseAdmin } from '~/server/utils/supabaseAdmin'
+import { isValidTwilioRequest } from '~/server/services/providers/twilio'
 
 export default defineEventHandler(async (event) => {
   const { twilioToken } = useRuntimeConfig()
+
+  if (!twilioToken) {
+    throw createError({ statusCode: 500, statusMessage: 'Twilio webhook not configured' })
+  }
+
   const rawBody = (await readRawBody(event)) ?? ''
   const body: Record<string, string> = rawBody ? Object.fromEntries(new URLSearchParams(rawBody)) : {}
+  const signature = getHeader(event, 'x-twilio-signature') ?? null
 
-  if (twilioToken && !isValidTwilioSignature(event, twilioToken, rawBody)) {
+  if (!isValidTwilioRequest(twilioToken, getRequestURL(event).toString(), signature, body)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid Twilio signature' })
   }
 
@@ -35,20 +43,3 @@ export default defineEventHandler(async (event) => {
 
   return { ok: true }
 })
-
-/** Twilio signs `url + url-encoded POST body (sorted key/value pairs)` with AuthToken (HMAC-SHA1). */
-function isValidTwilioSignature(event: H3Event, authToken: string, rawBody: string): boolean {
-  const url = getRequestURL(event).toString()
-  const header = getHeader(event, 'x-twilio-signature')
-  if (!header) return false
-
-  const sorted = Object.entries(Object.fromEntries(new URLSearchParams(rawBody)))
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([k, v]) => `${k}${v}`)
-    .join('')
-
-  const expected = createHmac('sha1', authToken).update(url + sorted).digest('base64')
-  const a = Buffer.from(header)
-  const b = Buffer.from(expected)
-  return a.length === b.length && timingSafeEqual(a, b)
-}

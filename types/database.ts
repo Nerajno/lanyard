@@ -81,6 +81,7 @@ export interface Database {
           opened_at: string | null
           acted_at: string | null
           provider_message_id: string | null
+          delivery_status: 'pending' | 'sent' | 'failed'
           created_at: string
         }
         Insert: {
@@ -92,6 +93,7 @@ export interface Database {
           opened_at?: string | null
           acted_at?: string | null
           provider_message_id?: string | null
+          delivery_status?: 'pending' | 'sent' | 'failed'
         }
         Update: Partial<Database['public']['Tables']['nudges']['Insert']>
       }

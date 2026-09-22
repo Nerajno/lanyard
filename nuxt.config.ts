@@ -13,6 +13,27 @@ export default defineNuxtConfig({
 
   // Keep the dev file watcher off build/test artifacts — watching them
   // exhausts macOS file descriptors (EMFILE: too many open files, watch).
+  // `ignore` covers Nuxt's own watcher; `vite.server.watch.ignored` only
+  // covers Vite's. Git worktrees and .opencode carry their own node_modules
+  // and account for the bulk of the descriptors, so both must exclude them.
+  ignore: [
+    '.worktrees/**',
+    '.opencode/**',
+    'coverage/**',
+    'playwright-report/**',
+    'test-results/**',
+    'supabase/.temp/**',
+    'supabase/.branches/**',
+  ],
+
+  // chokidar 5 dropped glob support in `ignored` — it must be a predicate.
+  watchers: {
+    chokidar: {
+      ignored: (path: string) =>
+        /(^|\/)(\.worktrees|\.opencode|coverage|playwright-report|test-results)(\/|$)/.test(path),
+    },
+  },
+
   vite: {
     server: {
       watch: {
@@ -22,6 +43,8 @@ export default defineNuxtConfig({
           '**/.nuxt/**',
           '**/.output/**',
           '**/dist/**',
+          '**/.worktrees/**',
+          '**/.opencode/**',
           '**/coverage/**',
           '**/playwright-report/**',
           '**/test-results/**',

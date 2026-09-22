@@ -1,5 +1,5 @@
 -- Lanyard — Phase 1 schema
--- Creates tables, types, RLS. Mirrors Architecture.md §Data model.
+-- Creates tables, types, RLS. Mirrors project_docs/Architecture.md §Data model.
 -- RLS is enabled and defined in the same migration as each table (never a follow-up commit).
 
 -- Extensions

@@ -26,6 +26,17 @@
       "type": "remote",
       "url": "https://mcp.supabase.com/mcp",
       "enabled": true
+    },
+    "twilio-docs": {
+      "type": "remote",
+      "url": "https://mcp.twilio.com/docs",
+      "enabled": true,
+      "oauth": false
+    },
+    "resend": {
+      "type": "remote",
+      "url": "https://mcp.resend.com/mcp",
+      "enabled": true
     }
   }
 }

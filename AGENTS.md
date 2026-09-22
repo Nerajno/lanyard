@@ -3,7 +3,7 @@
 Guidance for AI coding agents (Claude Code, Cursor, etc.) working in this repo.
 
 ## What this is
-A conference follow-up nudger. Capture a contact, get a timed nudge (SMS or email), act in one tap. Three touchpoints — the "three cups of coffee" rule — then the contact graduates. **Not a CRM** — reject scope that turns it into one. See [prd.md](prd.md).
+A conference follow-up nudger. Capture a contact, get a timed nudge (SMS or email), act in one tap. Three touchpoints — the "three cups of coffee" rule — then the contact graduates. **Not a CRM** — reject scope that turns it into one. See [project_docs/prd.md](project_docs/prd.md).
 
 ## Stack & conventions
 - Nuxt 3 + Vue 3, `<script setup lang="ts">` only. Composition API, no Options API.
@@ -25,6 +25,7 @@ A conference follow-up nudger. Capture a contact, get a timed nudge (SMS or emai
 ## Rules
 - Each new plan (feature/fix work) goes on its own branch — never commit directly to `main`. Create a branch per plan, and finish the branch before starting the next plan.
 - Before opening or updating a PR, present a concise summary of the changes (what, why, files touched, verification) and wait for the user's explicit approval.
+- Every PR needs a label. A workflow auto-applies path-based labels (`.github/labeler.yml`); the PR author must also add a semantic label — `enhancement` or `bug` — when opening the PR.
 - Phase 1 only unless told otherwise (see PRD scope). Don't build QR/LinkedIn/AI opener/calendar yet.
 - **Never scrape LinkedIn** or infer profile data from a LinkedIn URL — store the URL, ask the user for the name.
 - A nudge targeting a **single** contact must include `how_met` verbatim. Digests (2+ due) link to triage instead. Keep the received→sent path one tap.

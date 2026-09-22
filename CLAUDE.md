@@ -8,29 +8,31 @@
 
 ## Doc map
 
-Four docs, four jobs. Check the right one before proposing work:
+Four docs, four jobs. They live in `project_docs/`. Check the right one before proposing work:
 
 | Doc | Answers |
 |---|---|
-| `prd.md` | What we're building and *why*. Scope boundaries, phases, success metrics. |
-| `Architecture.md` | Stack, data model, the reminder loop, secrets. |
-| `decisions.md` | ADR-lite. **Decided** = settled, don't relitigate. **Open** = needs a call before the relevant milestone. |
-| `tasks.md` | Phase 1 sequence. Work top-down; §5 (the nudge) is the point of the project. |
-| `AGENTS.md` | Code conventions, rules, definition of done. |
+| `project_docs/prd.md` | What we're building and *why*. Scope boundaries, phases, success metrics. |
+| `project_docs/Architecture.md` | Stack, data model, the reminder loop, secrets. |
+| `project_docs/decisions.md` | ADR-lite. **Decided** = settled, don't relitigate. **Open** = needs a call before the relevant milestone. |
+| `project_docs/tasks.md` | Phase 1 sequence. Work top-down; §5 (the nudge) is the point of the project. |
+| `AGENTS.md` | Code conventions, rules, definition of done. Stays at repo root. |
+
+Plans and specs live in `project_docs/superpowers/{plans,specs}/`.
 
 ## Before you write code
 
-1. **Check `decisions.md` first.** If a question is under **Decided**, it's settled — build it, don't re-argue it. If it's under **Open**, ask before building past it.
-2. **Check Phase 1 scope in `prd.md`.** Parked work (QR scan, LinkedIn attach, share-link capture, AI opener, calendar) does not get started, even if it's a small diff.
-3. **Check `tasks.md` order.** It's sequenced so the nudge loop works by end of week one. Don't build polish ahead of §5.
+1. **Check `project_docs/decisions.md` first.** If a question is under **Decided**, it's settled — build it, don't re-argue it. If it's under **Open**, ask before building past it.
+2. **Check Phase 1 scope in `project_docs/prd.md`.** Parked work (QR scan, LinkedIn attach, share-link capture, AI opener, calendar) does not get started, even if it's a small diff.
+3. **Check `project_docs/tasks.md` order.** It's sequenced so the nudge loop works by end of week one. Don't build polish ahead of §5.
 
 ## When a doc goes stale
 
 These five docs are the project's only state — there's no code yet to read. A change to the data model, the loop, or scope means **editing the doc in the same change**, not just the code:
 
-- New/changed column or table → `Architecture.md`
-- Scope moved between phases → `prd.md` **and** `tasks.md`
-- An **Open** question resolved → move it up to **Decided** in `decisions.md` with a one-line rationale
+- New/changed column or table → `project_docs/Architecture.md`
+- Scope moved between phases → `project_docs/prd.md` **and** `project_docs/tasks.md`
+- An **Open** question resolved → move it up to **Decided** in `project_docs/decisions.md` with a one-line rationale
 - New convention or rule → `AGENTS.md`
 
 Never leave a doc contradicting the code.
@@ -49,4 +51,4 @@ These are in AGENTS.md; they're the ones most likely to get violated by a plausi
 ## Repo notes
 
 - This project lives in a subdirectory of a larger `~/Documents/Dev` git repo. Scope git operations to `Projects/lanyard/`; do not stage unrelated sibling projects.
-- No code exists yet. `tasks.md` §0 is the starting line.
+- No code exists yet. `project_docs/tasks.md` §0 is the starting line.

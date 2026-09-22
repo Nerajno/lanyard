@@ -3,26 +3,28 @@
 //  - NEVER auto-send the follow-up; the act-link opens a prefilled composer.
 //  - No SMS without sms_opt_in_at, or with sms_opted_out_at set.
 //  - Insert a nudges row per send; that row is the double-send guard.
+//  - H5: the row starts 'pending'; it becomes 'sent' only after the provider
+//    accepts the message, or 'failed' if it throws. The cron's 26h cap guard
+//    counts only 'sent' rows, so a failed send is retried next pass instead of
+//    suppressing the user for a day.
 import { buildNudgeActLink } from '~/utils/actLink'
 import type { Contact, Profile } from '~/types'
 import type { DueResult } from '~/utils/due'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { useSupabaseAdmin } from '~/server/utils/supabaseAdmin'
 import { isSmsSuppressed } from '~/server/utils/smsSuppression'
+import type { SmsProvider, EmailProvider } from '~/server/services/providers/types'
 
 export interface DeliverResult {
   sent: number
   skipped: string[]
 }
 
-interface SenderConfig {
+export interface SenderDeps {
+  admin: SupabaseClient
+  sms: SmsProvider | null
+  email: EmailProvider | null
   appUrl: string
   actLinkSigningSecret: string
-  emailApiKey: string
-  emailFrom: string
-  twilioSid: string
-  twilioToken: string
-  twilioFrom: string
 }
 
 /** Send nudges for one user. Returns a count of sends + channel skip reasons. */
@@ -30,22 +32,13 @@ export async function deliverNudges(
   user: Profile,
   contactsById: Record<string, Contact>,
   result: DueResult,
+  deps: SenderDeps,
 ): Promise<DeliverResult> {
-  const r = useRuntimeConfig()
-  const cfg: SenderConfig = {
-    appUrl: r.public.appUrl || 'http://localhost:3000',
-    actLinkSigningSecret: r.actLinkSigningSecret || '',
-    emailApiKey: r.emailApiKey || '',
-    emailFrom: r.emailFrom || '',
-    twilioSid: r.twilioSid || '',
-    twilioToken: r.twilioToken || '',
-    twilioFrom: r.twilioFrom || '',
-  }
+  const { admin, sms, email, appUrl, actLinkSigningSecret } = deps
 
   const skipped: string[] = []
   let sent = 0
   const multiple = result.count > 1
-  const admin = useSupabaseAdmin()
   const now = new Date().toISOString()
 
   const channels = user.nudge_channel === 'both' ? (['sms', 'email'] as const) : ([user.nudge_channel] as const)
@@ -55,46 +48,59 @@ export async function deliverNudges(
       skipped.push('sms:no-opt-in-or-phone')
       continue
     }
-    if (channel === 'sms' && !(cfg.twilioSid && cfg.twilioToken && cfg.twilioFrom)) {
+    if (channel === 'sms' && !sms) {
       skipped.push('sms:twilio-not-configured')
       continue
     }
-    if (channel === 'email' && !(cfg.emailApiKey && cfg.emailFrom)) {
+    if (channel === 'email' && !email) {
       skipped.push('email:not-configured')
       continue
     }
 
-    // Insert the nudge row first so the act-link can embed a real nudge id.
+    // Insert the nudge row first (as 'pending') so the act-link can embed a
+    // real nudge id. Mark 'sent'/'failed' after the provider call.
     const { data: nudge } = await admin
       .from('nudges')
-      .insert({ user_id: user.user_id, contact_ids: result.due.map((d) => d.id), channel, sent_at: now })
+      .insert({ user_id: user.user_id, contact_ids: result.due.map((d) => d.id), channel, sent_at: now, delivery_status: 'pending' })
       .select()
       .single()
     const nudgeId = nudge?.id
 
     let providerMessageId: string | null
 
-    if (!multiple && result.due[0]) {
-      // Direct: one contact, inline how_met + one-tap act-link.
-      const contact = contactsById[result.due[0].id]
-      const link = buildNudgeActLink(cfg.appUrl, { nudgeId, contactId: contact.id }, cfg.actLinkSigningSecret)
-      if (channel === 'sms') {
-        providerMessageId = await sendSms(user.phone!, smsDirect(contact.how_met, link), cfg)
+    try {
+      if (!multiple && result.due[0]) {
+        // Direct: one contact, inline how_met + one-tap act-link.
+        const contact = contactsById[result.due[0].id]
+        const link = buildNudgeActLink(appUrl, { nudgeId, contactId: contact.id }, actLinkSigningSecret)
+        if (channel === 'sms') {
+          providerMessageId = await sms!.send(user.phone!, smsDirect(contact.how_met, link))
+        } else {
+          providerMessageId = await email!.send(user.email!, 'Follow up', emailDirect(contact.how_met, link))
+        }
       } else {
-        providerMessageId = await sendEmail(user.email!, 'Follow up', emailDirect(contact.how_met, link), cfg)
+        // Digest: batch link to the app triage list.
+        const triage = `${appUrl.replace(/\/$/, '')}/app`
+        if (channel === 'sms') {
+          providerMessageId = await sms!.send(user.phone!, smsDigest(result.count, triage))
+        } else {
+          providerMessageId = await email!.send(user.email ?? '', 'Follow-ups due', emailDigest(result.count, triage))
+        }
       }
-    } else {
-      // Digest: batch link to the app triage list.
-      const triage = `${cfg.appUrl.replace(/\/$/, '')}/app`
-      if (channel === 'sms') {
-        providerMessageId = await sendSms(user.phone!, smsDigest(result.count, triage), cfg)
-      } else {
-        providerMessageId = await sendEmail(user.email ?? '', 'Follow-ups due', emailDigest(result.count, triage), cfg)
-      }
-    }
 
-    if (nudgeId && providerMessageId) {
-      await admin.from('nudges').update({ provider_message_id: providerMessageId }).eq('id', nudgeId)
+      if (nudgeId) {
+        const update: Record<string, unknown> = providerMessageId
+          ? { delivery_status: 'sent', provider_message_id: providerMessageId }
+          : { delivery_status: 'sent' }
+        await admin.from('nudges').update(update).eq('id', nudgeId)
+      }
+    } catch (err) {
+      // H5: a failed send must not burn the 26h cap. Mark the row 'failed' so
+      // the cron's guard (which counts only 'sent') lets the next pass retry.
+      if (nudgeId) {
+        await admin.from('nudges').update({ delivery_status: 'failed' }).eq('id', nudgeId)
+      }
+      throw err
     }
     sent++
   }
@@ -122,31 +128,6 @@ function smsDigest(count: number, triage: string): string {
 }
 function emailDigest(count: number, triage: string): string {
   return `<p>${count} follow-up${count === 1 ? '' : 's'} due today.</p><p><a href="${escapeHtml(triage)}">Open your triage list</a></p>`
-}
-
-// --- providers --------------------------------------------------------------
-
-async function sendSms(to: string, body: string, cfg: SenderConfig): Promise<string | null> {
-  const params = new URLSearchParams({ To: to, From: cfg.twilioFrom, Body: body })
-  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${cfg.twilioSid}/Messages.json`, {
-    method: 'POST',
-    headers: { Authorization: `Basic ${Buffer.from(`${cfg.twilioSid}:${cfg.twilioToken}`).toString('base64')}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params,
-  })
-  if (!res.ok) throw new Error(`Twilio send failed: ${res.status}`)
-  const data = (await res.json()) as { sid?: string }
-  return data.sid ?? null
-}
-
-async function sendEmail(to: string, subject: string, html: string, cfg: SenderConfig): Promise<string | null> {
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${cfg.emailApiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: cfg.emailFrom, to: [to], subject, html }),
-  })
-  if (!res.ok) throw new Error(`Email send failed: ${res.status}`)
-  const data = (await res.json()) as { id?: string }
-  return data.id ?? null
 }
 
 function escapeHtml(s: string): string {
