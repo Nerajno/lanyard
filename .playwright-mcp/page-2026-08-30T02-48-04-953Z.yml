@@ -1,0 +1,52 @@
+- generic [active] [ref=f2e1]:
+  - generic [ref=f2e3]:
+    - banner [ref=f2e4]:
+      - generic [ref=f2e5]:
+        - link "lanyard." [ref=f2e6] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f2e7]:
+          - link "Get early access" [ref=f2e8] [cursor=pointer]:
+            - /url: /early-access
+          - button "Switch to light mode" [ref=f2e9] [cursor=pointer]: ☀
+          - button "Open menu" [ref=f2e10] [cursor=pointer]: ☰
+    - main [ref=f2e11]:
+      - generic [ref=f2e12]:
+        - paragraph [ref=f2e13]: Pricing
+        - heading "Free while we're in the hallway." [level=1] [ref=f2e14]
+        - paragraph [ref=f2e15]: Lanyard is in early access — the first 100 people get it free, forever. A paid Pro tier is coming later; early users stay on the free plan.
+        - generic [ref=f2e16]:
+          - generic [ref=f2e17]:
+            - heading "Free" [level=2] [ref=f2e18]
+            - generic [ref=f2e19]: $0
+          - list [ref=f2e20]:
+            - listitem [ref=f2e21]: ✓ Unlimited contacts
+            - listitem [ref=f2e22]: ✓ The three-coffee cadence on any schedule
+            - listitem [ref=f2e23]: ✓ Email nudges, plus SMS when you opt in
+            - listitem [ref=f2e24]: ✓ Share-links so the other person adds their details
+        - generic [ref=f2e25]:
+          - paragraph [ref=f2e26]: Pro
+          - paragraph [ref=f2e27]: Coming soon — early-access users will get it at launch pricing.
+    - contentinfo [ref=f2e28]:
+      - generic [ref=f2e29]:
+        - generic [ref=f2e30]: lanyard. · Progress over perfection
+        - generic [ref=f2e31]:
+          - link "How it works" [ref=f2e32] [cursor=pointer]:
+            - /url: /#how-it-works
+          - link "What it does" [ref=f2e33] [cursor=pointer]:
+            - /url: /#features
+          - link "Early access" [ref=f2e34] [cursor=pointer]:
+            - /url: /#get
+          - link "Pricing" [ref=f2e35] [cursor=pointer]:
+            - /url: /pricing
+          - link "About" [ref=f2e36] [cursor=pointer]:
+            - /url: /about
+          - link "Privacy" [ref=f2e37] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms" [ref=f2e38] [cursor=pointer]:
+            - /url: /terms
+  - generic [ref=f2e39]:
+    - button "Toggle Nuxt DevTools" [ref=f2e40] [cursor=pointer]
+    - generic "Page load time" [ref=f2e44]:
+      - generic [ref=f2e45]: "35"
+      - generic [ref=f2e46]: ms
+    - button "Toggle Component Inspector" [ref=f2e48] [cursor=pointer]

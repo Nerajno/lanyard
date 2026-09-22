@@ -2,7 +2,8 @@
 
 Three touchpoints — the **three cups of coffee** rule. Capture a contact, get a
 timed nudge (SMS or email), act in one tap, then the contact **graduates**. Not a
-CRM by design. See `prd.md`, `Architecture.md`, `decisions.md`, `tasks.md`.
+CRM by design. See [`project_docs/`](project_docs/) — `prd.md`, `Architecture.md`,
+`decisions.md`, `tasks.md`.
 
 ---
 
@@ -136,7 +137,7 @@ curl -f -X POST -H "x-cron-secret: $CRON_SECRET" https://<your-site>/api/cron/nu
 
 ---
 
-## How the loop works (Architecture.md §The reminder loop)
+## How the loop works (project_docs/Architecture.md §The reminder loop)
 
 1. `/api/cron/nudge` runs hourly: fans out over users whose local time is inside
    their send window, not opted out.

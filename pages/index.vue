@@ -23,23 +23,26 @@
             Follow up before it goes cold.
           </h1>
           <p class="text-ink-2 mt-4 max-w-lg text-[clamp(17px,2.3vw,20px)]">
-            You meet people worth knowing at conferences. Lanyard remembers them, texts you at the right moment, and gets you from "I should reach out" to message-sent in one tap.
+            Lanyard collapses the distance between meeting someone worth knowing and actually following up. It remembers them, nudges you at the right moment, and gets you from "I should reach out" to message-sent in one tap.
           </p>
           <div class="mt-7 flex flex-wrap items-center gap-3">
-            <button
+            <NuxtLink
+              to="/#get"
               class="inline-flex cursor-pointer items-center gap-[8px] rounded-[11px] border border-coral-press bg-coral-press px-6 py-[14px] text-[15px] font-semibold text-white transition-transform duration-150 hover:brightness-95 active:scale-[0.98]"
-              @click="scrollToId('get')"
-            >Get early access</button>
-            <button
+            >Get early access</NuxtLink>
+            <NuxtLink
+              to="/#how-it-works"
               class="inline-flex cursor-pointer items-center gap-[8px] rounded-[11px] border border-line bg-surface px-6 py-[14px] text-[15px] font-semibold text-ink transition-transform duration-150 active:scale-[0.98]"
-              @click="scrollToId('how-it-works')"
-            >See how it works</button>
+            >See how it works</NuxtLink>
           </div>
           <p class="mt-4 text-[12.5px] text-muted">No spam. Just a note when it's ready.</p>
         </div>
 
-        <div>
-          <LandingHeroPhone />
+        <div class="relative flex justify-center">
+          <div class="bg-sunken border-line absolute inset-x-2 inset-y-8 rounded-[32px] border" aria-hidden="true" />
+          <div class="relative py-6">
+            <LandingHeroPhone />
+          </div>
         </div>
       </div>
     </header>
@@ -57,31 +60,102 @@
       </div>
     </section>
 
-    <!-- HOW -->
-    <section id="how-it-works" class="border-line border-t py-16">
+    <!-- STORYBOARD: nudge / connect / climb -->
+    <section id="how-it-works" class="border-line scroll-mt-16 border-t py-16 md:py-24">
       <div class="mx-auto max-w-[1080px] px-6">
         <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">How it works</p>
-        <h2 class="font-display font-bold">Three steps, no spreadsheet.</h2>
-        <div class="mt-8 grid gap-4 md:grid-cols-3">
-          <div
-            v-for="(step, i) in steps"
-            :key="i"
-            class="border-line bg-surface rounded-[18px] border p-6"
-          >
-            <div class="font-mono mb-3 text-xs text-muted">{{ String(i + 1).padStart(2, '0') }}</div>
-            <div class="mb-3 text-2xl" aria-hidden="true">{{ step.icon }}</div>
-            <h3 class="font-display text-lg font-bold">{{ step.title }}</h3>
-            <p class="mt-2 text-sm text-ink-2">{{ step.body }}</p>
-            <p v-if="step.bubble" class="bg-bubble mt-3 rounded-[14px_14px_14px_4px] p-[10px_12px] text-[12.5px] leading-[1.4] text-bubble-ink">
-              Time to follow up with <b class="font-semibold">{{ step.bubbleName }}</b> — {{ step.bubbleMet }}
-            </p>
+        <h2 class="font-display text-[clamp(1.6rem,4.4vw,2.4rem)] font-bold leading-tight tracking-[-0.025em]">
+          Three steps, no spreadsheet.
+        </h2>
+
+        <div class="mt-14 flex flex-col gap-20 md:gap-24">
+          <!-- Nudge -->
+          <div class="flex flex-col items-center gap-10 md:flex-row md:gap-16">
+            <div class="w-full md:order-1 md:flex-1">
+              <h3 class="font-display text-[clamp(1.5rem,4vw,2rem)] font-bold tracking-[-0.025em]">Nudge.</h3>
+              <p class="text-ink-2 mt-3 max-w-[420px] text-[17px]">
+                A reminder arrives when it's time — carrying how you met, so you're never staring at a name wondering who it was.
+              </p>
+            </div>
+            <div class="w-full md:order-2 md:flex-1">
+              <div class="border-line bg-surface relative mx-auto w-full max-w-[340px] rounded-[18px] border p-6 shadow-[0_20px_45px_-30px_rgba(20,22,30,0.55)]">
+                <span class="bg-coral absolute -right-3 -top-3 flex h-10 w-10 items-center justify-center rounded-full text-lg text-white shadow-md" aria-hidden="true">☾</span>
+                <div class="flex items-center gap-3">
+                  <span class="bg-coral-soft text-coral-press font-display flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold" aria-hidden="true">PN</span>
+                  <div>
+                    <p class="font-display text-[15px] font-bold">Priya Nadkarni</p>
+                    <p class="text-xs text-muted">Met at DevNexus</p>
+                  </div>
+                </div>
+                <p class="bg-bubble mt-4 rounded-[14px_14px_14px_4px] p-[10px_12px] text-[12.5px] leading-[1.4] text-bubble-ink">
+                  Time to follow up with <b class="font-semibold">Priya</b> — you talked Nuxt SSR at DevNexus
+                </p>
+                <div class="mt-4 w-full rounded-[11px] bg-coral-press px-4 py-2.5 text-center text-sm font-semibold text-white">
+                  Follow up now
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connect -->
+          <div class="flex flex-col items-center gap-10 md:flex-row md:gap-16">
+            <div class="w-full md:flex-1">
+              <h3 class="font-display text-[clamp(1.5rem,4vw,2rem)] font-bold tracking-[-0.025em]">Connect.</h3>
+              <p class="text-ink-2 mt-3 max-w-[420px] text-[17px]">
+                One tap opens a message already drafted on the channel you captured, with the real context of how you met. You read it, tweak it, hit send. Lanyard never sends on your behalf.
+              </p>
+            </div>
+            <div class="w-full md:flex-1">
+              <div class="bg-navy mx-auto w-full max-w-[400px] rounded-3xl p-6 text-[#eef1f6]">
+                <div class="relative rounded-[14px] border border-white/15 p-4" style="background: rgba(255,255,255,0.06)">
+                  <span class="font-mono bg-navy absolute -top-2.5 left-4 px-2 text-[11px] uppercase tracking-[0.12em] text-[#f0a58f]">Draft</span>
+                  <p class="mt-1 text-[13.5px] leading-relaxed text-[#c8d0dd]">
+                    "Hi Priya — great talking Nuxt SSR with you at DevNexus. I'd love to keep the thread going. Free for a virtual coffee next week?"
+                  </p>
+                </div>
+                <div class="mt-5 w-full rounded-[11px] bg-coral-press px-4 py-3 text-center text-sm font-semibold text-white">
+                  Open draft in Messages
+                </div>
+                <p class="mt-3 text-center text-[12px] text-[#8fa1bd]">Opens your composer, prefilled. You hit send.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Climb -->
+          <div class="flex flex-col items-center gap-10 md:flex-row md:gap-16">
+            <div class="w-full md:order-1 md:flex-1">
+              <h3 class="font-display text-[clamp(1.5rem,4vw,2rem)] font-bold tracking-[-0.025em]">Climb.</h3>
+              <p class="text-ink-2 mt-3 max-w-[420px] text-[17px]">
+                {{ ladderCopy }} Enough to keep momentum, never enough to be overbearing.
+              </p>
+            </div>
+            <div class="w-full md:order-2 md:flex-1">
+              <div class="border-line bg-surface mx-auto w-full max-w-[360px] rounded-[18px] border p-6">
+                <div class="relative flex items-start justify-between">
+                  <div class="bg-line absolute inset-x-8 top-5 h-[2px] rounded-full" aria-hidden="true" />
+                  <div
+                    v-for="rung in rungs"
+                    :key="rung.label"
+                    class="relative z-10 flex flex-1 flex-col items-center gap-2"
+                  >
+                    <span
+                      class="bg-surface flex h-10 w-10 items-center justify-center rounded-full border-2 text-base"
+                      :class="rung.dotClass"
+                      aria-hidden="true"
+                    >{{ rung.icon }}</span>
+                    <span class="font-mono text-[11px] uppercase tracking-eyebrow" :class="rung.labelClass">{{ rung.label }}</span>
+                    <span class="text-[11px] text-muted">{{ rung.when }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- THREE COFFEES -->
-    <section id="three-coffees" class="border-line border-t py-16">
+    <section id="three-coffees" class="border-line scroll-mt-16 border-t py-16">
       <div class="mx-auto max-w-[1080px] px-6">
         <div class="bg-navy mt-2 rounded-3xl px-8 py-12 text-[#eef1f6] md:px-10">
           <p class="font-mono mb-3 text-xs uppercase tracking-[0.12em] text-[#f0a58f]">The idea</p>
@@ -110,7 +184,7 @@
     </section>
 
     <!-- FEATURES -->
-    <section id="features" class="border-line border-t py-16">
+    <section id="features" class="border-line scroll-mt-16 border-t py-16">
       <div class="mx-auto max-w-[1080px] px-6">
         <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">What it does</p>
         <h2 class="font-display text-3xl font-bold">Small on purpose.</h2>
@@ -124,6 +198,17 @@
             <p class="mt-1.5 text-[13.5px] leading-relaxed text-muted">{{ f.body }}</p>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- TRUST -->
+    <section class="border-line border-t py-16">
+      <div class="mx-auto max-w-[768px] px-6 text-center">
+        <div class="mb-4 text-3xl text-muted" aria-hidden="true">☾</div>
+        <h2 class="font-display text-2xl font-bold tracking-[-0.02em]">Respecting your focus.</h2>
+        <p class="text-ink-2 mx-auto mt-3 max-w-[520px] text-[17px]">
+          Nudges land inside your quiet hours — {{ quietHoursCopy }} by default, in your own timezone. Follow-ups arrive when you're ready to act on them, not in the middle of deep work or at 2am.
+        </p>
       </div>
     </section>
 
@@ -141,7 +226,7 @@
     </section>
 
     <!-- FINAL CTA -->
-    <section id="get" class="border-line bg-sunken border-t py-16 text-center">
+    <section id="get" class="border-line bg-sunken scroll-mt-16 border-t py-16 text-center">
       <div class="mx-auto max-w-[1080px] px-6">
         <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">Early access</p>
         <h2 class="font-display text-3xl font-bold leading-tight tracking">Follow up before it goes cold.</h2>
@@ -153,28 +238,12 @@
         </div>
       </div>
     </section>
-
-    <!-- FOOTER -->
-    <footer class="border-line border-t py-10">
-      <div class="mx-auto flex max-w-[1080px] flex-wrap items-center justify-between gap-4 px-6">
-        <div class="font-display text-[15px] font-bold">
-          lanyard<span class="text-coral">.</span> · Progress over perfection
-        </div>
-        <div class="flex gap-5 text-sm text-muted">
-          <button class="hover:text-coral" @click="scrollToId('how-it-works')">How it works</button>
-          <button class="hover:text-coral" @click="scrollToId('features')">What it does</button>
-          <button class="hover:text-coral" @click="scrollToId('get')">Early access</button>
-          <NuxtLink to="/pricing" class="hover:text-coral">Pricing</NuxtLink>
-          <NuxtLink to="/about" class="hover:text-coral">About</NuxtLink>
-          <NuxtLink to="/privacy" class="hover:text-coral">Privacy</NuxtLink>
-          <NuxtLink to="/terms" class="hover:text-coral">Terms</NuxtLink>
-        </div>
-      </div>
-    </footer>
   </div>
 </template>
 
 <script setup lang="ts">
+import { DEFAULT_QUIET_HOURS, LADDER_PRESETS } from '~/types'
+
 const route = useRoute()
 const auth = useAuthStore()
 
@@ -206,32 +275,42 @@ async function restore() {
   }
 }
 
-const steps = [
+// Cadence copy is derived from the shipped preset so the landing page can't
+// drift from the ladder the app actually runs.
+const defaultLadder = LADDER_PRESETS.default
+const ladderOffsets = defaultLadder.map(rung => `+${rung.value}`).join(', ')
+const ladderCopy = `Three touchpoints — ${ladderOffsets} days by default. Switch presets or write your own.`
+
+const quietHoursCopy = `${DEFAULT_QUIET_HOURS.from}:00–${DEFAULT_QUIET_HOURS.to}:00`
+
+const rungs = [
   {
     icon: '✎',
-    title: 'Capture',
-    body: 'Add someone in seconds — a name and one way to reach them. No form to fill at a booth.',
+    label: 'Met',
+    when: 'day 0',
+    dotClass: 'border-fresh text-fresh',
+    labelClass: 'text-ink',
   },
   {
-    icon: '☾',
-    title: 'Get nudged',
-    body: 'Lanyard texts you when it’s time, with a reminder of how you met — so you’re not staring at a name wondering who it was.',
-    bubble: true,
-    bubbleName: 'Priya',
-    bubbleMet: 'you talked Nuxt SSR at DevNexus',
+    icon: '✉',
+    label: 'Message',
+    when: `+${defaultLadder[0]?.value ?? 2} days`,
+    dotClass: 'border-warm text-warm',
+    labelClass: 'text-ink',
   },
   {
-    icon: '➤',
-    title: 'Follow up',
-    body: 'One tap opens a message, already drafted on the channel you captured. You read it, tweak it, hit send. Done.',
+    icon: '☕',
+    label: 'Coffee',
+    when: `+${defaultLadder[2]?.value ?? 45} days`,
+    dotClass: 'border-line text-faint',
+    labelClass: 'text-muted',
   },
 ]
 
-const cups = [
-  { label: '1st · +2 days', colorClass: 'bg-fresh' },
-  { label: '2nd · +2 weeks', colorClass: 'bg-warm' },
-  { label: '3rd · +6 weeks', colorClass: 'bg-due' },
-]
+const cups = defaultLadder.map((rung, i) => ({
+  label: `${['1st', '2nd', '3rd'][i]} · +${rung.value} days`,
+  colorClass: ['bg-fresh', 'bg-warm', 'bg-due'][i] ?? 'bg-fresh',
+}))
 
 const features = [
   {
@@ -271,8 +350,4 @@ const features = [
     body: 'Made for people who meet many and follow up with few — speakers, organizers, serial attendees.',
   },
 ]
-
-function scrollToId(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-}
 </script>

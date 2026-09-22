@@ -1,0 +1,212 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "lanyard." [ref=e6] [cursor=pointer]:
+          - /url: /
+        - navigation "Primary" [ref=e7]:
+          - link "How it works" [ref=e8] [cursor=pointer]:
+            - /url: /#how-it-works
+          - link "What it does" [ref=e9] [cursor=pointer]:
+            - /url: /#features
+          - link "Pricing" [ref=e10] [cursor=pointer]:
+            - /url: /pricing
+        - generic [ref=e11]:
+          - link "Log in" [ref=e12] [cursor=pointer]:
+            - /url: /login
+          - link "Get early access" [ref=e13] [cursor=pointer]:
+            - /url: /early-access
+          - button "Switch to dark mode" [ref=e14] [cursor=pointer]: ☾
+    - main [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e18]:
+          - generic [ref=e19]:
+            - generic [ref=e20]: ◇ Building in public · early access
+            - heading "Follow up before it goes cold." [level=1] [ref=e21]
+            - paragraph [ref=e22]: Lanyard collapses the distance between meeting someone worth knowing and actually following up. It remembers them, nudges you at the right moment, and gets you from "I should reach out" to message-sent in one tap.
+            - generic [ref=e23]:
+              - link "Get early access" [ref=e24] [cursor=pointer]:
+                - /url: /#get
+              - link "See how it works" [ref=e25] [cursor=pointer]:
+                - /url: /#how-it-works
+            - paragraph [ref=e26]: No spam. Just a note when it's ready.
+          - generic [ref=e30]:
+            - generic [ref=e31]:
+              - generic [ref=e32]:
+                - generic [ref=e33]: lanyard.
+                - generic [ref=e34]: Follow up before it goes cold
+              - generic [ref=e35]:
+                - generic [ref=e36]: "2"
+                - generic [ref=e37]: due
+            - generic [ref=e38]:
+              - generic [ref=e41]:
+                - generic [ref=e42]:
+                  - generic [ref=e43]: Marcus Bell
+                  - generic [ref=e44]: 2d overdue
+                - generic [ref=e45]: Booth chat · edge functions
+                - generic [ref=e46]:
+                  - generic [ref=e47]: ☕
+                  - generic [ref=e48]: ☕
+                  - generic [ref=e49]: ☕
+              - generic [ref=e52]:
+                - generic [ref=e53]:
+                  - generic [ref=e54]: Priya N.
+                  - generic [ref=e55]: due today
+                - generic [ref=e56]: Hallway track · Nuxt SSR
+                - generic [ref=e57]:
+                  - generic [ref=e58]: ☕
+                  - generic [ref=e59]: ☕
+                  - generic [ref=e60]: ☕
+              - generic [ref=e63]:
+                - generic [ref=e64]:
+                  - generic [ref=e65]: Dana Kirsch
+                  - generic [ref=e66]: in 4 days
+                - generic [ref=e67]: Speaker dinner · a11y
+                - generic [ref=e68]:
+                  - generic [ref=e69]: ☕
+                  - generic [ref=e70]: ☕
+                  - generic [ref=e71]: ☕
+              - generic [ref=e74]:
+                - generic [ref=e75]:
+                  - generic [ref=e76]: Sam Okonkwo
+                  - generic [ref=e77]: in 41 days
+                - generic [ref=e78]: Coffee line · both from GA
+                - generic [ref=e79]:
+                  - generic [ref=e80]: ☕
+                  - generic [ref=e81]: ☕
+                  - generic [ref=e82]: ☕
+        - generic [ref=e84]:
+          - paragraph [ref=e85]: The problem
+          - heading "The hallway track is where it happens. Then it fades." [level=2] [ref=e86]
+          - paragraph [ref=e87]: The best part of a conference is the conversations between the talks — the person you met in the coffee line, the one who gave you a real answer in the hallway. You both mean to keep in touch. Then the event ends, the context slips, and the follow-up you meant to send never goes out.
+        - generic [ref=e89]:
+          - paragraph [ref=e90]: How it works
+          - heading "Three steps, no spreadsheet." [level=2] [ref=e91]
+          - generic [ref=e92]:
+            - generic [ref=e93]:
+              - generic [ref=e94]:
+                - heading "Nudge." [level=3] [ref=e95]
+                - paragraph [ref=e96]: A reminder arrives when it's time — carrying how you met, so you're never staring at a name wondering who it was.
+              - generic [ref=e98]:
+                - generic [ref=e99]: ☾
+                - generic [ref=e100]:
+                  - generic [ref=e101]: PN
+                  - generic [ref=e102]:
+                    - paragraph [ref=e103]: Priya Nadkarni
+                    - paragraph [ref=e104]: Met at DevNexus
+                - paragraph [ref=e105]: Time to follow up with Priya — you talked Nuxt SSR at DevNexus
+                - generic [ref=e106]: Follow up now
+            - generic [ref=e107]:
+              - generic [ref=e108]:
+                - heading "Connect." [level=3] [ref=e109]
+                - paragraph [ref=e110]: One tap opens a message already drafted on the channel you captured, with the real context of how you met. You read it, tweak it, hit send. Lanyard never sends on your behalf.
+              - generic [ref=e112]:
+                - generic [ref=e113]:
+                  - generic [ref=e114]: Draft
+                  - paragraph [ref=e115]: "\"Hi Priya — great talking Nuxt SSR with you at DevNexus. I'd love to keep the thread going. Free for a virtual coffee next week?\""
+                - generic [ref=e116]: Open draft in Messages
+                - paragraph [ref=e117]: Opens your composer, prefilled. You hit send.
+            - generic [ref=e118]:
+              - generic [ref=e119]:
+                - heading "Climb." [level=3] [ref=e120]
+                - paragraph [ref=e121]: Three touchpoints — +2, +14, +45 days by default. Switch presets or write your own. Enough to keep momentum, never enough to be overbearing.
+              - generic [ref=e124]:
+                - generic [ref=e126]:
+                  - generic [ref=e127]: ✎
+                  - generic [ref=e128]: Met
+                  - generic [ref=e129]: day 0
+                - generic [ref=e130]:
+                  - generic [ref=e131]: ✉
+                  - generic [ref=e132]: Message
+                  - generic [ref=e133]: +2 days
+                - generic [ref=e134]:
+                  - generic [ref=e135]: ☕
+                  - generic [ref=e136]: Coffee
+                  - generic [ref=e137]: +45 days
+        - generic [ref=e140]:
+          - paragraph [ref=e141]: The idea
+          - heading "It takes three cups of coffee." [level=2] [ref=e142]
+          - paragraph [ref=e143]: Trust isn't built in one follow-up — it's a few. Lanyard runs each new contact through three well-timed touchpoints, from a fresh introduction to a real connection. After the third, they graduate — Lanyard stops nudging you about them. A finish line, not an endless to-do list.
+          - generic [ref=e144]:
+            - generic [ref=e145]:
+              - generic [ref=e146]: ☕
+              - generic [ref=e147]: 1st · +2 days
+            - generic [ref=e148]:
+              - generic [ref=e149]: ☕
+              - generic [ref=e150]: 2nd · +14 days
+            - generic [ref=e151]:
+              - generic [ref=e152]: ☕
+              - generic [ref=e153]: 3rd · +45 days
+            - generic [ref=e154]: →
+            - generic [ref=e155]: ✓ Graduated — a real connection
+        - generic [ref=e157]:
+          - paragraph [ref=e158]: What it does
+          - heading "Small on purpose." [level=2] [ref=e159]
+          - paragraph [ref=e160]: "Lanyard does one thing a CRM is too heavy to do well: get you to actually follow up."
+          - generic [ref=e161]:
+            - generic [ref=e162]:
+              - generic [ref=e163]: ◐
+              - heading "Triage by warmth" [level=3] [ref=e164]
+              - paragraph [ref=e165]: Every contact shows how close its follow-up is to slipping — teal when fresh, red when it’s due. See who’s cooling off at a glance.
+            - generic [ref=e166]:
+              - generic [ref=e167]: ✎
+              - heading "Capture in seconds" [level=3] [ref=e168]
+              - paragraph [ref=e169]: A name and one way to reach them. Rich details are optional — never a form to fill at a booth.
+            - generic [ref=e170]:
+              - generic [ref=e171]: ✉
+              - heading "Nudged your way" [level=3] [ref=e172]
+              - paragraph [ref=e173]: Get reminders by text or email, on your schedule, inside your own quiet hours.
+            - generic [ref=e174]:
+              - generic [ref=e175]: ➤
+              - heading "One tap to reply" [level=3] [ref=e176]
+              - paragraph [ref=e177]: The nudge opens a drafted message on the right channel. You never write from a blank page.
+            - generic [ref=e178]:
+              - generic [ref=e179]: ☕
+              - heading "A defined finish" [level=3] [ref=e180]
+              - paragraph [ref=e181]: Three touchpoints, then a contact graduates and stops nagging you. No infinite queue.
+            - generic [ref=e182]:
+              - generic [ref=e183]: ◇
+              - heading "Built for the hallway track" [level=3] [ref=e184]
+              - paragraph [ref=e185]: Made for people who meet many and follow up with few — speakers, organizers, serial attendees.
+        - generic [ref=e187]:
+          - generic [ref=e188]: ☾
+          - heading "Respecting your focus." [level=2] [ref=e189]
+          - paragraph [ref=e190]: Nudges land inside your quiet hours — 9:00–21:00 by default, in your own timezone. Follow-ups arrive when you're ready to act on them, not in the middle of deep work or at 2am.
+        - generic [ref=e192]:
+          - paragraph [ref=e193]: Why it exists
+          - heading "Your network deserves intentional consistency — not eventual consistency." [level=2] [ref=e194]
+          - paragraph [ref=e195]: Growth doesn't happen by accident. Lanyard makes follow-up a deliberate habit. (Idea sparked by Vincent Mayers' talk on developer community.)
+        - generic [ref=e197]:
+          - paragraph [ref=e198]: Early access
+          - heading "Follow up before it goes cold." [level=2] [ref=e199]
+          - paragraph [ref=e200]: Lanyard is being built in public. Leave your email and I'll tell you the moment it's ready to try at your next conference.
+          - generic [ref=e202]:
+            - generic [ref=e203]:
+              - textbox "Email address" [ref=e204]:
+                - /placeholder: you@email.com
+              - button "Get early access" [ref=e205] [cursor=pointer]
+            - paragraph
+    - contentinfo [ref=e206]:
+      - generic [ref=e207]:
+        - generic [ref=e208]: lanyard. · Progress over perfection
+        - generic [ref=e209]:
+          - link "How it works" [ref=e210] [cursor=pointer]:
+            - /url: /#how-it-works
+          - link "What it does" [ref=e211] [cursor=pointer]:
+            - /url: /#features
+          - link "Early access" [ref=e212] [cursor=pointer]:
+            - /url: /#get
+          - link "Pricing" [ref=e213] [cursor=pointer]:
+            - /url: /pricing
+          - link "About" [ref=e214] [cursor=pointer]:
+            - /url: /about
+          - link "Privacy" [ref=e215] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms" [ref=e216] [cursor=pointer]:
+            - /url: /terms
+  - generic [ref=e217]:
+    - button "Toggle Nuxt DevTools" [ref=e218] [cursor=pointer]
+    - generic "Page load time" [ref=e222]:
+      - generic [ref=e223]: "99"
+      - generic [ref=e224]: ms
+    - button "Toggle Component Inspector" [ref=e226] [cursor=pointer]

@@ -52,7 +52,7 @@ export function useContacts() {
 
   /**
    * Insert a contact. Computes follow_up_by = created_at + cadence_ladder[1]
-   * (the first rung), mirroring Architecture.md §Key flows → Add.
+   * (the first rung), mirroring project_docs/Architecture.md §Key flows → Add.
    */
   async function add(input: NewContactInput): Promise<Contact> {
     if (!auth.user) throw new Error('You must be signed in')

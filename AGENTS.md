@@ -3,7 +3,7 @@
 Guidance for AI coding agents (Claude Code, Cursor, etc.) working in this repo.
 
 ## What this is
-A conference follow-up nudger. Capture a contact, get a timed nudge (SMS or email), act in one tap. Three touchpoints — the "three cups of coffee" rule — then the contact graduates. **Not a CRM** — reject scope that turns it into one. See [prd.md](prd.md).
+A conference follow-up nudger. Capture a contact, get a timed nudge (SMS or email), act in one tap. Three touchpoints — the "three cups of coffee" rule — then the contact graduates. **Not a CRM** — reject scope that turns it into one. See [project_docs/prd.md](project_docs/prd.md).
 
 ## Stack & conventions
 - Nuxt 3 + Vue 3, `<script setup lang="ts">` only. Composition API, no Options API.
