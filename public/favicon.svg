@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="14" fill="#F7F6F2"/>
-  <text x="32" y="44" font-family="Bricolage Grotesque, Inter, sans-serif" font-size="40" font-weight="800" letter-spacing="-2" text-anchor="middle" fill="#17191F">lanyard<tspan fill="#E8503A" dominant-baseline="alphabetic">.</tspan></text>
+  <text x="32" y="44" font-family="Inter, sans-serif" font-size="40" font-weight="800" letter-spacing="-2" text-anchor="middle" fill="#041627">lanyard<tspan fill="#006D37" dominant-baseline="alphabetic">.</tspan></text>
   <circle cx="14" cy="55" r="4" fill="#0F9D8F"/>
   <circle cx="24" cy="55" r="4" fill="#E8A13A"/>
-  <circle cx="34" cy="55" r="4" fill="#E8503A"/>
+  <circle cx="34" cy="55" r="4" fill="#006D37"/>
 </svg>

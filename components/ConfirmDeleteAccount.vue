@@ -7,11 +7,11 @@
         <li>We keep a one-way hash of numbers that opted out, so they're never texted again.</li>
         <li>Paid invoices, if any, stay on file.</li>
       </ul>
-      <p class="mt-4 rounded-lg bg-coral-soft px-3 py-2 text-xs text-coral-press">
+      <p class="mt-4 rounded-lg bg-error-soft px-3 py-2 text-xs text-error">
         You have 14 days to change your mind. Sign back in from the home page and we'll restore everything.
       </p>
 
-      <button type="button" class="mt-4 text-sm text-coral hover:underline disabled:opacity-50" :disabled="downloading" @click="download">
+      <button type="button" class="mt-4 text-sm text-accent hover:underline disabled:opacity-50" :disabled="downloading" @click="download">
         {{ downloading ? 'Preparing…' : 'Download my data' }}
       </button>
 
@@ -19,19 +19,19 @@
         <label class="text-sm font-medium text-ink" for="confirm-email">Type your email to confirm</label>
         <input
           id="confirm-email" v-model="confirm" type="email" autocomplete="email"
-          class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none"
+          class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none"
           :placeholder="userEmail || 'you@example.com'"
         >
       </div>
 
-      <p v-if="error" class="mt-3 text-sm text-coral">{{ error }}</p>
+      <p v-if="error" class="mt-3 text-sm text-error">{{ error }}</p>
 
       <div class="mt-5 flex gap-2">
         <button type="button" class="flex-1 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:bg-paper" @click="$emit('close')">
           Keep my account
         </button>
         <button
-          type="button" class="flex-1 rounded-lg bg-coral px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:opacity-50"
+          type="button" class="flex-1 rounded-lg bg-error px-3 py-2 text-sm font-medium text-on-error transition-colors hover:bg-error/90 disabled:opacity-50"
           :disabled="!matches || busy" @click="confirmDelete"
         >
           {{ busy ? 'Deleting…' : 'Delete my account' }}

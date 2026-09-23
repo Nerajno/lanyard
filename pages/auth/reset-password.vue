@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto max-w-sm py-12">
     <template v-if="ready">
-      <h1 class="font-display text-3xl font-extrabold tracking-[-0.03em]">Set a new password</h1>
+      <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Set a new password</h1>
 
       <form class="mt-6 space-y-4" @submit.prevent="update">
         <div>
@@ -13,16 +13,16 @@
             required
             minlength="8"
             autocomplete="new-password"
-            class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none"
+            class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none"
           >
         </div>
 
-        <p v-if="message" class="text-sm" :class="updated ? 'text-graduated' : 'text-coral'">{{ message }}</p>
+        <p v-if="message" class="text-sm" :class="updated ? 'text-graduated' : 'text-error'">{{ message }}</p>
 
         <button
           type="submit"
           :disabled="busy"
-          class="w-full rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:opacity-50"
+          class="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press disabled:opacity-50"
         >
           Update password
         </button>

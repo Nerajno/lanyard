@@ -16,7 +16,7 @@
     >
       Continue with Apple
     </button>
-    <p v-if="error" class="text-sm text-coral">{{ error }}</p>
+    <p v-if="error" class="text-sm text-error">{{ error }}</p>
   </div>
 </template>
 

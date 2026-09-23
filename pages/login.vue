@@ -1,13 +1,13 @@
 <template>
-  <div class="mx-auto max-w-sm">
-    <h1 class="font-display text-3xl font-extrabold tracking-[-0.03em]">Sign in</h1>
+  <div class="mx-auto max-w-sm px-4 py-12">
+    <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Sign in</h1>
 
     <div class="mt-6 space-y-4">
       <AuthOAuthButtons />
 
       <div class="flex items-center gap-3 text-muted">
         <span class="h-px flex-1 bg-line"/>
-        <span class="font-mono text-xs uppercase tracking-eyebrow">or</span>
+        <span class="text-label-caps uppercase">or</span>
         <span class="h-px flex-1 bg-line"/>
       </div>
 
@@ -41,18 +41,18 @@
             type="email"
             required
             autocomplete="email"
-            class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none"
+            class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none"
             placeholder="you@example.com"
           >
         </div>
 
         <p v-if="sent" class="text-sm text-graduated">Check your inbox for the sign-in link.</p>
-        <p v-if="error" class="text-sm text-coral">{{ error }}</p>
+        <p v-if="error" class="text-sm text-error">{{ error }}</p>
 
         <button
           type="submit"
           :disabled="sending"
-          class="w-full rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:opacity-50"
+          class="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press disabled:opacity-50"
         >
           {{ sending ? 'Sending…' : 'Send magic link' }}
         </button>

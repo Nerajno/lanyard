@@ -38,16 +38,16 @@ describe('NudgePrefsForm', () => {
   it('defaults to the email channel when no profile exists', async () => {
     const w = await mount()
     const email = w.findAll('button').find((b) => b.text().trim() === 'Email')!
-    expect(email.classes()).toContain('bg-coral-soft')
+    expect(email.classes()).toContain('bg-accent-soft')
   })
 
   it('selects the existing SMS channel when the profile prefers it', async () => {
     profileRef.value = makeProfile({ nudge_channel: 'sms', sms_opt_in_at: '2026-01-01T00:00:00Z' })
     const w = await mount()
     const sms = w.findAll('button').find((b) => b.text().includes('Text'))!
-    expect(sms.classes()).toContain('bg-coral-soft')
+    expect(sms.classes()).toContain('bg-accent-soft')
     const email = w.findAll('button').find((b) => b.text().trim() === 'Email')!
-    expect(email.classes()).not.toContain('bg-coral-soft')
+    expect(email.classes()).not.toContain('bg-accent-soft')
   })
 
   it('saves the chosen channel and timezone', async () => {

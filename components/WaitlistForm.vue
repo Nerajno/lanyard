@@ -13,7 +13,7 @@
       <button
         type="submit"
         :disabled="sending"
-        class="shrink-0 rounded-[11px] bg-coral-press px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:brightness-95 active:scale-[0.98] disabled:opacity-60"
+        class="shrink-0 rounded-[11px] bg-accent-press px-5 py-2.5 text-sm font-semibold text-on-accent transition-transform hover:brightness-95 active:scale-[0.98] disabled:opacity-60"
       >
         {{ sending ? 'Sending…' : 'Get early access' }}
       </button>

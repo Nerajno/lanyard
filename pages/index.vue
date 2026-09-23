@@ -1,10 +1,10 @@
 <template>
   <div class="bg-paper text-ink">
-    <section v-if="restoreOpen" class="border-b border-line bg-coral-soft/40">
+    <section v-if="restoreOpen" class="border-b border-line bg-accent-soft/40">
       <div class="mx-auto flex max-w-[1080px] flex-wrap items-center gap-3 px-6 py-4">
         <p class="text-sm text-ink">Your account is scheduled for deletion. Within 14 days we can restore it — everything is still here.</p>
-        <input v-model="restoreEmail" type="email" placeholder="account email" class="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm focus:border-coral focus:outline-none">
-        <button type="button" class="rounded-lg bg-coral px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:opacity-50" :disabled="restoring" @click="restore">
+        <input v-model="restoreEmail" type="email" placeholder="account email" class="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm focus:border-accent focus:outline-none">
+        <button type="button" class="rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press disabled:opacity-50" :disabled="restoring" @click="restore">
           {{ restoring ? 'Sending…' : 'Restore account' }}
         </button>
         <button type="button" class="text-sm text-muted underline" @click="dismissRestore">Dismiss</button>
@@ -12,238 +12,58 @@
       <p v-if="restoreMsg" class="mx-auto max-w-[1080px] px-6 pb-3 text-sm text-ink">{{ restoreMsg }}</p>
     </section>
 
-    <!-- HERO -->
-    <header class="pb-10 pt-14">
-      <div class="mx-auto grid max-w-[1080px] items-center gap-10 px-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div>
-          <span class="border-coral-soft bg-coral-soft text-coral-press mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold">
-            ◇ Building in public · early access
-          </span>
-          <h1 class="font-display text-[clamp(40px,6.5vw,62px)] font-extrabold leading-[0.98] tracking-[-0.03em]">
-            Follow up before it goes cold.
-          </h1>
-          <p class="text-ink-2 mt-4 max-w-lg text-[clamp(17px,2.3vw,20px)]">
-            Lanyard collapses the distance between meeting someone worth knowing and actually following up. It remembers them, nudges you at the right moment, and gets you from "I should reach out" to message-sent in one tap.
-          </p>
-          <div class="mt-7 flex flex-wrap items-center gap-3">
-            <NuxtLink
-              to="/#get"
-              class="inline-flex cursor-pointer items-center gap-[8px] rounded-[11px] border border-coral-press bg-coral-press px-6 py-[14px] text-[15px] font-semibold text-white transition-transform duration-150 hover:brightness-95 active:scale-[0.98]"
-            >Get early access</NuxtLink>
-            <NuxtLink
-              to="/#how-it-works"
-              class="inline-flex cursor-pointer items-center gap-[8px] rounded-[11px] border border-line bg-surface px-6 py-[14px] text-[15px] font-semibold text-ink transition-transform duration-150 active:scale-[0.98]"
-            >See how it works</NuxtLink>
-          </div>
-          <p class="mt-4 text-[12.5px] text-muted">No spam. Just a note when it's ready.</p>
-        </div>
-
-        <div class="relative flex justify-center">
-          <div class="bg-sunken border-line absolute inset-x-2 inset-y-8 rounded-[32px] border" aria-hidden="true" />
-          <div class="relative py-6">
-            <LandingHeroPhone />
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- PROBLEM -->
-    <section class="border-line border-t py-16">
-      <div class="mx-auto max-w-[1080px] px-6">
-        <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">The problem</p>
-        <h2 class="font-display text-[clamp(1.6rem,4.4vw,2.4rem)] font-bold leading-tight tracking-[-0.025em]">
-          The hallway track is where it happens. Then it fades.
-        </h2>
-        <p class="text-ink-2 max-w-[620px] pt-4 text-[17px]">
-          The best part of a conference is the conversations between the talks — the person you met in the coffee line, the one who gave you a real answer in the hallway. You both mean to keep in touch. Then the event ends, the context slips, and the follow-up you meant to send never goes out.
-        </p>
-      </div>
-    </section>
+    <LandingHero />
 
     <!-- STORYBOARD: nudge / connect / climb -->
-    <section id="how-it-works" class="border-line scroll-mt-16 border-t py-16 md:py-24">
-      <div class="mx-auto max-w-[1080px] px-6">
-        <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">How it works</p>
-        <h2 class="font-display text-[clamp(1.6rem,4.4vw,2.4rem)] font-bold leading-tight tracking-[-0.025em]">
-          Three steps, no spreadsheet.
-        </h2>
-
-        <div class="mt-14 flex flex-col gap-20 md:gap-24">
-          <!-- Nudge -->
-          <div class="flex flex-col items-center gap-10 md:flex-row md:gap-16">
-            <div class="w-full md:order-1 md:flex-1">
-              <h3 class="font-display text-[clamp(1.5rem,4vw,2rem)] font-bold tracking-[-0.025em]">Nudge.</h3>
-              <p class="text-ink-2 mt-3 max-w-[420px] text-[17px]">
-                A reminder arrives when it's time — carrying how you met, so you're never staring at a name wondering who it was.
-              </p>
-            </div>
-            <div class="w-full md:order-2 md:flex-1">
-              <div class="border-line bg-surface relative mx-auto w-full max-w-[340px] rounded-[18px] border p-6 shadow-[0_20px_45px_-30px_rgba(20,22,30,0.55)]">
-                <span class="bg-coral absolute -right-3 -top-3 flex h-10 w-10 items-center justify-center rounded-full text-lg text-white shadow-md" aria-hidden="true">☾</span>
-                <div class="flex items-center gap-3">
-                  <span class="bg-coral-soft text-coral-press font-display flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold" aria-hidden="true">PN</span>
-                  <div>
-                    <p class="font-display text-[15px] font-bold">Priya Nadkarni</p>
-                    <p class="text-xs text-muted">Met at DevNexus</p>
-                  </div>
-                </div>
-                <p class="bg-bubble mt-4 rounded-[14px_14px_14px_4px] p-[10px_12px] text-[12.5px] leading-[1.4] text-bubble-ink">
-                  Time to follow up with <b class="font-semibold">Priya</b> — you talked Nuxt SSR at DevNexus
-                </p>
-                <div class="mt-4 w-full rounded-[11px] bg-coral-press px-4 py-2.5 text-center text-sm font-semibold text-white">
-                  Follow up now
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Connect -->
-          <div class="flex flex-col items-center gap-10 md:flex-row md:gap-16">
-            <div class="w-full md:flex-1">
-              <h3 class="font-display text-[clamp(1.5rem,4vw,2rem)] font-bold tracking-[-0.025em]">Connect.</h3>
-              <p class="text-ink-2 mt-3 max-w-[420px] text-[17px]">
-                One tap opens a message already drafted on the channel you captured, with the real context of how you met. You read it, tweak it, hit send. Lanyard never sends on your behalf.
-              </p>
-            </div>
-            <div class="w-full md:flex-1">
-              <div class="bg-navy mx-auto w-full max-w-[400px] rounded-3xl p-6 text-[#eef1f6]">
-                <div class="relative rounded-[14px] border border-white/15 p-4" style="background: rgba(255,255,255,0.06)">
-                  <span class="font-mono bg-navy absolute -top-2.5 left-4 px-2 text-[11px] uppercase tracking-[0.12em] text-[#f0a58f]">Draft</span>
-                  <p class="mt-1 text-[13.5px] leading-relaxed text-[#c8d0dd]">
-                    "Hi Priya — great talking Nuxt SSR with you at DevNexus. I'd love to keep the thread going. Free for a virtual coffee next week?"
-                  </p>
-                </div>
-                <div class="mt-5 w-full rounded-[11px] bg-coral-press px-4 py-3 text-center text-sm font-semibold text-white">
-                  Open draft in Messages
-                </div>
-                <p class="mt-3 text-center text-[12px] text-[#8fa1bd]">Opens your composer, prefilled. You hit send.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Climb -->
-          <div class="flex flex-col items-center gap-10 md:flex-row md:gap-16">
-            <div class="w-full md:order-1 md:flex-1">
-              <h3 class="font-display text-[clamp(1.5rem,4vw,2rem)] font-bold tracking-[-0.025em]">Climb.</h3>
-              <p class="text-ink-2 mt-3 max-w-[420px] text-[17px]">
-                {{ ladderCopy }} Enough to keep momentum, never enough to be overbearing.
-              </p>
-            </div>
-            <div class="w-full md:order-2 md:flex-1">
-              <div class="border-line bg-surface mx-auto w-full max-w-[360px] rounded-[18px] border p-6">
-                <div class="relative flex items-start justify-between">
-                  <div class="bg-line absolute inset-x-8 top-5 h-[2px] rounded-full" aria-hidden="true" />
-                  <div
-                    v-for="rung in rungs"
-                    :key="rung.label"
-                    class="relative z-10 flex flex-1 flex-col items-center gap-2"
-                  >
-                    <span
-                      class="bg-surface flex h-10 w-10 items-center justify-center rounded-full border-2 text-base"
-                      :class="rung.dotClass"
-                      aria-hidden="true"
-                    >{{ rung.icon }}</span>
-                    <span class="font-mono text-[11px] uppercase tracking-eyebrow" :class="rung.labelClass">{{ rung.label }}</span>
-                    <span class="text-[11px] text-muted">{{ rung.when }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- THREE COFFEES -->
-    <section id="three-coffees" class="border-line scroll-mt-16 border-t py-16">
-      <div class="mx-auto max-w-[1080px] px-6">
-        <div class="bg-navy mt-2 rounded-3xl px-8 py-12 text-[#eef1f6] md:px-10">
-          <p class="font-mono mb-3 text-xs uppercase tracking-[0.12em] text-[#f0a58f]">The idea</p>
-          <h2 class="font-display text-2xl font-bold text-white md:text-3xl">It takes three cups of coffee.</h2>
-          <p class="mt-2 max-w-[560px] text-base text-[#c8d0dd]">
-            Trust isn't built in one follow-up — it's a few. Lanyard runs each new contact through three well-timed touchpoints, from a fresh introduction to a real connection. After the third, they <b class="text-white">graduate</b> — Lanyard stops nudging you about them. A finish line, not an endless to-do list.
-          </p>
-          <div class="mt-8 flex flex-wrap items-center gap-3.5">
-            <div v-for="cup in cups" :key="cup.label" class="flex flex-col items-center gap-2">
-              <div
-                class="flex h-[52px] w-[52px] items-center justify-center rounded-full text-[22px]"
-                :class="cup.colorClass"
-                style="border: 2px solid rgba(255,255,255,0.2)"
-              >
-                ☕
-              </div>
-              <small class="text-[11px] text-[#8fa1bd]">{{ cup.label }}</small>
-            </div>
-            <span class="text-lg text-[#5b7196]" aria-hidden="true">→</span>
-            <span class="border-graduated text-[#7fd4c8] rounded-full border px-4 py-2 text-sm font-semibold" style="background: rgba(27,145,132,0.18)">
-              ✓ Graduated — a real connection
-            </span>
-          </div>
-        </div>
+    <section id="how-it-works" class="mx-auto max-w-[1024px] scroll-mt-16 px-4 py-8 md:py-24">
+      <p class="text-label-caps mb-2 text-center uppercase text-accent md:text-left">How it works</p>
+      <h2 class="text-headline-lg mb-16 text-center text-ink md:text-left">Three steps, no spreadsheet.</h2>
+      <div class="flex flex-col gap-24">
+        <LandingStepNudge />
+        <LandingStepConnect />
+        <LandingStepClimb />
       </div>
     </section>
 
     <!-- FEATURES -->
-    <section id="features" class="border-line scroll-mt-16 border-t py-16">
-      <div class="mx-auto max-w-[1080px] px-6">
-        <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">What it does</p>
-        <h2 class="font-display text-3xl font-bold">Small on purpose.</h2>
-        <p class="text-ink-2 max-w-[620px] pt-4 text-[17px]">
+    <section id="features" class="scroll-mt-16 border-t border-line bg-sunken py-16">
+      <div class="mx-auto max-w-[1024px] px-4">
+        <p class="text-label-caps mb-2 uppercase text-accent">What it does</p>
+        <h2 class="text-headline-lg text-ink">Small on purpose.</h2>
+        <p class="text-body-lg max-w-[620px] pt-2 text-ink-2">
           Lanyard does one thing a CRM is too heavy to do well: get you to actually follow up.
         </p>
         <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div v-for="(f, i) in features" :key="i" class="border-line bg-surface rounded-[16px] border p-5">
-            <div class="mb-3 text-xl" :class="f.iconClass">{{ f.icon }}</div>
-            <h3 class="font-display text-[15.5px] font-bold">{{ f.title }}</h3>
-            <p class="mt-1.5 text-[13.5px] leading-relaxed text-muted">{{ f.body }}</p>
+          <div v-for="f in features" :key="f.title" class="rounded-xl border border-line bg-surface p-5">
+            <h3 class="text-action text-ink">{{ f.title }}</h3>
+            <p class="text-body-sm mt-1.5 text-ink-2">{{ f.body }}</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- TRUST -->
-    <section class="border-line border-t py-16">
-      <div class="mx-auto max-w-[768px] px-6 text-center">
-        <div class="mb-4 text-3xl text-muted" aria-hidden="true">☾</div>
-        <h2 class="font-display text-2xl font-bold tracking-[-0.02em]">Respecting your focus.</h2>
-        <p class="text-ink-2 mx-auto mt-3 max-w-[520px] text-[17px]">
-          Nudges land inside your quiet hours — {{ quietHoursCopy }} by default, in your own timezone. Follow-ups arrive when you're ready to act on them, not in the middle of deep work or at 2am.
-        </p>
-      </div>
-    </section>
-
-    <!-- PHILOSOPHY -->
-    <section class="border-line border-t py-16 text-center">
-      <div class="mx-auto max-w-[1080px] px-6">
-        <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">Why it exists</p>
-        <h2 class="font-display mx-auto max-w-[760px] font-bold leading-tight tracking-[-0.025em]">
-          Your network deserves intentional consistency — not eventual consistency.
-        </h2>
-        <p class="mt-3 text-sm text-muted">
-          Growth doesn't happen by accident. Lanyard makes follow-up a deliberate habit. <span class="opacity-70">(Idea sparked by Vincent Mayers' talk on developer community.)</span>
-        </p>
-      </div>
-    </section>
+    <LandingFocus />
 
     <!-- FINAL CTA -->
-    <section id="get" class="border-line bg-sunken scroll-mt-16 border-t py-16 text-center">
-      <div class="mx-auto max-w-[1080px] px-6">
-        <p class="font-mono mb-3.5 text-[12px] uppercase tracking-[0.12em] text-coral">Early access</p>
-        <h2 class="font-display text-3xl font-bold leading-tight tracking">Follow up before it goes cold.</h2>
-        <p class="text-ink-2 mx-auto mt-3 max-w-[560px] text-[17px]">
+    <section id="get" class="scroll-mt-16 border-t border-line bg-sunken py-16 text-center">
+      <div class="mx-auto max-w-[1024px] px-4">
+        <p class="text-label-caps mb-2 uppercase text-accent">Early access</p>
+        <h2 class="text-headline-lg text-ink">Follow up before it goes cold.</h2>
+        <p class="text-body-lg mx-auto mt-3 max-w-[560px] text-ink-2">
           Lanyard is being built in public. Leave your email and I'll tell you the moment it's ready to try at your next conference.
         </p>
         <div class="mt-6">
           <WaitlistForm />
         </div>
+        <p class="text-body-sm mt-8 text-muted">
+          Your network deserves intentional consistency, not eventual consistency. <span class="opacity-70">(Idea sparked by Vincent Mayers' talk on developer community.)</span>
+        </p>
       </div>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { DEFAULT_QUIET_HOURS, LADDER_PRESETS } from '~/types'
-
 const route = useRoute()
 const auth = useAuthStore()
 
@@ -275,79 +95,12 @@ async function restore() {
   }
 }
 
-// Cadence copy is derived from the shipped preset so the landing page can't
-// drift from the ladder the app actually runs.
-const defaultLadder = LADDER_PRESETS.default
-const ladderOffsets = defaultLadder.map(rung => `+${rung.value}`).join(', ')
-const ladderCopy = `Three touchpoints — ${ladderOffsets} days by default. Switch presets or write your own.`
-
-const quietHoursCopy = `${DEFAULT_QUIET_HOURS.from}:00–${DEFAULT_QUIET_HOURS.to}:00`
-
-const rungs = [
-  {
-    icon: '✎',
-    label: 'Met',
-    when: 'day 0',
-    dotClass: 'border-fresh text-fresh',
-    labelClass: 'text-ink',
-  },
-  {
-    icon: '✉',
-    label: 'Message',
-    when: `+${defaultLadder[0]?.value ?? 2} days`,
-    dotClass: 'border-warm text-warm',
-    labelClass: 'text-ink',
-  },
-  {
-    icon: '☕',
-    label: 'Coffee',
-    when: `+${defaultLadder[2]?.value ?? 45} days`,
-    dotClass: 'border-line text-faint',
-    labelClass: 'text-muted',
-  },
-]
-
-const cups = defaultLadder.map((rung, i) => ({
-  label: `${['1st', '2nd', '3rd'][i]} · +${rung.value} days`,
-  colorClass: ['bg-fresh', 'bg-warm', 'bg-due'][i] ?? 'bg-fresh',
-}))
-
 const features = [
-  {
-    icon: '◐',
-    iconClass: 'text-fresh',
-    title: 'Triage by warmth',
-    body: 'Every contact shows how close its follow-up is to slipping — teal when fresh, red when it’s due. See who’s cooling off at a glance.',
-  },
-  {
-    icon: '✎',
-    iconClass: 'text-coral',
-    title: 'Capture in seconds',
-    body: 'A name and one way to reach them. Rich details are optional — never a form to fill at a booth.',
-  },
-  {
-    icon: '✉',
-    iconClass: 'text-warm',
-    title: 'Nudged your way',
-    body: 'Get reminders by text or email, on your schedule, inside your own quiet hours.',
-  },
-  {
-    icon: '➤',
-    iconClass: 'text-coral',
-    title: 'One tap to reply',
-    body: 'The nudge opens a drafted message on the right channel. You never write from a blank page.',
-  },
-  {
-    icon: '☕',
-    iconClass: 'text-warm',
-    title: 'A defined finish',
-    body: 'Three touchpoints, then a contact graduates and stops nagging you. No infinite queue.',
-  },
-  {
-    icon: '◇',
-    iconClass: 'text-fresh',
-    title: 'Built for the hallway track',
-    body: 'Made for people who meet many and follow up with few — speakers, organizers, serial attendees.',
-  },
+  { title: 'Triage by warmth', body: 'Every contact shows how close its follow-up is to slipping: green when fresh, amber when it’s due. See who’s cooling off at a glance.' },
+  { title: 'Capture in seconds', body: 'A name and one way to reach them. Rich details are optional, never a form to fill at a booth.' },
+  { title: 'Nudged your way', body: 'Get reminders by text or email, on your schedule, inside your own send window.' },
+  { title: 'One tap to reply', body: 'The nudge opens a drafted message on the right channel. You never write from a blank page, and you always hit send.' },
+  { title: 'A defined finish', body: 'Three touchpoints, then a contact graduates and stops nagging you. No infinite queue.' },
+  { title: 'Built for the hallway track', body: 'Made for people who meet many and follow up with few: speakers, organizers, serial attendees.' },
 ]
 </script>

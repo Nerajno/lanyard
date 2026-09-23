@@ -1,13 +1,13 @@
 <template>
   <form class="space-y-6" @submit.prevent="onSave">
     <fieldset>
-      <legend class="font-mono text-xs uppercase tracking-eyebrow text-ink">Channel</legend>
-      <p v-if="profile?.sms_opted_out_at" class="mt-1 text-xs text-coral">You've opted out of SMS. Choose email to receive nudges.</p>
+      <legend class="text-label-caps uppercase text-ink">Channel</legend>
+      <p v-if="profile?.sms_opted_out_at" class="mt-1 text-xs text-error">You've opted out of SMS. Choose email to receive nudges.</p>
       <div class="mt-2 flex flex-wrap gap-2">
         <button
           v-for="c in channels" :key="c.value" type="button"
           class="rounded-lg border px-3 py-2 text-sm"
-          :class="form.nudge_channel === c.value ? 'border-coral bg-coral-soft text-coral' : 'border-line bg-surface text-ink hover:border-muted'"
+          :class="form.nudge_channel === c.value ? 'border-accent bg-accent-soft text-accent' : 'border-line bg-surface text-ink hover:border-muted'"
           @click="form.nudge_channel = c.value"
         >{{ c.label }}</button>
       </div>
@@ -15,20 +15,20 @@
 
     <div v-if="!profile?.sms_opted_out_at">
       <label class="flex items-start gap-3 text-sm">
-        <input v-model="smsOptInConsent" type="checkbox" class="mt-0.5 accent-coral">
+        <input v-model="smsOptInConsent" type="checkbox" class="mt-0.5 accent-accent">
         <span>I agree to receive conference follow-up reminders by text. <span class="text-muted">Reply STOP to opt out, HELP for help. Message &amp; data rates may apply.</span></span>
       </label>
       <div v-if="smsOptInConsent" class="mt-3 flex items-end gap-2">
         <div class="flex-1">
           <label class="text-sm font-medium text-ink" for="phone">Mobile number</label>
-          <input id="phone" v-model="form.phone" type="tel" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none" placeholder="+1 555 000 0000">
+          <input id="phone" v-model="form.phone" type="tel" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none" placeholder="+1 555 000 0000">
         </div>
         <button type="button" class="rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:bg-paper" :disabled="sendingCode" @click="sendCode">{{ smsOptedIn ? 'Verify' : 'Send code' }}</button>
       </div>
       <div v-if="smsCodeSent" class="mt-2 flex items-end gap-2">
         <div class="flex-1">
           <label class="text-sm font-medium text-ink" for="code">Enter the code we texted you</label>
-          <input id="code" v-model="code" inputmode="numeric" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none" placeholder="123456">
+          <input id="code" v-model="code" inputmode="numeric" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none" placeholder="123456">
         </div>
         <button type="button" class="rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:bg-paper" @click="verifyCode">Confirm</button>
       </div>
@@ -36,17 +36,17 @@
 
     <div>
       <label class="text-sm font-medium text-ink" for="timezone">Timezone</label>
-      <select id="timezone" v-model="form.timezone" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none">
+      <select id="timezone" v-model="form.timezone" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none">
         <option v-for="tz in commonTimezones" :key="tz" :value="tz">{{ tz }}</option>
       </select>
       <p class="mt-1 text-xs text-muted">Nudges are sent during your local daytime (09:00–21:00).</p>
     </div>
 
-    <p v-if="error" class="text-sm text-coral">{{ error }}</p>
+    <p v-if="error" class="text-sm text-error">{{ error }}</p>
 
     <button
       type="submit" :disabled="saving"
-      class="rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:opacity-50"
+      class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press disabled:opacity-50"
     >{{ saving ? 'Saving…' : 'Save preferences' }}</button>
   </form>
 </template>

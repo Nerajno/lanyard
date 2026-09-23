@@ -3,7 +3,7 @@
     <div class="w-full max-w-md">
       <div class="text-center">
         <BrandMark class="pointer-events-none" />
-        <h1 class="font-display mt-4 text-2xl font-extrabold tracking-[-0.03em]">Let's stay in touch</h1>
+        <h1 class="font-display mt-4 text-2xl font-bold tracking-[-0.02em]">Let's stay in touch</h1>
         <p class="mt-1 text-sm text-muted">Add the details you're comfortable sharing — it becomes a follow-up for the person who sent this.</p>
       </div>
 
@@ -18,29 +18,29 @@
       </div>
 
       <form v-else class="mt-6 space-y-4 rounded-xl border border-line bg-surface p-5" @submit.prevent="submit">
-        <p v-if="submitError" class="text-sm text-coral">{{ submitError }}</p>
+        <p v-if="submitError" class="text-sm text-error">{{ submitError }}</p>
         <div>
           <label class="text-sm font-medium text-ink" for="name">Name *</label>
-          <input id="name" v-model="name" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none" placeholder="Ada Lovelace">
+          <input id="name" v-model="name" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none" placeholder="Ada Lovelace">
         </div>
         <div>
           <label class="text-sm font-medium text-ink" for="how_met">How you met *</label>
-          <textarea id="how_met" v-model="howMet" rows="2" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none" :placeholder="howMetDefault || 'Where did you run into each other?'" />
+          <textarea id="how_met" v-model="howMet" rows="2" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none" :placeholder="howMetDefault || 'Where did you run into each other?'" />
         </div>
         <div class="flex flex-col gap-3 sm:flex-row">
           <div class="flex-1">
             <label class="text-sm font-medium text-ink" for="email">Email</label>
-            <input id="email" v-model="email" type="email" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none">
+            <input id="email" v-model="email" type="email" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none">
           </div>
           <div class="flex-1">
             <label class="text-sm font-medium text-ink" for="phone">Phone</label>
-            <input id="phone" v-model="phone" type="tel" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none" placeholder="+1 555 000 0000">
+            <input id="phone" v-model="phone" type="tel" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none" placeholder="+1 555 000 0000">
           </div>
         </div>
-        <p v-if="!hasChannel && touched" class="text-sm text-coral">Add an email or a phone number.</p>
+        <p v-if="!hasChannel && touched" class="text-sm text-error">Add an email or a phone number.</p>
         <button
           type="submit" :disabled="submitting || !valid"
-          class="w-full rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:cursor-not-allowed disabled:opacity-50"
+          class="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press disabled:cursor-not-allowed disabled:opacity-50"
         >{{ submitting ? 'Saving…' : 'Save it' }}</button>
       </form>
     </div>

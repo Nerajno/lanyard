@@ -8,7 +8,7 @@
         type="email"
         required
         autocomplete="email"
-        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none"
+        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none"
         placeholder="you@example.com"
       >
     </div>
@@ -21,7 +21,7 @@
         type="password"
         required
         autocomplete="current-password"
-        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none"
+        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none"
         placeholder="••••••••"
       >
       <button
@@ -35,14 +35,14 @@
       <p v-else class="mt-2 text-sm text-graduated">Check your inbox — we sent a reset link.</p>
     </div>
 
-    <p v-if="notice" class="text-sm" :class="notice.tone === 'coral' ? 'text-coral' : notice.tone === 'graduated' ? 'text-graduated' : 'text-muted'">
+    <p v-if="notice" class="text-sm" :class="notice.tone === 'error' ? 'text-error' : notice.tone === 'graduated' ? 'text-graduated' : 'text-muted'">
       {{ notice.text }}
     </p>
 
     <button
       type="submit"
       :disabled="loading"
-      class="w-full rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:opacity-50"
+      class="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press disabled:opacity-50"
     >
       {{ buttonLabel }}
     </button>
@@ -73,9 +73,9 @@ const notice = computed(() => {
     case 'confirm-email':
       return { tone: 'graduated' as const, text: CHECK_INBOX_MESSAGE }
     case 'duplicate':
-      return { tone: 'coral' as const, text: DUPLICATE_MESSAGE }
+      return { tone: 'error' as const, text: DUPLICATE_MESSAGE }
     case 'error':
-      return { tone: 'coral' as const, text: p.message }
+      return { tone: 'error' as const, text: p.message }
     default:
       return null
   }

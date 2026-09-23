@@ -2,53 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Palette: Stitch navy/green system (see project_docs/decisions.md, 2026-09-22). */
 :root {
-  --canvas: 13 21 32;
-  --paper: 247 246 242;
-  --sunken: 242 241 236;
+  --canvas: 4 22 39;
+  --paper: 248 249 255;
+  --sunken: 239 244 255;
   --surface: 255 255 255;
-  --ink: 23 25 31;
-  --ink-2: 74 76 84;
-  --muted: 113 116 125;
+  --ink: 11 28 48;
+  --ink-2: 68 71 76;
+  --muted: 105 108 114;
   --faint: 154 157 165;
-  --line: 231 229 223;
-  --navy: 18 36 63;
-  --coral: 232 80 58;
-  --coral-press: 200 62 41;
-  --coral-soft: 251 230 225;
-  --fresh: 15 157 143;
-  --fresh-soft: 230 245 242;
-  --warm: 232 161 58;
-  --warm-soft: 251 240 220;
-  --due: 232 80 58;
-  --due-soft: 251 230 225;
-  --graduated: 11 110 100;
-  --bubble: 233 234 237;
-  --bubble-ink: 28 30 36;
+  --line: 196 198 205;
+  --navy: 4 22 39;
+  --accent: 0 109 55;
+  --accent-press: 0 82 40;
+  --accent-soft: 216 245 226;
+  --on-accent: 255 255 255;
+  --error: 186 26 26;
+  --error-soft: 255 218 214;
+  --on-error: 255 255 255;
+  --fresh: 0 109 55;
+  --fresh-soft: 216 245 226;
+  --warm: 158 94 0;
+  --warm-soft: 255 221 185;
+  --due: 128 76 0;
+  --due-soft: 255 221 185;
+  --graduated: 0 82 40;
+  --bubble: 229 238 255;
+  --bubble-ink: 11 28 48;
 }
 
 [data-theme='dark'] {
-  --paper: 21 23 28;
-  --sunken: 17 19 24;
-  --surface: 29 32 39;
-  --line: 44 47 55;
-  --ink: 236 237 239;
-  --ink-2: 185 188 196;
-  --muted: 138 141 150;
-  --faint: 102 105 115;
-  --navy: 22 39 63;
-  --coral: 238 90 66;
-  --coral-press: 216 70 46;
-  --coral-soft: 58 33 28;
-  --fresh: 22 179 163;
-  --fresh-soft: 20 49 46;
-  --warm: 240 176 84;
-  --warm-soft: 58 46 23;
-  --due: 238 90 66;
-  --due-soft: 58 33 28;
-  --graduated: 27 145 132;
-  --bubble: 42 45 52;
-  --bubble-ink: 230 232 238;
+  --paper: 4 22 39;
+  --sunken: 11 29 45;
+  --surface: 26 43 60;
+  --line: 42 59 77;
+  --ink: 210 228 251;
+  --ink-2: 183 200 222;
+  --muted: 129 146 167;
+  --faint: 93 110 130;
+  --navy: 26 43 60;
+  --accent: 74 225 131;
+  --accent-press: 107 254 156;
+  --accent-soft: 15 51 33;
+  --on-accent: 0 33 12;
+  --error: 255 180 171;
+  --error-soft: 147 0 10;
+  --on-error: 105 0 5;
+  --fresh: 74 225 131;
+  --fresh-soft: 15 51 33;
+  --warm: 255 185 97;
+  --warm-soft: 62 36 0;
+  --due: 255 164 72;
+  --due-soft: 62 36 0;
+  --graduated: 107 254 156;
+  --bubble: 33 49 69;
+  --bubble-ink: 234 241 255;
 }
 
 html {
@@ -63,7 +72,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2.5px solid rgb(var(--coral));
+  outline: 2.5px solid rgb(var(--accent));
   outline-offset: 3px;
   border-radius: 4px;
 }

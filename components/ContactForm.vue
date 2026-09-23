@@ -6,7 +6,7 @@
         id="name"
         v-model="form.name"
         type="text"
-        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink placeholder:text-muted focus:border-coral focus:outline-none"
+        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink placeholder:text-muted focus:border-accent focus:outline-none"
         placeholder="Ada Lovelace"
       >
     </div>
@@ -17,27 +17,27 @@
         id="how_met"
         v-model="form.how_met"
         rows="2"
-        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink placeholder:text-muted transition-colors focus:border-coral focus:outline-none"
+        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink placeholder:text-muted transition-colors focus:border-accent focus:outline-none"
         placeholder="Met at the analytics track after her lightning talk…"
       />
       <p class="mt-1 text-xs text-muted">Sent verbatim in your follow-up nudge.</p>
     </div>
 
-    <div class="font-mono text-xs uppercase tracking-eyebrow text-ink">Reach them via (at least one) *</div>
+    <div class="text-label-caps uppercase text-ink">Reach them via (at least one) *</div>
     <div class="flex flex-col gap-3 sm:flex-row">
       <div class="flex-1">
         <label class="text-sm font-medium text-ink" for="email">Email</label>
-        <input id="email" v-model="form.email" type="email" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none" >
+        <input id="email" v-model="form.email" type="email" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none" >
       </div>
       <div class="flex-1">
         <label class="text-sm font-medium text-ink" for="phone">Phone</label>
-        <input id="phone" v-model="form.phone" type="tel" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none" placeholder="+1 555 000 0000" >
+        <input id="phone" v-model="form.phone" type="tel" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none" placeholder="+1 555 000 0000" >
       </div>
     </div>
-    <p v-if="!hasChannel" class="text-sm text-coral">Add an email or a phone number.</p>
+    <p v-if="!hasChannel" class="text-sm text-error">Add an email or a phone number.</p>
 
     <fieldset>
-      <legend class="font-mono text-xs uppercase tracking-eyebrow text-ink">Follow-up pace</legend>
+      <legend class="text-label-caps uppercase text-ink">Follow-up pace</legend>
       <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <button
           v-for="preset in presets"
@@ -45,12 +45,12 @@
           type="button"
           class="rounded-lg border px-3 py-2 text-sm transition"
           :class="form.ladderPreset === preset.key
-            ? 'border-coral bg-coral-soft text-coral'
+            ? 'border-accent bg-accent-soft text-accent'
             : 'border-line bg-surface text-ink hover:border-muted'"
           @click="form.ladderPreset = preset.key"
         >
           {{ preset.label }}
-          <span :class="form.ladderPreset === preset.key ? 'text-coral' : 'text-muted'" class="block text-xs">
+          <span :class="form.ladderPreset === preset.key ? 'text-accent' : 'text-muted'" class="block text-xs">
             {{ preset.summary }}
           </span>
         </button>
@@ -58,12 +58,12 @@
           type="button"
           class="rounded-lg border px-3 py-2 text-sm transition"
           :class="form.ladderPreset === 'custom'
-            ? 'border-coral bg-coral-soft text-coral'
+            ? 'border-accent bg-accent-soft text-accent'
             : 'border-line bg-surface text-ink hover:border-muted'"
           @click="form.ladderPreset = 'custom'"
         >
           Custom
-          <span :class="form.ladderPreset === 'custom' ? 'text-coral' : 'text-muted'" class="block text-xs">
+          <span :class="form.ladderPreset === 'custom' ? 'text-accent' : 'text-muted'" class="block text-xs">
             {{ customSummary }}
           </span>
         </button>
@@ -75,14 +75,14 @@
             v-model.number="form.customLadder[i].value"
             type="number"
             min="1"
-            class="w-24 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm text-ink transition-colors focus:border-coral focus:outline-none"
+            class="w-24 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm text-ink transition-colors focus:border-accent focus:outline-none"
           >
-          <select v-model="form.customLadder[i].unit" class="rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-ink transition-colors focus:border-coral focus:outline-none">
+          <select v-model="form.customLadder[i].unit" class="rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-ink transition-colors focus:border-accent focus:outline-none">
             <option value="min">min</option>
             <option value="hour">hours</option>
             <option value="day">days</option>
           </select>
-          <button type="button" class="text-sm text-coral" @click="removeRung(i)">Remove</button>
+          <button type="button" class="text-sm text-accent" @click="removeRung(i)">Remove</button>
         </div>
         <button v-if="form.customLadder.length < 3" type="button" class="text-sm text-muted hover:text-ink" @click="addRung()">
           + Add rung
@@ -90,12 +90,12 @@
       </div>
     </fieldset>
 
-    <p v-if="formError" class="text-sm text-coral">{{ formError }}</p>
+    <p v-if="formError" class="text-sm text-error">{{ formError }}</p>
 
     <button
       type="submit"
       :disabled="submitting || !valid"
-      class="rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:cursor-not-allowed disabled:opacity-50"
+      class="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press disabled:cursor-not-allowed disabled:opacity-50"
     >
       {{ submitting ? 'Saving…' : submitLabel }}
     </button>
