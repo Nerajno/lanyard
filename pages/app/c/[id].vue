@@ -1,9 +1,9 @@
 <template>
   <div class="mx-auto max-w-xl">
-    <h1 class="font-display text-3xl font-extrabold tracking-[-0.03em]">Edit contact</h1>
+    <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Edit contact</h1>
     <p class="mt-1 text-sm text-muted">Update how you reach {{ contact?.name }}.</p>
 
-    <p v-if="error" class="mt-4 text-sm text-coral">{{ error }}</p>
+    <p v-if="error" class="mt-4 text-sm text-error">{{ error }}</p>
     <p v-else-if="!contact && !loading" class="mt-4 text-sm text-muted">Contact not found.</p>
 
     <div v-if="contact" class="mt-6 pb-8">
@@ -13,7 +13,7 @@
         @submit="onSubmit"
       />
       <button
-        class="mt-6 text-sm text-coral hover:underline"
+        class="mt-6 text-sm text-error hover:underline"
         @click="onDelete"
       >
         Delete {{ contact.name }}

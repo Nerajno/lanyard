@@ -1,28 +1,28 @@
 <template>
   <div class="mx-auto max-w-xl">
-    <h1 class="font-display text-3xl font-extrabold tracking-[-0.03em]">Settings</h1>
+    <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Settings</h1>
 
     <section class="mt-6">
-      <h2 class="font-mono text-xs uppercase tracking-eyebrow text-muted">Nudges</h2>
+      <h2 class="text-label-caps uppercase text-muted">Nudges</h2>
       <div class="mt-3">
         <NudgePrefsForm @saved="onSaved" />
       </div>
     </section>
 
     <section class="mt-10">
-      <h2 class="font-mono text-xs uppercase tracking-eyebrow text-muted">Appearance</h2>
+      <h2 class="text-label-caps uppercase text-muted">Appearance</h2>
       <button type="button" class="mt-3 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors hover:bg-paper" @click="toggleTheme">
         Switch to {{ isDark ? 'light' : 'dark' }}
       </button>
     </section>
 
     <section class="mt-10">
-      <h2 class="font-mono text-xs uppercase tracking-eyebrow text-muted">Account</h2>
+      <h2 class="text-label-caps uppercase text-muted">Account</h2>
       <p v-if="user" class="mt-2 text-sm text-muted">{{ user.email }}</p>
-      <button type="button" class="mt-3 block text-sm text-coral hover:underline" @click="onSignOut">Sign out</button>
-      <button type="button" class="mt-1 block text-sm text-coral hover:underline" @click="showDeleteConfirm = true">Delete account</button>
+      <button type="button" class="mt-3 block text-sm text-accent hover:underline" @click="onSignOut">Sign out</button>
+      <button type="button" class="mt-1 block text-sm text-error hover:underline" @click="showDeleteConfirm = true">Delete account</button>
       <div class="mt-6 rounded-lg border border-line bg-surface p-4">
-        <h3 class="font-mono text-xs uppercase tracking-eyebrow text-muted">Password</h3>
+        <h3 class="text-label-caps uppercase text-muted">Password</h3>
         <div class="mt-3">
           <ChangePasswordForm />
         </div>

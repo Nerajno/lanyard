@@ -21,10 +21,16 @@ export default {
         faint: 'rgb(var(--faint) / <alpha-value>)',
         line: 'rgb(var(--line) / <alpha-value>)',
         navy: 'rgb(var(--navy) / <alpha-value>)',
-        coral: {
-          DEFAULT: 'rgb(var(--coral) / <alpha-value>)',
-          press: 'rgb(var(--coral-press) / <alpha-value>)',
-          soft: 'rgb(var(--coral-soft) / <alpha-value>)',
+        accent: {
+          DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
+          press: 'rgb(var(--accent-press) / <alpha-value>)',
+          soft: 'rgb(var(--accent-soft) / <alpha-value>)',
+        },
+        'on-accent': 'rgb(var(--on-accent) / <alpha-value>)',
+        'on-error': 'rgb(var(--on-error) / <alpha-value>)',
+        error: {
+          DEFAULT: 'rgb(var(--error) / <alpha-value>)',
+          soft: 'rgb(var(--error-soft) / <alpha-value>)',
         },
         fresh: {
           DEFAULT: 'rgb(var(--fresh) / <alpha-value>)',
@@ -45,9 +51,18 @@ export default {
         'bubble-ink': 'rgb(var(--bubble-ink) / <alpha-value>)',
       },
       fontFamily: {
-        display: ['"Bricolage Grotesque"', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'system-ui', 'sans-serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+      },
+      fontSize: {
+        'label-caps': ['12px', { lineHeight: '16px', letterSpacing: '0.05em', fontWeight: '600' }],
+        action: ['16px', { lineHeight: '20px', fontWeight: '600' }],
+        'body-sm': ['14px', { lineHeight: '20px' }],
+        'body-lg': ['16px', { lineHeight: '24px' }],
+        'headline-md': ['20px', { lineHeight: '28px', fontWeight: '600' }],
+        'headline-lg': ['30px', { lineHeight: '38px', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'headline-xl': ['48px', { lineHeight: '56px', letterSpacing: '-0.02em', fontWeight: '700' }],
       },
       letterSpacing: {
         eyebrow: '0.12em',

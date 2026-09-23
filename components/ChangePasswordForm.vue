@@ -5,7 +5,7 @@
       <input
         id="current-password" v-model="currentPassword" type="password"
         autocomplete="current-password"
-        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none"
+        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none"
         placeholder="••••••••"
       >
       <p class="mt-1 text-xs text-muted">Leave blank if you signed in with Google, Apple, or a magic link.</p>
@@ -16,7 +16,7 @@
       <input
         id="new-password" v-model="newPassword" type="password" required minlength="8"
         autocomplete="new-password"
-        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none"
+        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none"
         placeholder="at least 8 characters"
       >
     </div>
@@ -26,16 +26,16 @@
       <input
         id="confirm-password" v-model="confirmPassword" type="password" required
         autocomplete="new-password"
-        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-coral focus:outline-none"
+        class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none"
       >
     </div>
 
-    <p v-if="error" class="text-sm text-coral">{{ error }}</p>
+    <p v-if="error" class="text-sm text-error">{{ error }}</p>
     <p v-if="success" class="text-sm text-graduated">Password updated. You've been signed out on your other devices.</p>
 
     <button
       type="submit" :disabled="busy"
-      class="w-full rounded-lg bg-coral px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-coral-press disabled:opacity-50"
+      class="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press disabled:opacity-50"
     >
       {{ busy ? 'Updating…' : 'Update password' }}
     </button>

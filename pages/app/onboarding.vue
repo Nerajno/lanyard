@@ -1,6 +1,6 @@
 <template>
   <div class="mx-auto max-w-xl">
-    <h1 class="font-display text-3xl font-extrabold tracking-[-0.03em]">Almost there</h1>
+    <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Almost there</h1>
     <p class="mt-1 text-sm text-muted">Lanyard needs a destination before it can nudge you.</p>
     <div class="mt-6">
       <NudgePrefsForm @saved="onSaved" />

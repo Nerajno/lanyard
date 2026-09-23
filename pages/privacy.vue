@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto max-w-2xl px-6 py-16">
-    <p class="font-mono mb-3 text-xs uppercase tracking-[0.12em] text-coral">Privacy</p>
-    <h1 class="font-display text-4xl font-extrabold tracking-[-0.03em]">Privacy policy</h1>
+    <p class="mb-3 text-label-caps uppercase text-accent">Privacy</p>
+    <h1 class="font-display text-4xl font-bold tracking-[-0.02em]">Privacy policy</h1>
     <div class="prose-ink mt-8 space-y-6 text-sm leading-relaxed text-ink-2">
       <p><strong>Draft for review.</strong> TL;DR: Lanyard stores what you give it to run the follow-up loop, never sells it, and stops messaging you on request.</p>
       <section>

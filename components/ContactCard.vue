@@ -6,7 +6,7 @@
         <p class="mt-0.5 line-clamp-2 text-sm text-muted">{{ contact.how_met }}</p>
         <p v-if="dueLabel" class="mt-1 font-mono text-xs text-muted">{{ dueLabel }}</p>
       </div>
-      <span class="shrink-0 rounded-full px-2.5 py-1 font-mono text-[11px] uppercase tracking-eyebrow" :class="urgencyClasses">
+      <span class="shrink-0 rounded-full px-2.5 py-1 text-label-caps uppercase" :class="urgencyClasses">
         {{ urgencyLabel }}
       </span>
     </div>
@@ -18,7 +18,7 @@
     <footer class="mt-3 flex flex-wrap items-center gap-2">
       <template v-if="contact.status === 'active'">
         <button
-          class="rounded-lg bg-coral px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-coral-press"
+          class="rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-on-accent transition-colors hover:bg-accent-press"
           @click="$emit('follow-up', contact)"
         >
           Follow up
@@ -44,7 +44,7 @@
           </button>
         </div>
       </template>
-      <button v-if="contact.status !== 'graduated'" class="rounded-lg px-3 py-1.5 text-xs text-coral transition-colors hover:bg-coral-soft" @click="$emit('delete', contact)">
+      <button v-if="contact.status !== 'graduated'" class="rounded-lg px-3 py-1.5 text-xs text-error transition-colors hover:bg-error-soft" @click="$emit('delete', contact)">
         Delete
       </button>
       <NuxtLink :to="`/app/c/${contact.id}`" class="rounded-lg px-3 py-1.5 text-xs text-muted transition-colors hover:bg-paper">
@@ -108,7 +108,7 @@ function onRemindPick(rung: LadderRung): void {
 
 const urgencyClasses = computed(() => {
   switch (urgency.value) {
-    case 'due': return isOverdue.value ? 'bg-coral-soft text-coral' : 'bg-coral-soft text-coral'
+    case 'due': return isOverdue.value ? 'bg-due-soft text-due' : 'bg-due-soft text-due'
     case 'close': return 'bg-warm/15 text-warm'
     case 'graduated': return 'bg-graduated/15 text-graduated'
     default: return 'bg-fresh/15 text-fresh'

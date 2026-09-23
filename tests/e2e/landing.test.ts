@@ -2,7 +2,7 @@ import { expect, test } from '@nuxt/test-utils/playwright'
 
 test('renders the hero heading', async ({ page, goto }) => {
   await goto('/', { waitUntil: 'hydration' })
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Follow up before it goes cold.')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Turn brief encounters into lasting connections.')
 })
 
 test('renders the anchored sections the nav links to', async ({ page, goto }) => {
@@ -33,6 +33,16 @@ test('mobile nav disclosure opens and closes', async ({ page, goto }) => {
 
 test('does not imply Lanyard sends on the user behalf', async ({ page, goto }) => {
   await goto('/', { waitUntil: 'hydration' })
-  await expect(page.getByText('Open draft in Messages')).toBeVisible()
-  await expect(page.getByText('Send SMS Follow-up')).toHaveCount(0)
+  await expect(page.getByText('Open prefilled text')).toBeVisible()
+  await expect(page.getByText(/send sms follow-up|we send|sent for you/i)).toHaveCount(0)
+})
+
+test('single-contact nudge preview quotes how they met', async ({ page, goto }) => {
+  await goto('/', { waitUntil: 'hydration' })
+  await expect(page.locator('#how-it-works').getByText(/How you met: “.+”/)).toBeVisible()
+})
+
+test('loads no images from the Stitch mockup host', async ({ page, goto }) => {
+  await goto('/', { waitUntil: 'hydration' })
+  await expect(page.locator('img[src*="googleusercontent.com"]')).toHaveCount(0)
 })
