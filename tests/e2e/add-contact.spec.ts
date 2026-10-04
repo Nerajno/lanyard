@@ -6,8 +6,7 @@ test('adds a contact from the manual form and sees it in the list', async ({ pag
   await expect(page).toHaveURL(/\/app(\/|$)/)
 
   await page.getByRole('navigation').getByRole('link', { name: 'Add', exact: true }).click()
-  await page.getByRole('link', { name: 'By hand' }).click()
-  await expect(page).toHaveURL('/app/add/manual')
+  await expect(page).toHaveURL('/app/add')
 
   await page.locator('#name').fill('Ada Lovelace')
   await page.locator('#how_met').fill('CppCon hallway')
