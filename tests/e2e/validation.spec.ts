@@ -10,6 +10,9 @@ test('blocks a contact with no email or phone', async ({ page, goto }) => {
 
   await page.locator('#name').fill('No Channel')
   await page.locator('#how_met').fill('Somewhere')
+  await expect(page.getByText('Add an email or a phone number.')).toBeHidden()
 
+  await page.getByRole('button', { name: 'Save contact' }).click()
   await expect(page.getByText('Add an email or a phone number.')).toBeVisible()
+  await expect(page).toHaveURL('/app/add')
 })

@@ -29,3 +29,12 @@ export function applyHowMetChip(current: string, chip: string): string {
   }
   return `${chip} · ${current.replace(/^\s+/, '')}`
 }
+
+export function cleanHowMet(text: string): string {
+  const trimmed = text.trim()
+  // Remove trailing · and whitespace if there's nothing after it
+  if (trimmed.endsWith('·')) {
+    return trimmed.slice(0, -1).trim()
+  }
+  return trimmed
+}

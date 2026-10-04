@@ -83,8 +83,22 @@ describe('ContactForm', () => {
     expect(w.find('#pace-options').exists()).toBe(true)
   })
 
-  it('opens the pace picker when editing a custom ladder', async () => {
+  it('shows the custom ladder in the pace picker when selected', async () => {
     const w = await mount({ name: 'Ada', how_met: 'x', email: 'a@b.co', ladderPreset: 'custom', customLadder: [{ value: 3, unit: 'day' }] })
+    const toggle = w.find('button[aria-controls="pace-options"]')
+    expect(toggle.text()).toContain('Custom')
+    await toggle.trigger('click')
     expect(w.find('#pace-options').exists()).toBe(true)
+  })
+
+  it('strips dangling chip separator on submit', async () => {
+    const w = await mount()
+    await w.find('#name').setValue('Ada')
+    await w.find('#how_met').setValue('WebSummit · ')
+    await w.find('#email').setValue('a@b.co')
+    await w.find('form').trigger('submit')
+    await vi.dynamicImportSettled()
+    const emitted = w.emitted('submit')![0][0] as Record<string, unknown>
+    expect(emitted.how_met).toBe('WebSummit')
   })
 })

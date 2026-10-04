@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { applyHowMetChip, recentHowMetPrefixes } from '~/utils/howMet'
+import { applyHowMetChip, cleanHowMet, recentHowMetPrefixes } from '~/utils/howMet'
 
 const c = (how_met: string, created_at: string) => ({ how_met, created_at })
 
@@ -31,4 +31,17 @@ describe('applyHowMetChip', () => {
   it('prefixes the chip', () => expect(applyHowMetChip('talked Postgres', 'WebSummit')).toBe('WebSummit · talked Postgres'))
   it('fills an empty field', () => expect(applyHowMetChip('  ', 'WebSummit')).toBe('WebSummit · '))
   it('does not stack the same chip', () => expect(applyHowMetChip('WebSummit · x', 'WebSummit')).toBe('WebSummit · x'))
+})
+
+describe('cleanHowMet', () => {
+  it('removes a dangling chip separator', () => {
+    expect(cleanHowMet('WebSummit · ')).toBe('WebSummit')
+    expect(cleanHowMet('   WebSummit   ·   ')).toBe('WebSummit')
+  })
+  it('leaves text with content after the separator', () => {
+    expect(cleanHowMet('WebSummit · talked Postgres')).toBe('WebSummit · talked Postgres')
+  })
+  it('preserves text without a separator', () => {
+    expect(cleanHowMet('WebSummit')).toBe('WebSummit')
+  })
 })
