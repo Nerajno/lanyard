@@ -18,7 +18,7 @@ Four docs, four jobs. They live in `project_docs/`. Check the right one before p
 | `project_docs/tasks.md` | Phase 1 sequence. Work top-down; §5 (the nudge) is the point of the project. |
 | `AGENTS.md` | Code conventions, rules, definition of done. Stays at repo root. |
 
-Plans and specs live in `project_docs/superpowers/{plans,specs}/`.
+Plans and specs live in `project_docs/{plans,specs}/`. Design inputs (Stitch brief, screen exports) live in `project_docs/design/`.
 
 ## Before you write code
 
