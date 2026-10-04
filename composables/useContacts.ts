@@ -2,7 +2,10 @@ import { watch } from 'vue'
 import type { Ref } from 'vue'
 import type { Contact, InsertContact, Ladder, LadderRung, UpdateContact } from '~/types'
 import type { LadderPreset } from '~/utils/cadence'
-import { addToTimestamp, advanceTouchpoint, initialFollowUp, resolveLadder, snooze } from '~/utils/cadence'
+import { addToTimestamp, initialFollowUp, resolveLadder, snooze } from '~/utils/cadence'
+import { claimOpenNudges } from '~/utils/claimNudges'
+import { followUpPatch } from '~/utils/followUp'
+import type { FollowUpResult } from '~/utils/followUp'
 
 export interface NewContactInput {
   name: string
@@ -90,21 +93,25 @@ export function useContacts() {
   }
 
   /**
-   * Mark a single touchpoint done. Advances the ladder, or graduates on the
-   * third rung. Uses shared cadence logic so it can't drift from the tests.
+   * Mark a single touchpoint done. First claims any open direct nudge for the
+   * contact so its act-link can't advance the ladder a second time. If the
+   * act-link already claimed it, this does not advance (it already happened).
    */
-  async function markFollowedUp(id: string): Promise<void> {
+  async function markFollowedUp(id: string): Promise<FollowUpResult> {
     if (!auth.user) throw new Error('You must be signed in')
     const contact = contacts.value.find((c) => c.id === id)
-    if (!contact) return
+    if (!contact) return { outcome: 'skipped' }
 
-    const next = advanceTouchpoint(contact.cadence_ladder, contact.touchpoints_done, new Date())
-    const patch: UpdateContact = {
-      touchpoints_done: next?.touchpoints_done ?? contact.touchpoints_done + 1,
+    const now = new Date()
+    const claim = await claimOpenNudges(sb, auth.user.id, id, now)
+    if (claim === 'lost') {
+      await load()
+      return { outcome: 'skipped' }
     }
-    if (next) patch.follow_up_by = next.follow_up_by
-    else patch.status = 'graduated'
+
+    const { patch, result } = followUpPatch(contact, now)
     await update(id, patch)
+    return result
   }
 
   /** Snooze a contact 3 days. Ladder position is unchanged — never consumes a rung. */

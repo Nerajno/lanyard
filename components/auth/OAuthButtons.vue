@@ -1,22 +1,8 @@
 <template>
   <div class="space-y-3">
-    <button
-      type="button"
-      :disabled="loading"
-      class="flex w-full items-center justify-center gap-2 rounded-lg border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-paper disabled:opacity-50"
-      @click="start('google')"
-    >
-      Continue with Google
-    </button>
-    <button
-      type="button"
-      :disabled="loading"
-      class="flex w-full items-center justify-center gap-2 rounded-lg border border-line bg-surface px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-paper disabled:opacity-50"
-      @click="start('apple')"
-    >
-      Continue with Apple
-    </button>
-    <p v-if="error" class="text-sm text-error">{{ error }}</p>
+    <UiButton variant="secondary" block :disabled="loading" @click="start('google')">Continue with Google</UiButton>
+    <UiButton variant="secondary" block :disabled="loading" @click="start('apple')">Continue with Apple</UiButton>
+    <p v-if="error" role="alert" class="text-sm text-error">{{ error }}</p>
   </div>
 </template>
 

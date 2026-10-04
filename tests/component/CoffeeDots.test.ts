@@ -25,4 +25,10 @@ describe('CoffeeDots', () => {
     expect(wrapper.text()).toContain('1/5 coffees')
     expect(wrapper.findAll('span.inline-block')).toHaveLength(5)
   })
+
+  it('exposes progress to screen readers', async () => {
+    const wrapper = await mountSuspended(CoffeeDots, { props: { filled: 2 } })
+    expect(wrapper.attributes('aria-label')).toBe('2 of 3 coffees')
+    expect(wrapper.attributes('role')).toBe('img')
+  })
 })

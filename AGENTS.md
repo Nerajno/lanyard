@@ -9,6 +9,7 @@ A conference follow-up nudger. Capture a contact, get a timed nudge (SMS or emai
 - Nuxt 3 + Vue 3, `<script setup lang="ts">` only. Composition API, no Options API.
 - Pinia for state; composables for reusable logic (`useContacts`, `useNudge`).
 - Tailwind for styling; no component CSS files.
+- Build UI from the `components/ui/` primitives (`UiButton`, `UiField`, `UiInput`, `UiMenu`, `UiIcon`, …) rather than repeating Tailwind class strings. Interactive targets are at least 44px (`min-h-11`).
 - Supabase client for data; **every table has RLS** keyed on `auth.uid()`. Never write a query that assumes a single user without RLS.
 - Server logic in Nitro routes (`server/api/`) or Supabase edge functions.
 
@@ -30,7 +31,7 @@ A conference follow-up nudger. Capture a contact, get a timed nudge (SMS or emai
 - **Never scrape LinkedIn** or infer profile data from a LinkedIn URL — store the URL, ask the user for the name.
 - A nudge targeting a **single** contact must include `how_met` verbatim. Digests (2+ due) link to triage instead. Keep the received→sent path one tap.
 - **Never auto-send a follow-up on the user's behalf.** The act-link opens a prefilled `sms:`/`mailto:` composer; the user hits send.
-- The act-link advances the ladder **at most once per nudge** (first act wins, via an atomic `acted_at` claim). Replays still open the composer. Emails go through `isValidContactEmail` before landing in a `mailto:`.
+- The act-link advances the ladder **at most once per nudge** (first act wins, via an atomic `acted_at` claim). Replays still open the composer. Emails go through `isValidContactEmail` before landing in a `mailto:`. In-app follow-ups claim the contact's open direct nudges the same way (`utils/claimNudges.ts`) and don't advance if the act-link got there first.
 - Every contact needs at least one of `email`/`phone` — enforced by DB CHECK, mirror it in form validation.
 - Never send SMS to a user without `sms_opt_in_at` set, or with `sms_opted_out_at` set.
 - Any new table → add RLS in the same migration.

@@ -103,6 +103,7 @@ Fallback if Netlify scheduling is fiddly: any external cron (GitHub Actions, cro
 - **Add:** form → validate at least one of email/phone → insert row, `follow_up_by = created_at + cadence_ladder[1]`.
 - **Nudge:** scheduled fn → Twilio or email (above).
 - **Act:** act-link (signed, single-purpose token so it works from a phone without a fresh login) → stamps `nudges.opened_at`, opens `sms:<phone>?&body=…` or `mailto:<email>?subject=…&body=…` prefilled, and marks the touchpoint: `touchpoints_done += 1`, `acted_at` stamped. If `touchpoints_done < 3` → `follow_up_by = acted_at + cadence_ladder[touchpoints_done + 1]`; if `= 3` → `status = 'graduated'`, nudging stops.
+  In-app follow-up (`useContacts.markFollowedUp`) runs the same claim on the user's session before advancing: it stamps `acted_at` on every open **direct** nudge for that contact (`utils/claimNudges.ts`). No open nudge → advance. Claimed at least one → advance. Open nudge(s) but the act-link claimed them first → don't advance. In-app acts therefore also count toward nudge→act latency.
 - **Snooze:** `follow_up_by += 3d`, ladder position unchanged.
 - **Triage list:** active contacts `order by follow_up_by asc`, urgency color from days-until-due; separate graduated section — visible proof the loop worked.
 

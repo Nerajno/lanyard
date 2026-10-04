@@ -14,7 +14,7 @@
 - Every new table must have RLS enabled **in the same migration**; `sms_suppressions` and `account_deletions` get RLS enabled with **no public policies** (service-role only, same pattern as `waitlist`).
 - `<script setup lang="ts">` + Composition API only; Tailwind for all styling; no component CSS files.
 - No new secrets. No new npm dependencies.
-- Copy in Lanyard's plain voice (see `docs/superpowers/specs/2026-08-10-account-deletion-design.md`): say what happens and how to confirm; no "Oops".
+- Copy in Lanyard's plain voice (see `project_docs/specs/2026-08-10-account-deletion-design.md`): say what happens and how to confirm; no "Oops".
 - Grace = **14 days** (`GRACE_DAYS = 14`).
 - `types/database.ts` is **hand-maintained** (see its header) — hand-edit it; do NOT run `supabase gen types`.
 - FK `ON DELETE CASCADE` on `profiles`/`contacts`/`nudges`/`shares` → `auth.users` already exists (`0001`, `0005`) — no FK changes.

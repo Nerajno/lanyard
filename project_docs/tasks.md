@@ -82,7 +82,7 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] Vitest: delete happy/failure/idempotent, suppression hash, purge/restore plans
 
 ## 8. Auth methods — *in flight on `feature/auth-methods`*
-Plan: `project_docs/superpowers/plans/2026-08-10-auth-methods.md`. Spec: `project_docs/superpowers/specs/2026-08-10-auth-methods-design.md`.
+Plan: `project_docs/plans/2026-08-10-auth-methods.md`. Spec: `project_docs/specs/2026-08-10-auth-methods-design.md`.
 - [x] Pure smart-form phase resolver + tests
 - [x] Auth store actions: password sign-in/sign-up, OAuth, password reset
 - [x] Smart-form composable + component
@@ -144,4 +144,8 @@ RLS on every table (policies + enable in same migration, zero public policies on
 
 ## Parked (do NOT start in Phase 1)
 QR scan · LinkedIn attach · share-link capture · email/calendar · AI opener
+
+## App UI redesign (2026-10-03)
+
+- [x] Shared `components/ui/` primitives, icon tab bar, grouped queue (Due now / Later today / Upcoming) with one-tap Message, capture form with recent chips, editable quiet hours, restyled stats/auth/share. Spec: `project_docs/specs/2026-10-03-app-ui-redesign-design.md`. Plan: `project_docs/plans/2026-10-03-app-ui-redesign.md`.
 
