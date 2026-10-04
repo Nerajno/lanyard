@@ -14,6 +14,8 @@ test('adds a contact from the manual form and sees it in the list', async ({ pag
   await page.getByRole('button', { name: 'Save contact' }).click()
   await expect(page).toHaveURL(/\/app(\/|$)/)
 
-  await expect(page.getByText('Ada Lovelace')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Ada Lovelace' })).toBeVisible()
   await expect(page.getByText('CppCon hallway')).toBeVisible()
 })
+
+
