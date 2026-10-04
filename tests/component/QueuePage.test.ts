@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import QueuePage from '~/pages/app/index.vue'
 import type { Contact } from '~/types'
@@ -82,5 +82,25 @@ describe('queue page', () => {
     const w = await mountSuspended(QueuePage, { route: '/app' })
     expect(w.text()).toContain('Grad')
     expect(w.text()).toContain('Graduated · 3 coffees')
+  })
+})
+
+describe('queue clock', () => {
+  it('moves a contact from Later today to Due now as time passes', async () => {
+    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] })
+    try {
+      vi.setSystemTime(new Date(2026, 9, 3, 10, 0))
+      contacts.value = [makeContact({ id: 'a', name: 'Tick', follow_up_by: new Date(2026, 9, 3, 10, 30).toISOString() })]
+      const w = await mountSuspended(QueuePage, { route: '/app' })
+      const headings = () => w.findAll('h2').map((h) => h.text())
+      expect(headings().some((t) => t.startsWith('Later today'))).toBe(true)
+      expect(headings().some((t) => t.startsWith('Due now'))).toBe(false)
+      vi.advanceTimersByTime(31 * 60 * 1000)
+      await nextTick()
+      expect(headings().some((t) => t.startsWith('Due now'))).toBe(true)
+      expect(headings().some((t) => t.startsWith('Later today'))).toBe(false)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

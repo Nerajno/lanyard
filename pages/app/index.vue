@@ -4,12 +4,12 @@
       <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Queue</h1>
       <div class="flex rounded-lg border border-line bg-surface p-1 text-sm">
         <NuxtLink
-          to="/app" class="inline-flex min-h-9 items-center rounded-md px-3 font-medium"
+          to="/app" class="inline-flex min-h-11 items-center rounded-md px-3 font-medium"
           :class="!showGraduated ? 'bg-accent-soft text-accent' : 'text-muted hover:text-ink'"
           :aria-current="!showGraduated ? 'page' : undefined"
         >Due</NuxtLink>
         <NuxtLink
-          to="/app?filter=graduated" class="inline-flex min-h-9 items-center rounded-md px-3 font-medium"
+          to="/app?filter=graduated" class="inline-flex min-h-11 items-center rounded-md px-3 font-medium"
           :class="showGraduated ? 'bg-accent-soft text-accent' : 'text-muted hover:text-ink'"
           :aria-current="showGraduated ? 'page' : undefined"
         >Graduated</NuxtLink>
@@ -32,7 +32,7 @@
         <UiSectionHeader :label="g.label" :count="g.items.length" :tone="g.tone" />
         <div class="mt-3 grid gap-3 sm:grid-cols-2">
           <ContactCard
-            v-for="c in g.items" :key="c.id" :contact="c"
+            v-for="c in g.items" :key="c.id" :contact="c" :now="now"
             @message="onMessage" @mark-done="onMarkDone" @snooze="onSnooze" @archive="onArchive"
             @delete="onDelete" @remind="onRemind(c, $event)"
           />
@@ -63,8 +63,14 @@ definePageMeta({ layout: 'app', middleware: 'app' })
 const { contacts, loading, error, markFollowedUp, snoozeContact, archive, remove, remindContact } = useContacts()
 const route = useRoute()
 
+// Ticks every minute so groups and badges follow the clock (midnight, a rung coming due).
+const now = ref(new Date())
+let clockTimer: ReturnType<typeof setInterval> | undefined
+onMounted(() => { clockTimer = setInterval(() => { now.value = new Date() }, 60_000) })
+onBeforeUnmount(() => clearInterval(clockTimer))
+
 const showGraduated = computed(() => route.query.filter === 'graduated')
-const groups = computed(() => groupQueue(contacts.value))
+const groups = computed(() => groupQueue(contacts.value, now.value))
 const graduated = computed(() => contacts.value.filter((c) => c.status === 'graduated'))
 
 const sections = computed(() => [
@@ -76,7 +82,7 @@ const sections = computed(() => [
 const caughtUp = computed(() => groups.value.due.length === 0 && groups.value.today.length === 0 && groups.value.upcoming.length > 0)
 const nextNudgeLine = computed(() => {
   const next = groups.value.upcoming[0]
-  return next ? `Next nudge: ${next.name}, in ${localDayDiff(next.follow_up_by)}d` : ''
+  return next ? `Next nudge: ${next.name}, in ${localDayDiff(next.follow_up_by, now.value)}d` : ''
 })
 
 const toast = ref<string | null>(null)
