@@ -54,7 +54,7 @@ const emit = defineEmits<{
 
 const BADGE_TONES = {
   due: 'bg-due-soft text-due',
-  warm: 'bg-warm-soft text-warm',
+  warm: 'bg-warm-soft text-ink',
   muted: 'bg-sunken text-muted',
   graduated: 'bg-accent-soft text-graduated',
 } as const
