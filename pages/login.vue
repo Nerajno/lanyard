@@ -12,25 +12,19 @@
           <span class="h-px flex-1 bg-line"/>
         </div>
 
-        <div class="flex rounded-lg border border-line bg-paper p-1">
+        <div class="grid grid-cols-2 gap-1 rounded-lg border border-line bg-paper p-1" role="tablist" aria-label="Sign-in method">
           <button
-            role="tab"
-            type="button"
-            class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+            type="button" role="tab" :aria-selected="tab === 'password'"
+            class="min-h-9 rounded-md px-3 text-sm font-medium transition-colors"
             :class="tab === 'password' ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'"
             @click="tab = 'password'"
-          >
-            Password
-          </button>
+          >Password</button>
           <button
-            role="tab"
-            type="button"
-            class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+            type="button" role="tab" :aria-selected="tab === 'magic'"
+            class="min-h-9 rounded-md px-3 text-sm font-medium transition-colors"
             :class="tab === 'magic' ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'"
             @click="tab = 'magic'"
-          >
-            Magic link
-          </button>
+          >Magic link</button>
         </div>
 
         <AuthPasswordAuthForm v-if="tab === 'password'" />

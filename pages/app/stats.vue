@@ -19,8 +19,8 @@
           <p class="mt-1 text-xs text-muted">nudges acted on ({{ stats.nudges.actedOn }} / {{ stats.nudges.total }})</p>
         </div>
         <div class="rounded-xl border border-line bg-surface p-4">
-          <p class="font-display text-3xl font-bold tracking-[-0.02em]">{{ stats.contacts.graduatedPercent }}%</p>
-          <p class="mt-1 text-xs text-muted">all three coffees ({{ stats.contacts.graduated }} / {{ stats.contacts.total }})</p>
+          <p class="font-display text-3xl font-bold tracking-[-0.02em] text-graduated">{{ stats.contacts.graduatedPercent }}%</p>
+          <p class="mt-1 text-xs text-muted">reached all three coffees ({{ stats.contacts.graduated }} / {{ stats.contacts.total }})</p>
         </div>
       </section>
 

@@ -7,13 +7,13 @@
         <p class="mt-1 text-sm text-muted">Add the details you're comfortable sharing — it becomes a follow-up for the person who sent this.</p>
       </div>
 
-      <p v-if="loading" class="mt-6 rounded-xl border border-line bg-surface p-5 text-center text-sm text-muted">Checking this link…</p>
+      <p v-if="loading" class="mt-6 rounded-xl border border-line bg-surface p-5 text-center text-sm text-muted" role="status">Checking this link…</p>
 
       <p v-else-if="!valid" class="mt-6 rounded-xl border border-line bg-surface p-5 text-center text-sm text-muted">This link has expired or was already used.</p>
 
-      <div v-else-if="done" class="mt-6 rounded-xl border border-graduated bg-surface p-6 text-center">
-        <p class="text-2xl">☕</p>
-        <p class="font-display mt-2 text-lg font-bold">Saved — thanks, {{ doneName }}</p>
+      <div v-else-if="done" class="mt-6 rounded-xl border border-graduated bg-surface p-6 text-center" role="status">
+        <span class="mx-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent"><UiIcon name="check" /></span>
+        <p class="mt-3 font-display text-lg font-bold">Saved — thanks, {{ doneName }}</p>
         <p class="mt-1 text-sm text-muted">They'll be prompted to follow up with you.</p>
       </div>
 

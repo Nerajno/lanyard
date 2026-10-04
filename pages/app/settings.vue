@@ -2,33 +2,30 @@
   <div class="mx-auto max-w-xl space-y-6">
     <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Settings</h1>
 
-    <section class="rounded-xl border border-line bg-surface p-5" aria-labelledby="nudges-heading">
-      <h2 id="nudges-heading" class="text-label-caps uppercase text-ink">Nudges</h2>
-      <div class="mt-4">
-        <NudgePrefsForm @saved="onSaved" />
-      </div>
+    <section class="rounded-xl border border-line bg-surface p-5" aria-labelledby="s-nudges">
+      <h2 id="s-nudges" class="font-display text-lg font-bold">Nudge preferences</h2>
+      <p class="mt-1 text-sm text-muted">When and how Lanyard reminds you to follow up.</p>
+      <div class="mt-4"><NudgePrefsForm @saved="onSaved" /></div>
     </section>
 
-    <section class="rounded-xl border border-line bg-surface p-5" aria-labelledby="appearance-heading">
-      <h2 id="appearance-heading" class="text-label-caps uppercase text-ink">Appearance</h2>
-      <button type="button" class="mt-3 min-h-11 rounded-lg border border-line bg-paper px-3 py-2 text-sm text-ink transition-colors hover:bg-paper" @click="toggleTheme">
-        Switch to {{ isDark ? 'light' : 'dark' }}
-      </button>
+    <section class="rounded-xl border border-line bg-surface p-5" aria-labelledby="s-appearance">
+      <h2 id="s-appearance" class="font-display text-lg font-bold">Appearance</h2>
+      <UiButton variant="secondary" class="mt-3" @click="toggleTheme">
+        <UiIcon :name="isDark ? 'sun' : 'moon'" /> Switch to {{ isDark ? 'light' : 'dark' }}
+      </UiButton>
     </section>
 
-    <section class="rounded-xl border border-line bg-surface p-5" aria-labelledby="account-heading">
-      <h2 id="account-heading" class="text-label-caps uppercase text-ink">Account</h2>
-      <p v-if="user" class="mt-2 text-sm text-muted">{{ user.email }}</p>
-      <div class="mt-4 space-y-2">
-        <button type="button" class="block text-sm text-accent hover:underline" @click="onSignOut">Sign out</button>
-        <button type="button" class="block text-sm text-error hover:underline" @click="showDeleteConfirm = true">Delete account</button>
+    <section class="rounded-xl border border-line bg-surface p-5" aria-labelledby="s-account">
+      <h2 id="s-account" class="font-display text-lg font-bold">Account</h2>
+      <p v-if="user" class="mt-1 text-sm text-muted">{{ user.email }}</p>
+      <UiButton variant="secondary" class="mt-3" @click="onSignOut">Sign out</UiButton>
+      <div class="mt-6 border-t border-line pt-5">
+        <h3 class="text-label-caps uppercase text-muted">Password</h3>
+        <div class="mt-3"><ChangePasswordForm /></div>
       </div>
-
-      <div class="mt-6 rounded-lg border border-line bg-paper p-4" aria-labelledby="password-heading">
-        <h3 id="password-heading" class="text-label-caps uppercase text-muted">Password</h3>
-        <div class="mt-3">
-          <ChangePasswordForm />
-        </div>
+      <div class="mt-6 border-t border-line pt-5">
+        <h3 class="text-label-caps uppercase text-error">Danger zone</h3>
+        <UiButton variant="danger" class="mt-3" @click="showDeleteConfirm = true">Delete account</UiButton>
       </div>
     </section>
 
