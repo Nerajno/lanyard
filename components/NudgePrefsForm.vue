@@ -34,12 +34,30 @@
       </div>
     </div>
 
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="text-sm font-medium text-ink" for="quiet_start">Don't disturb after</label>
+        <select id="quiet_start" v-model.number="form.quiet_hours_start" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none">
+          <option v-for="h in HOURS" :key="h" :value="h">{{ formatHour(h) }}</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-sm font-medium text-ink" for="quiet_end">Resume nudges at</label>
+        <select id="quiet_end" v-model.number="form.quiet_hours_end" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none">
+          <option v-for="h in HOURS" :key="h" :value="h">{{ formatHour(h) }}</option>
+        </select>
+      </div>
+    </div>
+    <p class="mt-3 text-xs text-muted">
+      Lanyard won't nudge you between {{ formatHour(form.quiet_hours_start) }} and {{ formatHour(form.quiet_hours_end) }} your time. Anything outside those hours gets through.
+    </p>
+
     <div>
       <label class="text-sm font-medium text-ink" for="timezone">Timezone</label>
       <select id="timezone" v-model="form.timezone" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none">
         <option v-for="tz in commonTimezones" :key="tz" :value="tz">{{ tz }}</option>
       </select>
-      <p class="mt-1 text-xs text-muted">Nudges are sent during your local daytime (09:00–21:00).</p>
+      <p class="mt-1 text-xs text-muted">Used to send nudges at sensible local times as you travel.</p>
     </div>
 
     <p v-if="error" class="text-sm text-error">{{ error }}</p>
@@ -52,7 +70,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed, reactive, ref } from 'vue'
 import { useProfile } from '~/composables/useProfile'
+import { HOURS, formatHour, validateQuietHours } from '~/utils/quietHours'
 
 const emit = defineEmits<{ saved: [] }>()
 const { profile, save, optInSms } = useProfile()
@@ -72,6 +92,8 @@ const form = reactive({
   nudge_channel: (profile.value?.nudge_channel ?? 'email') as 'sms' | 'email' | 'both',
   phone: profile.value?.phone ?? '',
   timezone: profile.value?.timezone ?? detectedTimezone,
+  quiet_hours_start: profile.value?.quiet_hours_start ?? 21,
+  quiet_hours_end: profile.value?.quiet_hours_end ?? 9,
 })
 
 const smsOptInConsent = ref(false)
@@ -107,10 +129,17 @@ async function verifyCode() {
 }
 
 async function onSave() {
-  error.value = null
+  error.value = validateQuietHours(form.quiet_hours_start, form.quiet_hours_end)
+  if (error.value) return
   saving.value = true
   try {
-    await save({ nudge_channel: form.nudge_channel, timezone: form.timezone, phone: form.phone || null })
+    await save({
+      nudge_channel: form.nudge_channel,
+      timezone: form.timezone,
+      phone: form.phone || null,
+      quiet_hours_start: form.quiet_hours_start,
+      quiet_hours_end: form.quiet_hours_end,
+    })
     emit('saved')
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)

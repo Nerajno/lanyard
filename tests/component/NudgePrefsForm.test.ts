@@ -14,6 +14,8 @@ function makeProfile(overrides: Record<string, unknown> = {}) {
     timezone: 'UTC',
     sms_opt_in_at: null,
     sms_opted_out_at: null,
+    quiet_hours_start: 21,
+    quiet_hours_end: 9,
     ...overrides,
   }
 }
@@ -84,5 +86,26 @@ describe('NudgePrefsForm', () => {
     await w.find('form').trigger('submit')
     await vi.dynamicImportSettled()
     expect(w.text()).toContain('You must be signed in')
+  })
+
+  it('saves quiet hours with the channel and timezone', async () => {
+    const w = await mount()
+    await w.find('#quiet_start').setValue('22')
+    await w.find('#quiet_end').setValue('7')
+    await w.find('form').trigger('submit')
+    await vi.dynamicImportSettled()
+    expect(saveMock).toHaveBeenCalledWith(
+      expect.objectContaining({ quiet_hours_start: 22, quiet_hours_end: 7, timezone: expect.any(String) }),
+    )
+  })
+
+  it('shows a validation error when quiet hours start and end match', async () => {
+    const w = await mount()
+    await w.find('#quiet_start').setValue('9')
+    await w.find('#quiet_end').setValue('9')
+    await w.find('form').trigger('submit')
+    await vi.dynamicImportSettled()
+    expect(w.text()).toContain('Quiet hours need different start and end times.')
+    expect(saveMock).not.toHaveBeenCalled()
   })
 })
