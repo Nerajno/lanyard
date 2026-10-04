@@ -1,7 +1,7 @@
 <template>
   <div ref="root" class="relative">
     <button
-      ref="trigger" type="button" aria-haspopup="menu" :aria-expanded="String(open)" :aria-label="label"
+      ref="trigger" type="button" aria-haspopup="menu" :aria-expanded="open ? 'true' : 'false'" :aria-label="label"
       class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-muted transition-colors hover:bg-paper hover:text-ink"
       @click="toggle"
     >
