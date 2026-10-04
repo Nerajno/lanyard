@@ -13,3 +13,8 @@ export function composerUrl(contact: { email: string | null; phone: string | nul
   const body = encodeURIComponent(`Hi! ${howMet} — would love to keep in touch.`)
   return `sms:${phone}?body=${body}`
 }
+
+/** True when composerUrl would address someone: a safe email or a phone with digits. */
+export function hasUsableChannel(contact: { email: string | null; phone: string | null }): boolean {
+  return isValidContactEmail(contact.email) || (contact.phone ?? '').replace(/\D/g, '').length > 0
+}
