@@ -2,6 +2,7 @@ import { useSupabaseAdmin } from '~/server/utils/supabaseAdmin'
 import { shareIsValid } from '~/utils/share'
 import { LADDER_PRESETS } from '~/types'
 import { initialFollowUp } from '~/utils/cadence'
+import { isValidContactEmail } from '~/utils/email'
 
 export default defineEventHandler(async (event) => {
   const token = getRouterParam(event, 'token')
@@ -20,6 +21,7 @@ export default defineEventHandler(async (event) => {
   const phone = (body?.phone ?? '').trim() || null
   if (!name || !howMet) throw createError({ statusCode: 400, statusMessage: 'Name and how you met are required.' })
   if (!email && !phone) throw createError({ statusCode: 400, statusMessage: 'Add an email or phone number.' })
+  if (email && !isValidContactEmail(email)) throw createError({ statusCode: 400, statusMessage: 'Enter a valid email.' })
 
   const now = new Date()
   const ladder = LADDER_PRESETS.default
