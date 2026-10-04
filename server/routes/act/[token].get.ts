@@ -1,10 +1,11 @@
 // The one-tap act path. This URL arrives on a phone WITHOUT a fresh login, so it
 // can't rely on a Supabase session — the token is HMAC-signed and self-verifying.
-// 1. verify token  2. stamp nudge.opened_at  3. (single contact) mark the touchpoint
-// and stamp acted_at  4. 302 to the prefilled sms:/mailto: composer.
+// 1. verify token  2. stamp nudge.opened_at  3. (single contact) claim acted_at and,
+// only on the first claim, mark the touchpoint  4. 302 to the prefilled composer.
 // Lanyard never sends the follow-up itself; it opens a composer the user hits send on.
 import { verifyActLink } from '~/utils/actLink'
 import { advanceTouchpoint } from '~/utils/cadence'
+import { composerUrl } from '~/utils/composer'
 import { useSupabaseAdmin } from '~/server/utils/supabaseAdmin'
 
 export default defineEventHandler(async (event) => {
@@ -42,29 +43,25 @@ export default defineEventHandler(async (event) => {
     return sendRedirect(event, '/', 302)
   }
 
-  // Mark the touchpoint (advance ladder or graduate) and instrument acted_at.
-  const next = advanceTouchpoint(contact.cadence_ladder, contact.touchpoints_done, new Date())
-  const patch: Record<string, unknown> = {
-    touchpoints_done: (next?.touchpoints_done ?? contact.touchpoints_done + 1),
-  }
-  if (next) patch.follow_up_by = next.follow_up_by
-  else patch.status = 'graduated'
+  // First act wins: atomically claim acted_at; only the request that claims it
+  // advances the ladder. Re-clicks and forwarded links still open the composer.
+  const { data: claimed } = await admin
+    .from('nudges')
+    .update({ acted_at: new Date().toISOString() })
+    .eq('id', payload.nudgeId)
+    .is('acted_at', null)
+    .select('id')
+    .maybeSingle()
 
-  await admin.from('contacts').update(patch).eq('id', contact.id)
-  if (nudge && !nudge.acted_at) {
-    await admin.from('nudges').update({ acted_at: new Date().toISOString() }).eq('id', nudge.id)
+  if (claimed) {
+    const next = advanceTouchpoint(contact.cadence_ladder, contact.touchpoints_done, new Date())
+    const patch: Record<string, unknown> = {
+      touchpoints_done: (next?.touchpoints_done ?? contact.touchpoints_done + 1),
+    }
+    if (next) patch.follow_up_by = next.follow_up_by
+    else patch.status = 'graduated'
+    await admin.from('contacts').update(patch).eq('id', contact.id)
   }
 
   return sendRedirect(event, composerUrl(contact, contact.how_met), 302)
 })
-
-function composerUrl(contact: { email: string | null; phone: string | null }, howMet: string): string {
-  if (contact.email) {
-    const subject = encodeURIComponent('Great connecting at the conference')
-    const body = encodeURIComponent(`Hi,\n\n${howMet}\n\nBest,\n[Your name]`)
-    return `mailto:${contact.email}?subject=${subject}&body=${body}`
-  }
-  const phone = (contact.phone ?? '').replace(/\D/g, '')
-  const body = encodeURIComponent(`Hi! ${howMet} — would love to keep in touch.`)
-  return `sms:${phone}?body=${body}`
-}
