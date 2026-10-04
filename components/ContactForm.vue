@@ -19,7 +19,7 @@
           id="how_met"
           v-model="form.how_met"
           as="textarea"
-          rows="2"
+          :rows="2"
           placeholder="Met at the analytics track after her lightning talk…"
           :invalid="invalid"
           :aria-describedby="describedby"
@@ -203,7 +203,7 @@ const submitting = ref(false)
 const formError = ref<string | null>(null)
 const channelTouched = ref(false)
 const pacePickerOpen = ref(false)
-const nameInput = ref<InstanceType<typeof import('./ui/UiInput.vue').default> | null>(null)
+const nameInput = ref<{ $el: HTMLInputElement } | null>(null)
 
 const hasChannel = computed(() => Boolean((form.email ?? '').trim() || (form.phone ?? '').trim()))
 const valid = computed(() => Boolean(form.name.trim() && form.how_met.trim()) && hasChannel.value)
