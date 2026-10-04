@@ -84,7 +84,7 @@ async function onRemind(c: Contact, rung: LadderRung) {
   await run(remindContact(c.id, rung))
 }
 
-async function run(p: Promise<void>) {
+async function run(p: Promise<unknown>) {
   try {
     await p
   } catch (e) {
