@@ -35,6 +35,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Contact, LadderRung } from '~/types'
 import type { MenuItem } from '~/components/ui/Menu.vue'
 import { coffeeProgress } from '~/utils/cadence'
