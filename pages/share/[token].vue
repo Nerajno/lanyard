@@ -17,31 +17,24 @@
         <p class="mt-1 text-sm text-muted">They'll be prompted to follow up with you.</p>
       </div>
 
-      <form v-else class="mt-6 space-y-4 rounded-xl border border-line bg-surface p-5" @submit.prevent="submit">
-        <p v-if="submitError" class="text-sm text-error">{{ submitError }}</p>
-        <div>
-          <label class="text-sm font-medium text-ink" for="name">Name *</label>
-          <input id="name" v-model="name" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none" placeholder="Ada Lovelace">
-        </div>
-        <div>
-          <label class="text-sm font-medium text-ink" for="how_met">How you met *</label>
-          <textarea id="how_met" v-model="howMet" rows="2" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none" :placeholder="howMetDefault || 'Where did you run into each other?'" />
-        </div>
-        <div class="flex flex-col gap-3 sm:flex-row">
-          <div class="flex-1">
-            <label class="text-sm font-medium text-ink" for="email">Email</label>
-            <input id="email" v-model="email" type="email" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none">
-          </div>
-          <div class="flex-1">
-            <label class="text-sm font-medium text-ink" for="phone">Phone</label>
-            <input id="phone" v-model="phone" type="tel" class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none" placeholder="+1 555 000 0000">
-          </div>
+      <form v-else class="mt-6 space-y-4 rounded-xl border border-line bg-surface p-5 shadow-sm" novalidate @submit.prevent="submit">
+        <p v-if="submitError" role="alert" class="text-sm text-error">{{ submitError }}</p>
+        <UiField label="Name" input-id="name" required>
+          <UiInput id="name" v-model="name" placeholder="Ada Lovelace" />
+        </UiField>
+        <UiField label="How you met" input-id="how_met" required>
+          <UiInput id="how_met" v-model="howMet" as="textarea" :placeholder="howMetDefault || 'Where did you run into each other?'" />
+        </UiField>
+        <div class="space-y-3">
+          <UiField label="Email" input-id="email">
+            <UiInput id="email" v-model="email" type="email" :invalid="!hasChannel && touched" />
+          </UiField>
+          <UiField label="Phone" input-id="phone">
+            <UiInput id="phone" v-model="phone" type="tel" placeholder="+1 555 000 0000" :invalid="!hasChannel && touched" />
+          </UiField>
         </div>
         <p v-if="!hasChannel && touched" class="text-sm text-error">Add an email or a phone number.</p>
-        <button
-          type="submit" :disabled="submitting || !valid"
-          class="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press disabled:cursor-not-allowed disabled:opacity-50"
-        >{{ submitting ? 'Saving…' : 'Save it' }}</button>
+        <UiButton type="submit" block :disabled="submitting">{{ submitting ? 'Saving…' : 'Save it' }}</UiButton>
       </form>
     </div>
   </div>
