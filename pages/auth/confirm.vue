@@ -1,6 +1,9 @@
 <template>
-  <div class="mx-auto max-w-sm py-12 text-center">
-    <p>{{ message }}</p>
+  <div class="mx-auto max-w-sm px-4 py-12">
+    <div class="rounded-xl border border-line bg-surface p-6 text-center shadow-sm" role="status">
+      <BrandMark class="pointer-events-none" />
+      <p class="mt-4 text-ink">{{ message }}</p>
+    </div>
   </div>
 </template>
 

@@ -1,39 +1,19 @@
 <template>
-  <div class="mx-auto max-w-sm py-12">
-    <template v-if="ready">
-      <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Set a new password</h1>
-
-      <form class="mt-6 space-y-4" @submit.prevent="update">
-        <div>
-          <label class="text-sm font-medium text-ink" for="pw">New password</label>
-          <input
-            id="pw"
-            v-model="password"
-            type="password"
-            required
-            minlength="8"
-            autocomplete="new-password"
-            class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none"
-          >
-        </div>
-
-        <p v-if="message" class="text-sm" :class="updated ? 'text-graduated' : 'text-error'">{{ message }}</p>
-
-        <button
-          type="submit"
-          :disabled="busy"
-          class="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press disabled:opacity-50"
-        >
-          Update password
-        </button>
-
-        <button v-if="updated" type="button" class="w-full text-sm text-muted hover:text-ink hover:underline" @click="navigateTo('/login')">
-          Back to sign in
-        </button>
-      </form>
-    </template>
-
-    <p v-else class="text-sm text-muted">{{ message }}</p>
+  <div class="mx-auto max-w-sm px-4 py-12">
+    <div class="rounded-xl border border-line bg-surface p-6 shadow-sm">
+      <template v-if="ready">
+        <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Set a new password</h1>
+        <form class="mt-6 space-y-4" @submit.prevent="update">
+          <UiField label="New password" input-id="pw" hint="At least 8 characters.">
+            <UiInput id="pw" v-model="password" type="password" required minlength="8" autocomplete="new-password" />
+          </UiField>
+          <p v-if="message" class="text-sm" :role="updated ? undefined : 'alert'" :class="updated ? 'text-graduated' : 'text-error'">{{ message }}</p>
+          <UiButton type="submit" block :disabled="busy">Update password</UiButton>
+          <UiButton v-if="updated" variant="ghost" block @click="navigateTo('/login')">Back to sign in</UiButton>
+        </form>
+      </template>
+      <p v-else class="text-sm text-muted">{{ message }}</p>
+    </div>
   </div>
 </template>
 
