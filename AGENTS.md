@@ -9,6 +9,7 @@ A conference follow-up nudger. Capture a contact, get a timed nudge (SMS or emai
 - Nuxt 3 + Vue 3, `<script setup lang="ts">` only. Composition API, no Options API.
 - Pinia for state; composables for reusable logic (`useContacts`, `useNudge`).
 - Tailwind for styling; no component CSS files.
+- Build UI from the `components/ui/` primitives (`UiButton`, `UiField`, `UiInput`, `UiMenu`, `UiIcon`, …) rather than repeating Tailwind class strings. Interactive targets are at least 44px (`min-h-11`).
 - Supabase client for data; **every table has RLS** keyed on `auth.uid()`. Never write a query that assumes a single user without RLS.
 - Server logic in Nitro routes (`server/api/`) or Supabase edge functions.
 

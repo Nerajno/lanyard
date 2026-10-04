@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center gap-2">
+  <div class="flex items-center gap-2" role="img" :aria-label="`${filled} of ${total} coffees`">
     <div class="flex gap-1.5" aria-hidden="true">
       <span
         v-for="i in total"

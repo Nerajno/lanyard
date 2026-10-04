@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { nextTick, ref, type Ref } from 'vue'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import NudgePrefsForm from '~/components/NudgePrefsForm.vue'
 
 const saveMock = vi.fn()
 const optInSmsMock = vi.fn()
-let profileRef: { value: ReturnType<typeof makeProfile> | null } = { value: null }
+let profileRef: Ref<ReturnType<typeof makeProfile> | null> = ref(null)
 
 function makeProfile(overrides: Record<string, unknown> = {}) {
   return {
@@ -14,6 +15,8 @@ function makeProfile(overrides: Record<string, unknown> = {}) {
     timezone: 'UTC',
     sms_opt_in_at: null,
     sms_opted_out_at: null,
+    quiet_hours_start: 21,
+    quiet_hours_end: 9,
     ...overrides,
   }
 }
@@ -27,7 +30,7 @@ mockNuxtImport('useProfile', () => () => ({
 beforeEach(() => {
   saveMock.mockReset().mockResolvedValue(undefined)
   optInSmsMock.mockReset().mockResolvedValue(undefined)
-  profileRef = { value: null }
+  profileRef = ref(null)
 })
 
 function mount() {
@@ -84,5 +87,36 @@ describe('NudgePrefsForm', () => {
     await w.find('form').trigger('submit')
     await vi.dynamicImportSettled()
     expect(w.text()).toContain('You must be signed in')
+  })
+
+  it('saves quiet hours with the channel and timezone', async () => {
+    const w = await mount()
+    await w.find('#quiet_start').setValue('22')
+    await w.find('#quiet_end').setValue('7')
+    await w.find('form').trigger('submit')
+    await vi.dynamicImportSettled()
+    expect(saveMock).toHaveBeenCalledWith(
+      expect.objectContaining({ quiet_hours_start: 22, quiet_hours_end: 7, timezone: expect.any(String) }),
+    )
+  })
+
+  it('shows the quiet-hours error inline before submit and blocks saving', async () => {
+    const w = await mount()
+    await w.find('#quiet_start').setValue('9')
+    await w.find('#quiet_end').setValue('9')
+    expect(w.text()).toContain('Quiet hours need different start and end times.')
+    await w.find('form').trigger('submit')
+    await vi.dynamicImportSettled()
+    expect(saveMock).not.toHaveBeenCalled()
+  })
+
+  it('fills the form when the profile loads after mount', async () => {
+    const w = await mount()
+    profileRef.value = makeProfile({ quiet_hours_start: 23, quiet_hours_end: 6 })
+    await nextTick()
+    expect((w.find('#quiet_start').element as HTMLSelectElement).value).toBe('23')
+    await w.find('form').trigger('submit')
+    await vi.dynamicImportSettled()
+    expect(saveMock).toHaveBeenCalledWith(expect.objectContaining({ quiet_hours_start: 23, quiet_hours_end: 6 }))
   })
 })

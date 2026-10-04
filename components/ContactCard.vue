@@ -1,117 +1,99 @@
 <template>
   <article class="rounded-xl border border-line bg-surface p-4 shadow-sm">
-    <div class="flex items-start justify-between gap-3">
-      <div class="min-w-0">
-        <h3 class="truncate font-display text-base font-bold tracking-[-0.02em] text-ink">{{ contact.name }}</h3>
-        <p class="mt-0.5 line-clamp-2 text-sm text-muted">{{ contact.how_met }}</p>
-        <p v-if="dueLabel" class="mt-1 font-mono text-xs text-muted">{{ dueLabel }}</p>
-      </div>
-      <span class="shrink-0 rounded-full px-2.5 py-1 text-label-caps uppercase" :class="urgencyClasses">
-        {{ urgencyLabel }}
-      </span>
-    </div>
-
-    <div class="mt-3">
-      <CoffeeDots :filled="coffee" />
-    </div>
-
-    <footer class="mt-3 flex flex-wrap items-center gap-2">
-      <template v-if="contact.status === 'active'">
-        <button
-          class="rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-on-accent transition-colors hover:bg-accent-press"
-          @click="$emit('follow-up', contact)"
-        >
-          Follow up
-        </button>
-        <button class="rounded-lg border border-line px-3 py-1.5 text-xs text-ink transition-colors hover:bg-paper" @click="$emit('snooze', contact)">
-          Snooze
-        </button>
-        <button class="rounded-lg border border-line px-3 py-1.5 text-xs text-ink transition-colors hover:bg-paper" @click="$emit('archive', contact)">
-          Set aside
-        </button>
-        <button class="rounded-lg border border-line px-3 py-1.5 text-xs text-ink transition-colors hover:bg-paper" @click="showRemind = !showRemind">
-          Nudge me later
-        </button>
-        <div v-if="showRemind" class="mt-2 flex flex-wrap items-center gap-2 rounded-lg bg-paper p-2">
-          <button
-            v-for="opt in remindOptions"
-            :key="opt.label"
-            type="button"
-            class="rounded-lg border border-line bg-surface px-3 py-1 text-xs text-ink transition-colors hover:bg-paper"
-            @click="onRemindPick(opt.rung)"
-          >
-            {{ opt.label }}
-          </button>
+    <div class="flex items-start gap-3">
+      <UiAvatar :name="contact.name" />
+      <div class="min-w-0 flex-1">
+        <div class="flex items-start justify-between gap-2">
+          <h3 class="truncate font-display text-base font-bold tracking-[-0.02em] text-ink">{{ contact.name }}</h3>
+          <span class="shrink-0 rounded-full px-2.5 py-1 text-label-caps uppercase" :class="BADGE_TONES[badge.tone]">{{ badge.label }}</span>
         </div>
+        <p class="mt-0.5 line-clamp-2 text-sm text-muted">{{ contact.how_met }}</p>
+        <div class="mt-2"><CoffeeDots :filled="coffee" /></div>
+      </div>
+    </div>
+
+    <footer class="mt-4 flex items-center gap-2">
+      <template v-if="contact.status === 'active'">
+        <template v-if="!usable">
+          <UiButton data-test="message" disabled class="flex-1 sm:flex-none">Message</UiButton>
+          <UiButton data-test="edit" :to="editTo">Edit</UiButton>
+        </template>
+        <UiButton
+          v-else-if="!isUpcoming" data-test="message" :href="composer" class="flex-1 sm:flex-none"
+          @click="emit('message', contact)"
+        >
+          <UiIcon name="message" /> Message
+        </UiButton>
+        <UiButton v-else data-test="snooze" variant="secondary" class="flex-1 sm:flex-none" @click="emit('snooze', contact)">
+          <UiIcon name="clock" /> Snooze
+        </UiButton>
       </template>
-      <button v-if="contact.status !== 'graduated'" class="rounded-lg px-3 py-1.5 text-xs text-error transition-colors hover:bg-error-soft" @click="$emit('delete', contact)">
-        Delete
-      </button>
-      <NuxtLink :to="`/app/c/${contact.id}`" class="rounded-lg px-3 py-1.5 text-xs text-muted transition-colors hover:bg-paper">
-        Edit
-      </NuxtLink>
-      <span v-if="contact.status === 'graduated'" class="font-mono text-xs font-medium text-graduated">Graduated — all 3 coffees</span>
+      <p v-if="contact.status === 'active' && !usable" class="text-xs text-muted">Add a valid email or phone</p>
+      <div class="ml-auto"><UiMenu :items="menuItems" :label="`More actions for ${contact.name}`" /></div>
     </footer>
   </article>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Contact, LadderRung } from '~/types'
-import { coffeeProgress, daysUntil, urgencyOf } from '~/utils/cadence'
-import type { Urgency } from '~/utils/cadence'
+import type { MenuItem } from '~/components/ui/Menu.vue'
+import { coffeeProgress } from '~/utils/cadence'
+import { composerUrl, hasUsableChannel } from '~/utils/composer'
+import { dueBadge, localDayDiff } from '~/utils/queue'
 
-const props = defineProps<{ contact: Contact }>()
+const props = defineProps<{ contact: Contact; now?: Date }>()
 const emit = defineEmits<{
-  'follow-up': [contact: Contact]
+  message: [contact: Contact]
+  'mark-done': [contact: Contact]
   snooze: [contact: Contact]
   archive: [contact: Contact]
   delete: [contact: Contact]
   remind: [rung: LadderRung]
 }>()
 
+const BADGE_TONES = {
+  due: 'bg-due-soft text-due',
+  warm: 'bg-warm-soft text-ink',
+  muted: 'bg-sunken text-muted',
+  graduated: 'bg-accent-soft text-graduated',
+} as const
+
+const nowRef = computed(() => props.now ?? new Date())
 const coffee = computed(() => coffeeProgress(props.contact.cadence_ladder, props.contact.touchpoints_done))
-const urgency = computed<Urgency>(() => urgencyOf(props.contact.follow_up_by, props.contact.status))
-
-const dueLabel = computed(() => {
-  if (props.contact.status === 'graduated') return ''
-  if (!props.contact.follow_up_by) return ''
-  const d = daysUntil(props.contact.follow_up_by)
-  if (d < 0) return 'Due'
-  if (d === 0) return 'Due today'
-  return `In ${d}d`
+const badge = computed(() => dueBadge(props.contact, nowRef.value))
+const usable = computed(() => hasUsableChannel(props.contact))
+const composer = computed(() => composerUrl(props.contact, props.contact.how_met))
+const editTo = computed(() => `/app/c/${props.contact.id}`)
+const isUpcoming = computed(() => {
+  const at = new Date(props.contact.follow_up_by)
+  return at.getTime() > nowRef.value.getTime() && localDayDiff(at, nowRef.value) > 0
 })
 
-const urgencyLabel = computed(() => {
-  switch (urgency.value) {
-    case 'due': return 'Due'
-    case 'close': return 'Soon'
-    case 'graduated': return 'Graduated'
-    default: return 'Fresh'
-  }
-})
-
-const isOverdue = computed(() => urgency.value === 'due' && daysUntil(props.contact.follow_up_by) < 0)
-
-const showRemind = ref(false)
-
-const remindOptions: { label: string; rung: LadderRung }[] = [
+const REMIND: { label: string; rung: LadderRung }[] = [
   { label: '15 min', rung: { value: 15, unit: 'min' } },
   { label: '1 hr', rung: { value: 1, unit: 'hour' } },
   { label: '4 hr', rung: { value: 4, unit: 'hour' } },
   { label: '1 day', rung: { value: 1, unit: 'day' } },
 ]
 
-function onRemindPick(rung: LadderRung): void {
-  showRemind.value = false
-  emit('remind', rung)
+// Menu path only navigates: the page advances the ladder on the primary link's emit.
+function openComposer() {
+  window.location.href = composer.value
 }
 
-const urgencyClasses = computed(() => {
-  switch (urgency.value) {
-    case 'due': return isOverdue.value ? 'bg-due-soft text-due' : 'bg-due-soft text-due'
-    case 'close': return 'bg-warm/15 text-warm'
-    case 'graduated': return 'bg-graduated/15 text-graduated'
-    default: return 'bg-fresh/15 text-fresh'
-  }
+const menuItems = computed<MenuItem[]>(() => {
+  const edit: MenuItem = { label: 'Edit', onSelect: () => void navigateTo(editTo.value) }
+  if (props.contact.status === 'graduated') return [edit]
+  const items: MenuItem[] = []
+  if (isUpcoming.value && usable.value) items.push({ label: 'Message', onSelect: openComposer })
+  items.push(
+    { label: 'Mark done', onSelect: () => emit('mark-done', props.contact) },
+    { label: 'Nudge me later', children: REMIND.map((o) => ({ label: o.label, onSelect: () => emit('remind', o.rung) })) },
+    { label: 'Set aside', onSelect: () => emit('archive', props.contact) },
+    edit,
+    { label: 'Delete', danger: true, separatorBefore: true, onSelect: () => emit('delete', props.contact) },
+  )
+  return items
 })
 </script>

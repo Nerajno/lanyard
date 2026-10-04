@@ -1,74 +1,117 @@
 <template>
   <div>
-    <div class="flex items-center justify-between">
-      <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Contacts</h1>
-      <div class="flex items-center gap-2 text-sm">
-        <NuxtLink to="/app" class="rounded-lg border px-3 py-1.5 text-label-caps uppercase" :class="!showGraduated ? 'border-accent bg-accent-soft text-accent' : 'border-line bg-surface text-muted transition hover:text-accent'">Due</NuxtLink>
-        <NuxtLink to="/app?filter=graduated" class="rounded-lg border px-3 py-1.5 text-label-caps uppercase" :class="showGraduated ? 'border-accent bg-accent-soft text-accent' : 'border-line bg-surface text-muted transition hover:text-accent'">Graduated</NuxtLink>
-        <NuxtLink to="/app/add" class="rounded-lg bg-accent px-4 py-1.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press">
-          Add
-        </NuxtLink>
+    <div class="flex items-center justify-between gap-3">
+      <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Queue</h1>
+      <div class="flex rounded-lg border border-line bg-surface p-1 text-sm">
+        <NuxtLink
+          to="/app" class="inline-flex min-h-11 items-center rounded-md px-3 font-medium"
+          :class="!showGraduated ? 'bg-accent-soft text-accent' : 'text-muted hover:text-ink'"
+          :aria-current="!showGraduated ? 'page' : undefined"
+        >Due</NuxtLink>
+        <NuxtLink
+          to="/app?filter=graduated" class="inline-flex min-h-11 items-center rounded-md px-3 font-medium"
+          :class="showGraduated ? 'bg-accent-soft text-accent' : 'text-muted hover:text-ink'"
+          :aria-current="showGraduated ? 'page' : undefined"
+        >Graduated</NuxtLink>
       </div>
     </div>
 
-    <p v-if="error" class="mt-4 text-sm text-error">{{ error }}</p>
+    <p v-if="error" role="alert" class="mt-4 rounded-lg bg-error-soft px-3 py-2 text-sm text-error">{{ error }}</p>
 
-    <!-- Empty state -->
-    <div v-if="!loading && contacts.length === 0" class="mt-16 text-center">
-      <p class="font-display text-xl font-bold tracking-[-0.02em]">Met someone? Add them.</p>
-      <p class="mt-1 text-sm text-muted">We'll nudge you before it cools.</p>
-      <NuxtLink to="/app/add" class="mt-3 inline-block rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press">
-        Add your first contact
-      </NuxtLink>
-    </div>
+    <UiEmptyState
+      v-if="!loading && contacts.length === 0" class="mt-8"
+      title="Met someone? Add them." body="We'll nudge you before it cools."
+    >
+      <template #action><UiButton to="/app/add">Add your first contact</UiButton></template>
+    </UiEmptyState>
 
-    <template v-else>
-      <!-- Active / triage -->
-      <section v-if="!showGraduated" class="mt-6">
-        <h2 class="text-label-caps uppercase text-muted">Active</h2>
-        <div v-if="active.length" class="mt-3 grid gap-4 sm:grid-cols-2">
+    <template v-else-if="!showGraduated">
+      <UiEmptyState v-if="caughtUp" class="mt-6" title="All caught up" :body="nextNudgeLine" />
+
+      <section v-for="g in sections" :key="g.key" class="mt-6">
+        <UiSectionHeader :label="g.label" :count="g.items.length" :tone="g.tone" />
+        <div class="mt-3 grid gap-3 sm:grid-cols-2">
           <ContactCard
-            v-for="contact in active"
-            :key="contact.id"
-            :contact="contact"
-            @follow-up="onFollowUp"
-            @snooze="onSnooze"
-            @archive="onArchive"
-            @delete="onDelete"
-            @remind="onRemind(contact, $event)"
+            v-for="c in g.items" :key="c.id" :contact="c" :now="now"
+            @message="onMessage" @mark-done="onMarkDone" @snooze="onSnooze" @archive="onArchive"
+            @delete="onDelete" @remind="onRemind(c, $event)"
           />
         </div>
-        <p v-else class="mt-3 text-sm text-muted">Nothing on the docket. Add a contact or wait for the next rung.</p>
       </section>
 
-      <!-- Graduated -->
-      <section v-if="showGraduated" class="mt-6">
-        <h2 class="text-label-caps uppercase text-muted">Graduated</h2>
-        <div v-if="graduated.length" class="mt-3 grid gap-4 sm:grid-cols-2">
-          <ContactCard v-for="contact in graduated" :key="contact.id" :contact="contact" @delete="onDelete" />
-        </div>
-        <p v-else class="mt-3 text-sm text-muted">No one has finished their three coffees yet.</p>
-      </section>
+      <p v-if="!caughtUp && sections.length === 0" class="mt-6 text-sm text-muted">Nothing on the docket. Add a contact or wait for the next rung.</p>
     </template>
+
+    <section v-else class="mt-6">
+      <UiSectionHeader label="Graduated" :count="graduated.length" />
+      <div v-if="graduated.length" class="mt-3 grid gap-3 sm:grid-cols-2">
+        <ContactCard v-for="c in graduated" :key="c.id" :contact="c" />
+      </div>
+      <p v-else class="mt-3 text-sm text-muted">No one has finished their three coffees yet.</p>
+    </section>
+
+    <UiToast :message="toast" />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Contact, LadderRung } from '~/types'
+import { followUpToast, groupQueue, localDayDiff } from '~/utils/queue'
 
 definePageMeta({ layout: 'app', middleware: 'app' })
 
 const { contacts, loading, error, markFollowedUp, snoozeContact, archive, remove, remindContact } = useContacts()
 const route = useRoute()
 
-const active = computed(() =>
-  [...contacts.value].filter((c) => c.status === 'active').sort((a, b) => a.follow_up_by.localeCompare(b.follow_up_by)),
-)
-const graduated = computed(() => contacts.value.filter((c) => c.status === 'graduated'))
-const showGraduated = computed(() => route.query.filter === 'graduated')
+// Ticks every minute so groups and badges follow the clock (midnight, a rung coming due).
+const now = ref(new Date())
+let clockTimer: ReturnType<typeof setInterval> | undefined
+onMounted(() => { clockTimer = setInterval(() => { now.value = new Date() }, 60_000) })
+onBeforeUnmount(() => clearInterval(clockTimer))
 
-async function onFollowUp(c: Contact) {
-  await run(markFollowedUp(c.id))
+const showGraduated = computed(() => route.query.filter === 'graduated')
+const groups = computed(() => groupQueue(contacts.value, now.value))
+const graduated = computed(() => contacts.value.filter((c) => c.status === 'graduated'))
+
+const sections = computed(() => [
+  { key: 'due', label: 'Due now', tone: 'due' as const, items: groups.value.due },
+  { key: 'today', label: 'Later today', tone: 'warm' as const, items: groups.value.today },
+  { key: 'upcoming', label: 'Upcoming', tone: 'muted' as const, items: groups.value.upcoming },
+].filter((g) => g.items.length > 0))
+
+const caughtUp = computed(() => groups.value.due.length === 0 && groups.value.today.length === 0 && groups.value.upcoming.length > 0)
+const nextNudgeLine = computed(() => {
+  const next = groups.value.upcoming[0]
+  return next ? `Next nudge: ${next.name}, in ${localDayDiff(next.follow_up_by, now.value)}d` : ''
+})
+
+const toast = ref<string | null>(null)
+let toastTimer: ReturnType<typeof setTimeout> | undefined
+function showToast(message: string | null) {
+  if (!message) return
+  toast.value = message
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => { toast.value = null }, 4000)
+}
+onBeforeUnmount(() => clearTimeout(toastTimer))
+
+async function followUp(c: Contact, failureMessage?: string) {
+  error.value = null
+  try {
+    const result = await markFollowedUp(c.id)
+    showToast(followUpToast(result, c.cadence_ladder.length))
+  } catch (e) {
+    error.value = failureMessage ?? (e instanceof Error ? e.message : String(e))
+  }
+}
+
+// Message is an <a href="sms:/mailto:">; the browser opens the composer and we
+// log the touchpoint in the background. The error must survive the trip out.
+function onMessage(c: Contact) {
+  void followUp(c, "Couldn't log that follow-up. Use ⋯ › Mark done.")
+}
+function onMarkDone(c: Contact) {
+  void followUp(c)
 }
 async function onSnooze(c: Contact) {
   await run(snoozeContact(c.id))

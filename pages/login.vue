@@ -1,62 +1,43 @@
 <template>
   <div class="mx-auto max-w-sm px-4 py-12">
-    <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Sign in</h1>
+    <div class="rounded-xl border border-line bg-surface p-6 shadow-sm">
+      <h1 class="font-display text-3xl font-bold tracking-[-0.02em]">Sign in</h1>
 
-    <div class="mt-6 space-y-4">
-      <AuthOAuthButtons />
+      <div class="mt-6 space-y-4">
+        <AuthOAuthButtons />
 
-      <div class="flex items-center gap-3 text-muted">
-        <span class="h-px flex-1 bg-line"/>
-        <span class="text-label-caps uppercase">or</span>
-        <span class="h-px flex-1 bg-line"/>
-      </div>
-
-      <div class="flex rounded-lg border border-line bg-surface p-1">
-        <button
-          type="button"
-          class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
-          :class="tab === 'password' ? 'bg-paper text-ink shadow-sm' : 'text-muted hover:text-ink'"
-          @click="tab = 'password'"
-        >
-          Password
-        </button>
-        <button
-          type="button"
-          class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
-          :class="tab === 'magic' ? 'bg-paper text-ink shadow-sm' : 'text-muted hover:text-ink'"
-          @click="tab = 'magic'"
-        >
-          Magic link
-        </button>
-      </div>
-
-      <AuthPasswordAuthForm v-if="tab === 'password'" />
-
-      <form v-else class="space-y-4" @submit.prevent="send">
-        <div>
-          <label class="text-sm font-medium text-ink" for="email">Email</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            required
-            autocomplete="email"
-            class="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-ink transition-colors focus:border-accent focus:outline-none"
-            placeholder="you@example.com"
-          >
+        <div class="flex items-center gap-3 text-muted">
+          <span class="h-px flex-1 bg-line"/>
+          <span class="text-label-caps uppercase">or</span>
+          <span class="h-px flex-1 bg-line"/>
         </div>
 
-        <p v-if="sent" class="text-sm text-graduated">Check your inbox for the sign-in link.</p>
-        <p v-if="error" class="text-sm text-error">{{ error }}</p>
+        <div class="grid grid-cols-2 gap-1 rounded-lg border border-line bg-paper p-1" role="tablist" aria-label="Sign-in method">
+          <button
+            type="button" role="tab" :aria-selected="tab === 'password'"
+            class="min-h-11 rounded-md px-3 text-sm font-medium transition-colors"
+            :class="tab === 'password' ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'"
+            @click="tab = 'password'"
+          >Password</button>
+          <button
+            type="button" role="tab" :aria-selected="tab === 'magic'"
+            class="min-h-11 rounded-md px-3 text-sm font-medium transition-colors"
+            :class="tab === 'magic' ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'"
+            @click="tab = 'magic'"
+          >Magic link</button>
+        </div>
 
-        <button
-          type="submit"
-          :disabled="sending"
-          class="w-full rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-press disabled:opacity-50"
-        >
-          {{ sending ? 'Sending…' : 'Send magic link' }}
-        </button>
-      </form>
+        <AuthPasswordAuthForm v-if="tab === 'password'" />
+
+        <form v-else class="space-y-4" @submit.prevent="send">
+          <UiField label="Email" input-id="email">
+            <UiInput id="email" v-model="email" type="email" required autocomplete="email" placeholder="you@example.com" />
+          </UiField>
+          <p v-if="sent" class="text-sm text-graduated">Check your inbox for the sign-in link.</p>
+          <p v-if="error" role="alert" class="text-sm text-error">{{ error }}</p>
+          <UiButton type="submit" block :disabled="sending">{{ sending ? 'Sending…' : 'Send magic link' }}</UiButton>
+        </form>
+      </div>
     </div>
   </div>
 </template>
