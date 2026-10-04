@@ -15,13 +15,13 @@
         <div class="grid grid-cols-2 gap-1 rounded-lg border border-line bg-paper p-1" role="tablist" aria-label="Sign-in method">
           <button
             type="button" role="tab" :aria-selected="tab === 'password'"
-            class="min-h-9 rounded-md px-3 text-sm font-medium transition-colors"
+            class="min-h-11 rounded-md px-3 text-sm font-medium transition-colors"
             :class="tab === 'password' ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'"
             @click="tab = 'password'"
           >Password</button>
           <button
             type="button" role="tab" :aria-selected="tab === 'magic'"
-            class="min-h-9 rounded-md px-3 text-sm font-medium transition-colors"
+            class="min-h-11 rounded-md px-3 text-sm font-medium transition-colors"
             :class="tab === 'magic' ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink'"
             @click="tab = 'magic'"
           >Magic link</button>

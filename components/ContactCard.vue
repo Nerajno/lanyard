@@ -16,7 +16,7 @@
       <template v-if="contact.status === 'active'">
         <template v-if="!usable">
           <UiButton data-test="message" disabled class="flex-1 sm:flex-none">Message</UiButton>
-          <UiButton data-test="edit" variant="secondary" :to="editTo">Edit</UiButton>
+          <UiButton data-test="edit" :to="editTo">Edit</UiButton>
         </template>
         <UiButton
           v-else-if="!isUpcoming" data-test="message" :href="composer" class="flex-1 sm:flex-none"
@@ -77,8 +77,8 @@ const REMIND: { label: string; rung: LadderRung }[] = [
   { label: '1 day', rung: { value: 1, unit: 'day' } },
 ]
 
+// Menu path only navigates: the page advances the ladder on the primary link's emit.
 function openComposer() {
-  emit('message', props.contact)
   window.location.href = composer.value
 }
 

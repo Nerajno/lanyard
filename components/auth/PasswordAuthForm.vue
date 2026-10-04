@@ -8,7 +8,7 @@
       <UiField label="Password" input-id="password">
         <UiInput id="password" v-model="password" type="password" required autocomplete="current-password" placeholder="••••••••" />
       </UiField>
-      <button v-if="!forgotSent" type="button" class="mt-2 min-h-9 text-sm text-muted hover:text-ink hover:underline" @click="forgotPassword">
+      <button v-if="!forgotSent" type="button" class="mt-2 min-h-11 text-sm text-muted hover:text-ink hover:underline" @click="forgotPassword">
         Forgot password?
       </button>
       <p v-else class="mt-2 text-sm text-graduated">Check your inbox — we sent a reset link.</p>

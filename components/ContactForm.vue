@@ -12,7 +12,7 @@
         <div v-if="suggestions?.length" class="mt-2 flex flex-wrap gap-2">
           <button
             v-for="chip in suggestions" :key="chip" type="button"
-            class="min-h-9 rounded-full border border-line bg-sunken px-3 text-xs font-medium text-ink transition-colors hover:border-accent"
+            class="min-h-11 rounded-full border border-line bg-sunken px-3 text-xs font-medium text-ink transition-colors hover:border-accent"
             @click="form.how_met = applyHowMetChip(form.how_met, chip)"
           >{{ chip }}</button>
         </div>
@@ -160,7 +160,7 @@ const customSummary = computed(() => {
 const paceSummary = computed(() => {
   if (form.ladderPreset === 'custom') return `Custom (${formatLadder(form.customLadder)})`
   const p = presets.find((x) => x.key === form.ladderPreset)
-  return p ? p.label : 'Default'
+  return p ? `${p.label} (${p.summary})` : 'Default'
 })
 
 onMounted(() => {

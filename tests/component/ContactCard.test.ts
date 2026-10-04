@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import ContactCard from '~/components/ContactCard.vue'
 import { composerUrl } from '~/utils/composer'
@@ -23,6 +23,8 @@ async function openMenu(w: Awaited<ReturnType<typeof mount>>) {
   await w.find('button[aria-haspopup="menu"]').trigger('click')
   return w.findAll('[role="menuitem"]').map((i) => i.text())
 }
+
+afterEach(() => { vi.unstubAllGlobals() })
 
 describe('ContactCard', () => {
   it('shows name, verbatim how_met, badge and coffee progress', async () => {
@@ -56,6 +58,7 @@ describe('ContactCard', () => {
     expect(w.find('button[data-test="message"]').attributes('disabled')).toBeDefined()
     expect(w.text()).toContain('Add a valid email or phone')
     expect(w.find('a[data-test="edit"]').attributes('href')).toBe('/app/c/c1')
+    expect(w.find('a[data-test="edit"]').classes()).toContain('bg-accent')
   })
 
   it('lists the due-contact menu in order', async () => {
@@ -79,5 +82,17 @@ describe('ContactCard', () => {
     expect(w.text()).toContain('Graduated · 3 coffees')
     expect(w.find('[data-test="message"]').exists()).toBe(false)
     expect(await openMenu(w)).toEqual(['Edit'])
+  })
+
+  it('menu Message navigates to the composer without emitting message', async () => {
+    const loc = { href: '' }
+    vi.stubGlobal('location', loc)
+    const c = makeContact({ follow_up_by: new Date(2026, 9, 7).toISOString() })
+    const w = await mount(c)
+    await openMenu(w)
+    const item = w.findAll('[role="menuitem"]').find((i) => i.text() === 'Message')!
+    await item.trigger('click')
+    expect(loc.href).toBe(composerUrl(c, c.how_met))
+    expect(w.emitted('message')).toBeUndefined()
   })
 })

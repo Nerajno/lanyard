@@ -46,7 +46,7 @@
             <option v-for="h in HOURS" :key="h" :value="h">{{ formatHour(h) }}</option>
           </select>
         </UiField>
-        <UiField label="Resume nudges at" input-id="quiet_end">
+        <UiField label="Resume nudges at" input-id="quiet_end" :error="quietError">
           <select id="quiet_end" v-model.number="form.quiet_hours_end" class="min-h-11 w-full rounded-lg border border-line bg-surface px-3 text-ink focus:border-accent focus:outline-none">
             <option v-for="h in HOURS" :key="h" :value="h">{{ formatHour(h) }}</option>
           </select>
@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useProfile } from '~/composables/useProfile'
 import { HOURS, formatHour, validateQuietHours } from '~/utils/quietHours'
 
@@ -83,12 +83,26 @@ const detectedTimezone = (() => {
 })()
 
 const form = reactive({
-  nudge_channel: (profile.value?.nudge_channel ?? 'email') as 'sms' | 'email' | 'both',
-  phone: profile.value?.phone ?? '',
-  timezone: profile.value?.timezone ?? detectedTimezone,
-  quiet_hours_start: profile.value?.quiet_hours_start ?? 21,
-  quiet_hours_end: profile.value?.quiet_hours_end ?? 9,
+  nudge_channel: 'email' as 'sms' | 'email' | 'both',
+  phone: '',
+  timezone: detectedTimezone,
+  quiet_hours_start: 21,
+  quiet_hours_end: 9,
 })
+
+// The profile loads asynchronously; sync the form whenever it arrives.
+watch(profile, (p) => {
+  if (!p) return
+  Object.assign(form, {
+    nudge_channel: p.nudge_channel ?? form.nudge_channel,
+    phone: p.phone ?? '',
+    timezone: p.timezone ?? form.timezone,
+    quiet_hours_start: p.quiet_hours_start ?? 21,
+    quiet_hours_end: p.quiet_hours_end ?? 9,
+  })
+}, { immediate: true })
+
+const quietError = computed(() => validateQuietHours(form.quiet_hours_start, form.quiet_hours_end))
 
 const smsOptInConsent = ref(false)
 const smsOptedIn = computed(() => Boolean(profile.value?.sms_opt_in_at && !profile.value?.sms_opted_out_at))
@@ -123,8 +137,8 @@ async function verifyCode() {
 }
 
 async function onSave() {
-  error.value = validateQuietHours(form.quiet_hours_start, form.quiet_hours_end)
-  if (error.value) return
+  error.value = null
+  if (quietError.value) return
   saving.value = true
   try {
     await save({

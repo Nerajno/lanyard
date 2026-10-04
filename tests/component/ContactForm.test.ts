@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
+import { formatLadder } from '~/utils/cadence'
+import { LADDER_PRESETS } from '~/types'
 import ContactForm, { type ContactFormValues } from '~/components/ContactForm.vue'
 
 function mount(initial?: Partial<ContactFormValues> | null) {
@@ -76,7 +78,7 @@ describe('ContactForm', () => {
   it('keeps the pace picker collapsed until asked', async () => {
     const w = await mount()
     const toggle = w.find('button[aria-controls="pace-options"]')
-    expect(toggle.text()).toContain('Pace: Default')
+    expect(toggle.text()).toContain(`Default (${formatLadder(LADDER_PRESETS.default)})`)
     expect(toggle.attributes('aria-expanded')).toBe('false')
     expect(w.find('#pace-options').exists()).toBe(false)
     await toggle.trigger('click')
