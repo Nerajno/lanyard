@@ -37,6 +37,14 @@ A conference follow-up nudger. Capture a contact, get a timed nudge (SMS or emai
 - Any new table → add RLS in the same migration.
 - Secrets via env only; service-role key never ships to the client.
 
+## Issues
+- Open issues from a template in `.github/ISSUE_TEMPLATE/` (blank issues are disabled): **Task** (code work), **Bug**, or **Owner action** (accounts, dashboards, registrations, real-world testing).
+- Exactly one type label: `enhancement`, `bug`, `chore`, or `owner-action`. Add area labels (`infrastructure`, `security`, `documentation`) as they apply.
+- Launch blockers go on the **Launch** milestone.
+- Dependencies use GitHub's "blocked by" relationship, not only prose.
+- Acceptance criteria are checkboxes; tick them as work lands. PRs that finish an issue say `Closes #n`.
+- Write bodies as plain UTF-8 Markdown — no `\uXXXX` escapes (pass bodies via `--body-file` or a heredoc).
+
 ## Testing
 - Vitest unit tests for composables, the due-calculation logic, and the ladder advance (rung 1→2→3, graduation on 3, snooze doesn't consume a rung).
 - Test the "who is due" query against fixtures before wiring Twilio.
