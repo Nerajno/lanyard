@@ -31,3 +31,11 @@ playwright-report/
 
 # Nuxt test-utils generated config
 .nuxtrc
+
+# Tool & build caches — never commit
+node-compile-cache/
+nuxt-vite-*/
+.playwright-mcp/
+
+# Ad-hoc screenshots at repo root
+/*.png
