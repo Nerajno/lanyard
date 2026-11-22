@@ -76,8 +76,11 @@ jobs:
           version: latest
 
       - name: Start stack + apply migrations + e2e seed
+        # Skip services the app and e2e never touch. Fewer image pulls means
+        # fewer `toomanyrequests` rate-limit retries from the registry and a
+        # faster job. Needed: db, auth (gotrue), kong, rest, mail catcher.
         run: |
-          supabase start
+          supabase start -x studio,imgproxy,realtime,storage-api,edge-runtime,logflare,vector,postgres-meta,supavisor
           supabase db reset
 
       - name: Capture Supabase env
