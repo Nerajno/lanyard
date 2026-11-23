@@ -26,6 +26,8 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] Validate: name + how_met required, at least one of email/phone
 - [x] `follow_up_by = created_at + cadence_ladder[1]`
 - [x] Insert via Supabase
+- [x] Share-link capture: Add → Link creates a one-time, expiring `/share/:token`; the other person fills in their own details (`shares` table, `server/api/share/[token].*`)
+- [ ] Make the share claim atomic so two concurrent claims can't both succeed — see §9 M5
 
 ## 2.5 Onboarding (the nudge needs a destination)
 - [x] Capture user phone; verify via one-time code
@@ -64,7 +66,7 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] STOP/HELP webhook → set `sms_opted_out_at`, hard block sends
 
 ## 6. Dogfood
-- [ ] Deploy (Netlify + Supabase) — *Supabase project exists + migrations pushed; Netlify side pending*
+- [ ] Deploy (Netlify + Supabase) — *tracked in GitHub #6. As of 2026-11-22 the Supabase project is paused and which migrations reached the remote project is unverified (#13).*
   - ⚠️ **Blocked by §9 C1.** The client bundle currently carries a `service_role` key; deploying publishes it. Fix and rotate first. *(C1 still open as of 2026-08-15.)*
 - [x] Swap `vercel.json` for `netlify.toml` + `netlify/functions/nudge-cron.mts` (host decision changed; see decisions.md) *(`vercel.json` removed; `netlify.toml` + `nudge-cron.mts` + `purge-cron.mts` in place)*
 - [ ] Set `NUXT_PUBLIC_APP_URL` on Netlify — act-links are built from it *(set locally to `http://localhost:3000`; the real origin still needs setting on Netlify or live nudges link to localhost)*
@@ -81,7 +83,7 @@ Sequenced so you have a working nudge by end of week one. Check off in order.
 - [x] Settings UI + confirm dialog + post-delete redirect + home restore banner
 - [x] Vitest: delete happy/failure/idempotent, suppression hash, purge/restore plans
 
-## 8. Auth methods — *in flight on `feature/auth-methods`*
+## 8. Auth methods — *merged to `main`*
 Plan: `project_docs/plans/2026-08-10-auth-methods.md`. Spec: `project_docs/specs/2026-08-10-auth-methods-design.md`.
 - [x] Pure smart-form phase resolver + tests
 - [x] Auth store actions: password sign-in/sign-up, OAuth, password reset
@@ -91,8 +93,9 @@ Plan: `project_docs/plans/2026-08-10-auth-methods.md`. Spec: `project_docs/specs
 - [x] Forgot-password reset page
 - [x] Three-way sign-in decision recorded in `decisions.md`
 - [x] Final-review fix wave — *committed in the worktree (`3f90256` confirm-email resend + tested error mapping); worktree clean*
-- [ ] Plan Task 7: sync docs, run the full gate, commit
-- [ ] Merge to `main`, remove the worktree
+- [x] Plan Task 7: sync docs, run the full gate, commit
+- [x] Merge to `main`
+- [ ] Remove the leftover local worktree (`.worktrees/auth-methods`) — see GitHub #17
 
 Branch gate as of 2026-08-10: 61 tests pass, typecheck 0, lint 0.
 
@@ -143,7 +146,9 @@ From security-auditor + system-design-engineer audits. Ordered by severity; do t
 RLS on every table (policies + enable in same migration, zero public policies on service tables), SMS opt-in/out + suppression enforced in code not just docs, never auto-sends, service-role client strictly server-side, HMAC-signed act-links with TTL + constant-time compare, no `v-html`/XSS vectors, domain logic centralized in `utils/` shared by server + client.
 
 ## Parked (do NOT start in Phase 1)
-QR scan · LinkedIn attach · share-link capture · email/calendar · AI opener
+QR scan · LinkedIn attach · calendar · AI opener
+
+*(Share-link capture was pulled into Phase 1 on 2026-08-09 and shipped — see §2 and `decisions.md`.)*
 
 ## App UI redesign (2026-10-03)
 

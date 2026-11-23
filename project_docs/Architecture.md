@@ -23,6 +23,7 @@
 | quiet_hours_end | smallint | local hour (0-23) quiet window end, default 9; wrap = next day |
 | sms_opt_in_at | timestamptz | required before any SMS |
 | sms_opted_out_at | timestamptz | set by STOP webhook; hard block on sends |
+| onboarded_at | timestamptz | null until onboarding completes; gates `/app/onboarding` |
 
 `contacts`
 | col | type | notes |
@@ -53,10 +54,11 @@
 | opened_at | timestamptz | act-link clicked |
 | acted_at | timestamptz | touchpoint marked done |
 | provider_message_id | text | Twilio SID / email id, for delivery debugging |
+| delivery_status | text | `pending` (before provider call) \| `sent` \| `failed`; only `sent` rows count toward the daily-cap guard |
 
 Latency = `acted_at - sent_at`. Impossible to backfill, so write it from day one. (See decisions.md open item on digest latency attribution when `contact_ids` > 1.)
 
-RLS: `user_id = auth.uid()` on select/insert/update/delete, all three tables.
+RLS: `user_id = auth.uid()` on select/insert/update/delete for `profiles`, `contacts`, and `nudges`.
 
 `sms_suppressions` — numbers to never text again.
 | col | type | notes |
@@ -78,6 +80,27 @@ RLS enabled, **no public policies** — written by the delete flow and read by t
 | purged_at / superseded_at | timestamptz | purge done / restoration won |
 
 RLS enabled, **no public policies** (service-role only). Partial index on `purge_at` where `purged_at is null and superseded_at is null`.
+
+`shares` — one-time, expiring links that let someone add their own details as a contact (`/share/:token`).
+| col | type | notes |
+|---|---|---|
+| id | text pk | random token; the `/share/:token` value |
+| user_id | uuid | FK → auth.users (cascade), RLS key; the sharer |
+| how_met_default | text | prefilled `how_met` for the created contact |
+| expires_at | timestamptz | link dead after this |
+| used_at | timestamptz | set on claim; one-time use |
+| created_at | timestamptz | |
+
+RLS: owner select/insert/delete. The public claim (`POST /api/share/:token`) runs through the service-role client server-side and creates the contact for the sharer — RLS is never relaxed for strangers.
+
+`waitlist` — early-access signups from the landing page.
+| col | type | notes |
+|---|---|---|
+| id | bigint identity pk | |
+| email | text unique | normalized via `server/utils/waitlistEmail.ts` |
+| created_at | timestamptz | |
+
+RLS enabled, **no public policies** — written only by `POST /api/waitlist` with the service-role client.
 
 Later cols (P2/P3, all nullable): `title`, `company`, `event_name`, `socials jsonb` (`{linkedin, github, x, site}`), `photo_url`, `note`, `follow_up_reason` (what to actually do next — the field that makes the nudge actionable), `source` (manual/badge_qr/link), `opener_draft`.
 

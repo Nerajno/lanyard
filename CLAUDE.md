@@ -28,7 +28,7 @@ Plans and specs live in `project_docs/{plans,specs}/`. Design inputs (Stitch bri
 
 ## When a doc goes stale
 
-These five docs are the project's only state — there's no code yet to read. A change to the data model, the loop, or scope means **editing the doc in the same change**, not just the code:
+These docs record *why*; the code records *what*. A change to the data model, the loop, or scope means **editing the doc in the same change**, not just the code:
 
 - New/changed column or table → `project_docs/Architecture.md`
 - Scope moved between phases → `project_docs/prd.md` **and** `project_docs/tasks.md`
@@ -50,5 +50,5 @@ These are in AGENTS.md; they're the ones most likely to get violated by a plausi
 
 ## Repo notes
 
-- This project lives in a subdirectory of a larger `~/Documents/Dev` git repo. Scope git operations to `Projects/lanyard/`; do not stage unrelated sibling projects.
-- No code exists yet. `project_docs/tasks.md` §0 is the starting line.
+- `lanyard/` is its own git repo (`Nerajno/lanyard` on GitHub); git commands run from the repo root.
+- Phase 1 is largely built. Check open GitHub issues and the **Launch** milestone for what's left; `project_docs/tasks.md` records what shipped.

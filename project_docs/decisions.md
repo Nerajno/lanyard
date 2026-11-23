@@ -3,6 +3,8 @@
 ADR-lite. Newest first. When an open question closes, move it up as a decision.
 
 ## Decided
+- **Lanyard is a real product, not only a personal tool (2026-11-22).** It serves three goals at once: daily personal use, a public portfolio piece, and a product for other people. The landing page, waitlist, pricing, and legal pages stay. Consequence: abuse protection on public endpoints (waitlist spam guard), remote schema in sync with migrations, and SMS registration are launch blockers, tracked on the GitHub **Launch** milestone.
+- **Share-link capture is Phase 1 (2026-08-09).** Pulled forward in the sitemap buildout (`project_docs/specs/2026-08-09-sitemap-buildout-design.md`): a one-time, expiring `/share/:token` lets the other person enter their own details. Structured contact data without booth typing or scraping. Claims go through a service-role server route; RLS is unchanged.
 - **Visual system = Stitch navy/green + Inter, site-wide (2026-09-22).** Marketing and app share one token set in `assets/css/main.css`: primary accent green (`accent`, was `coral`), navy surfaces, amber for warm/due, and a separate `error` red for errors and destructive actions (a green brand can't signal danger). Headings are Inter 700; JetBrains Mono stays for numbers and codes only. All text/fill pairs meet WCAG AA in both themes. Stitch copy that contradicted product rules (auto-send wording, invented stats, a non-ladder stepper) was rewritten rather than ported.
 - **Password change revokes other devices.** In-app password change (Settings) verifies the current password when the account has one, then `signOut({ scope: 'others' })` keeps the current device signed in while revoking all other sessions. Current-password verification is omitted (optional field) for OAuth/magic-link accounts so they can set a first password.
 - **Sign-in = three ways.** Magic link (original), email/password via a smart form that auto-flips sign-in → sign-up on `invalid_credentials`, and Google/Apple OAuth (creds configured in the Supabase dashboard). Password sign-ups require email confirmation (ON). All three land in `/app` via the same auth store + `/auth/confirm` flow.
@@ -33,6 +35,7 @@ ADR-lite. Newest first. When an open question closes, move it up as a decision.
 - **Social handles = `socials jsonb`,** not a column per platform.
 
 ## Open (decide before/at the relevant milestone)
+- **How is "first 100 free, forever" enforced?** `pages/pricing.vue` promises it publicly. Decide what counts (waitlist row, confirmed account, or active user), where the count lives, and what user 101 sees. Decide before the waitlist link is shared widely.
 - **Digest latency attribution.** A `nudges` row can cover 2+ contacts but carries one `acted_at`, and post-conference digests dominate exactly when latency matters most — so the headline metric goes fuzzy in the highest-volume window. Decide: stamp `acted_at` on first act, or split a digest send into per-contact `nudges` rows for clean per-contact latency. Cheap to fix before there's data, expensive after.
 - **Can a graduated contact be re-armed for a fourth coffee?** Manual re-arm is trivial to add but reopens the infinite-queue problem the three-coffees rule exists to close.
 - **AI opener → draft-only or draft-and-send?** Draft-only is low-risk; sending touches tone + Twilio permissions.
