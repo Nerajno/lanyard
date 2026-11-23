@@ -4,7 +4,7 @@ import { loginAs } from './helpers'
 test('signs in with the seeded user and lands in the app', async ({ page, goto }) => {
   await loginAs(page, goto)
   await expect(page).toHaveURL(/\/app(\/|$)/)
-  await expect(page.getByText('Contacts')).toBeVisible({ timeout: 10000 })
+  await expect(page.getByRole('heading', { level: 1, name: 'Queue' })).toBeVisible({ timeout: 10000 })
 })
 
 test('flips to the signup prompt on the wrong password', async ({ page, goto }) => {
