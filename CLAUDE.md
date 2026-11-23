@@ -23,7 +23,7 @@ Plans and specs live in `project_docs/{plans,specs}/`. Design inputs (Stitch bri
 ## Before you write code
 
 1. **Check `project_docs/decisions.md` first.** If a question is under **Decided**, it's settled — build it, don't re-argue it. If it's under **Open**, ask before building past it.
-2. **Check Phase 1 scope in `project_docs/prd.md`.** Parked work (QR scan, LinkedIn attach, share-link capture, AI opener, calendar) does not get started, even if it's a small diff.
+2. **Check Phase 1 scope in `project_docs/prd.md`.** Parked work (QR scan, LinkedIn attach, AI opener, calendar) does not get started, even if it's a small diff.
 3. **Check `project_docs/tasks.md` order.** It's sequenced so the nudge loop works by end of week one. Don't build polish ahead of §5.
 
 ## When a doc goes stale
