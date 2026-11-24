@@ -8,7 +8,7 @@
 
 ## Doc map
 
-Four docs, four jobs. They live in `project_docs/`. Check the right one before proposing work:
+Five docs, five jobs. Four live in `project_docs/`; `AGENTS.md` stays at the repo root. Check the right one before proposing work:
 
 | Doc | Answers |
 |---|---|
@@ -24,7 +24,7 @@ Plans and specs live in `project_docs/{plans,specs}/`. Design inputs (Stitch bri
 
 1. **Check `project_docs/decisions.md` first.** If a question is under **Decided**, it's settled — build it, don't re-argue it. If it's under **Open**, ask before building past it.
 2. **Check Phase 1 scope in `project_docs/prd.md`.** Parked work (QR scan, LinkedIn attach, AI opener, calendar) does not get started, even if it's a small diff.
-3. **Check `project_docs/tasks.md` order.** It's sequenced so the nudge loop works by end of week one. Don't build polish ahead of §5.
+3. **Check `project_docs/tasks.md` order.** It records Phase 1 in build order; the nudge loop (§5) came first and still outranks polish.
 
 ## When a doc goes stale
 
@@ -44,7 +44,7 @@ These are in AGENTS.md; they're the ones most likely to get violated by a plausi
 - **Never auto-send a follow-up on the user's behalf.** The act-link opens a prefilled `sms:`/`mailto:` composer. This is a product decision, not a limitation to route around.
 - **Never send SMS without `sms_opt_in_at`, or with `sms_opted_out_at` set.** Legal, not stylistic.
 - **Every new table gets RLS in the same migration.** No exceptions, no follow-up commits.
-- **Service-role key is edge-function only.** It never reaches the client bundle.
+- **Service-role key is server-only** (Nitro routes via `server/utils/supabaseAdmin.ts`, plus cron). It never reaches the client bundle.
 - **Never scrape LinkedIn.** Store the URL, ask the user for the name.
 - **Not a CRM.** Reject scope that turns it into one.
 
