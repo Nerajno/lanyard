@@ -1,6 +1,5 @@
 name: Task
 description: Code work — a feature, refactor, or cleanup with a clear finish line.
-labels: ["enhancement"]
 body:
   - type: input
     id: source
