@@ -1,0 +1,39 @@
+name: Owner action
+description: Work done outside the code — accounts, dashboards, registrations, real-world testing.
+labels: ["owner-action"]
+body:
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      placeholder: "project_docs/tasks.md §0"
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What it unblocks and what code already depends on it.
+    validations:
+      required: true
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Steps in accounts/dashboards. Secrets go in env vars, never in the issue.
+      value: |
+        - [ ] 
+    validations:
+      required: true
+  - type: textarea
+    id: dod
+    attributes:
+      label: Definition of done
+    validations:
+      required: true
+  - type: textarea
+    id: status
+    attributes:
+      label: Status log
+      description: Dated updates as it moves (e.g. registration review). Add more as comments.
+      value: "- YYYY-MM-DD: not started"

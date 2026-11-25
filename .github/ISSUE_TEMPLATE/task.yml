@@ -1,0 +1,41 @@
+name: Task
+description: Code work — a feature, refactor, or cleanup with a clear finish line.
+body:
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: Where this comes from (doc + section, PR review, decision).
+      placeholder: "project_docs/tasks.md §5"
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why this matters now and what already exists.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Checkboxes. Each one verifiable by someone else.
+      value: |
+        - [ ] 
+        - [ ] Types, lint, and tests pass
+    validations:
+      required: true
+  - type: textarea
+    id: dod
+    attributes:
+      label: Definition of done
+      description: One sentence — the observable end state.
+    validations:
+      required: true
+  - type: input
+    id: blocked-by
+    attributes:
+      label: Blocked by
+      description: Issue numbers, or "none". Also link them under Relationships.
+      placeholder: "#4, #13"
