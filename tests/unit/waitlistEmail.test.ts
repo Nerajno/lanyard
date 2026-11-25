@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { normalizeWaitlistEmail, isValidWaitlistEmail } from '~/server/utils/waitlistEmail'
+import { normalizeWaitlistEmail, isValidWaitlistEmail, isHoneypotFilled } from '~/server/utils/waitlistEmail'
 
 describe('normalizeWaitlistEmail', () => {
   it('trims and lowercases', () => {
@@ -36,5 +36,18 @@ describe('isValidWaitlistEmail', () => {
   it('rejects whitespace inside the address', () => {
     expect(isValidWaitlistEmail('a l@example.com')).toBe(false)
     expect(isValidWaitlistEmail('a@exa mple.com')).toBe(false)
+  })
+})
+describe('isHoneypotFilled', () => {
+  it('is false for the empty field a human leaves', () => {
+    expect(isHoneypotFilled(undefined)).toBe(false)
+    expect(isHoneypotFilled('')).toBe(false)
+    expect(isHoneypotFilled('   ')).toBe(false)
+  })
+
+  it('is true for anything a bot puts there', () => {
+    expect(isHoneypotFilled('http://spam.example')).toBe(true)
+    expect(isHoneypotFilled(1)).toBe(true)
+    expect(isHoneypotFilled(['x'])).toBe(true)
   })
 })

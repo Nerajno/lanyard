@@ -40,4 +40,13 @@ describe('WaitlistForm', () => {
     await vi.dynamicImportSettled()
     expect(w.text()).toContain("You're already on the list.")
   })
+
+  it('keeps the honeypot out of reach of people and assistive tech', async () => {
+    const w = await mountSuspended(WaitlistForm)
+    const trap = w.find('input[name="website"]')
+    expect(trap.exists()).toBe(true)
+    expect(trap.attributes('tabindex')).toBe('-1')
+    expect(trap.attributes('autocomplete')).toBe('off')
+    expect(trap.element.closest('[aria-hidden="true"]')).not.toBeNull()
+  })
 })

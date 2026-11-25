@@ -10,6 +10,10 @@
         placeholder="you@email.com"
         aria-label="Email address"
       >
+      <!-- Honeypot: hidden from people and assistive tech; bots fill it and get dropped server-side. -->
+      <div aria-hidden="true" class="absolute -left-[9999px] h-px w-px overflow-hidden">
+        <label>Website <input v-model="website" type="text" name="website" tabindex="-1" autocomplete="off"></label>
+      </div>
       <button
         type="submit"
         :disabled="sending"
@@ -24,6 +28,7 @@
 
 <script setup lang="ts">
 const email = ref('')
+const website = ref('')
 const sending = ref(false)
 const message = ref('')
 
@@ -33,7 +38,7 @@ async function submit() {
   sending.value = true
   message.value = ''
   try {
-    await $fetch('/api/waitlist', { method: 'POST', body: { email: email.value } })
+    await $fetch('/api/waitlist', { method: 'POST', body: { email: email.value, website: website.value } })
     message.value = "You're on the list — talk soon."
     email.value = ''
   } catch (e) {
