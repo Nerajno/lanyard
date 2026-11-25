@@ -22,7 +22,7 @@ Frequent conference-goers (speakers, organizers, serial attendees) — people wh
 - No bulk contact import.
 
 ## Phases (gate = behavior retention, not signups)
-1. **Personal + portfolio** — dogfood at next conference. Q: does it change *my* behavior?
+1. **Personal + portfolio, with the public surface live** — dogfood at next conference while the landing page and waitlist collect early-access signups. Q: does it change *my* behavior?
 2. **Free MicroSaaS (first 100 free)** — do others return after their 2nd/3rd event?
 3. **Paid + retoolable** — will they pay; does the loop generalize (sales, recruiting, personal CRM)?
 
@@ -33,10 +33,14 @@ Manual add (`name` + `how_met` + **email or phone**, at least one) → ladder se
 
 **Nudge batching.** One contact due → a direct message inlining `how_met` with a one-tap act-link. Two or more due → a single digest ("3 due today") linking to the triage list. Protects the one-tap path on ordinary days and caps cost + mute risk after a conference.
 
-Out of Phase 1: QR, LinkedIn attach, share-link capture, AI opener, calendar.
+**Share-link capture (pulled into Phase 1, 2026-08-09).** Add → Link generates a one-time, expiring `/share/:token` link (with QR to display it); the other person enters their own name, `how_met`, and email or phone, which creates a contact for the sharer. Cheaper than typing at a booth and the source of structured data that doesn't come from scraping. See `project_docs/specs/2026-08-09-sitemap-buildout-design.md`.
+
+**Public launch surface.** Lanyard ships as a real product, not only a personal tool: landing page, early-access waitlist, pricing (free during early access), privacy and terms (privacy + terms are also required for A2P 10DLC).
+
+Out of Phase 1: badge/LinkedIn QR *scanning*, LinkedIn attach, AI opener, calendar.
 
 ## Later scope (tagged)
-- P2: badge-QR scan (vCard autofill / manual fallback), LinkedIn-QR attach-and-confirm, share-link self-entry, richer optional contact fields (company, title, socials, event, follow-up reason, photo), calendar delivery, consent capture.
+- P2: badge-QR scan (vCard autofill / manual fallback), LinkedIn-QR attach-and-confirm, richer optional contact fields (company, title, socials, event, follow-up reason, photo), calendar delivery, consent capture.
 - P3: AI-generated opener from the "how we met" note (paid differentiator); tier caps.
 
 ## Success signals
