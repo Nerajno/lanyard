@@ -113,7 +113,7 @@ describe('ResendEmailProvider', () => {
   it('returns the email id on success', async () => {
     vi.resetModules()
     const send = vi.fn(async () => ({ data: { id: 're_123' }, error: null }))
-    vi.doMock('resend', () => ({ Resend: vi.fn(() => ({ emails: { send } })) }))
+    vi.doMock('resend', () => ({ Resend: vi.fn(function () { return { emails: { send } } }) }))
     const { ResendEmailProvider } = await import('~/server/services/providers/resend')
     const provider = new ResendEmailProvider({ apiKey: 'k', from: 'hi@lanyard.app' })
     const id = await provider.send('to@x.co', 'Subject', '<p>hi</p>')
@@ -125,7 +125,7 @@ describe('ResendEmailProvider', () => {
   it('throws when the API reports an error', async () => {
     vi.resetModules()
     const send = vi.fn(async () => ({ data: null, error: { message: 'domain not verified' } }))
-    vi.doMock('resend', () => ({ Resend: vi.fn(() => ({ emails: { send } })) }))
+    vi.doMock('resend', () => ({ Resend: vi.fn(function () { return { emails: { send } } }) }))
     const { ResendEmailProvider } = await import('~/server/services/providers/resend')
     const provider = new ResendEmailProvider({ apiKey: 'k', from: 'hi@lanyard.app' })
     await expect(provider.send('to@x.co', 'S', '<p>hi</p>')).rejects.toThrow('Resend send failed: domain not verified')
