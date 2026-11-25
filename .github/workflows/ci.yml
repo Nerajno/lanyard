@@ -73,7 +73,9 @@ jobs:
       - name: Start local Supabase stack
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned: `latest` asks the GitHub API on every run and fails when
+          # that's rate-limited. 3.2.0 is the version recent green runs used.
+          version: 3.2.0
 
       - name: Start stack + apply migrations + e2e seed
         # Skip services the app and e2e never touch. Fewer image pulls means
